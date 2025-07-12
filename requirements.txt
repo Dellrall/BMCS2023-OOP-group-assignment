@@ -1,0 +1,77 @@
+===============================================================================
+                    VEHICLE RENTAL SERVICE SYSTEM - GROUP PROJECT
+===============================================================================
+
+TOPIC: Vehicle Rental Service System
+
+DESCRIPTION:
+Professional Vehicle Rental Service System implementing Object-Oriented
+Programming (OOP) principles using Java programming language.
+
+===============================================================================
+                              *** IMPORTANT POINTS ***
+===============================================================================
+
+⚠️  CRITICAL REQUIREMENTS:
+   • Each team's idea MUST BE DIFFERENT AND UNIQUE from other student teams
+   • All students in the team MUST be involved in system development
+   • Advanced OOP features are REQUIRED: polymorphism, inheritance, encapsulation
+   • Java interfaces encouraged for weak relationships between objects
+
+🎯 MANDATORY CORE FUNCTIONS (ALL REQUIRED):
+   ✓ Add/register new customers
+   ✓ Add new vehicles to the system
+   ✓ Display available vehicles
+   ✓ Rent a vehicle to a customer
+   ✓ Return a rented vehicle
+   ✓ Calculate and display rental charges
+   ✓ Rental history
+
+💻 IMPLEMENTATION OPTIONS:
+   • Console output (character-based) - ACCEPTABLE
+   • Graphical User Interface (GUI) - ACCEPTABLE
+   • No mark discrimination between display methods
+
+📋 TECHNICAL REQUIREMENTS:
+   • Java programming language (MANDATORY)
+   • Object-oriented design with proper class definitions
+   • Simulated environment for testing
+   • Professional-level implementation
+
+⚠️  LEGAL/ETHICAL CONSIDERATIONS:
+   • NO copyrighted images if using GUI
+   • Use own created images OR publicly available licensed images
+   • Proper attribution for creative commons images
+
+===============================================================================
+                                   DELIVERABLES
+===============================================================================
+
+□ Complete Java application with OOP implementation
+□ System demonstrating all mandatory functions
+□ Unique features and functionality (innovation encouraged)
+□ Documentation and code comments
+□ Working demonstration (console or GUI)
+
+===============================================================================
+                                   INNOVATION
+===============================================================================
+
+💡 ENCOURAGED ADDITIONS:
+   • Unique features beyond basic requirements
+   • Enhanced functionality
+   • Creative implementation approaches
+   • Additional rental service features
+
+===============================================================================
+                                RESEARCH NOTES
+===============================================================================
+
+Students are highly encouraged to conduct independent research for:
+• Advanced Java OOP concepts
+• Vehicle rental industry best practices
+• System design patterns
+• User interface design principles
+• Database integration concepts (if applicable)
+
+===============================================================================
