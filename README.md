@@ -20,6 +20,22 @@ _Role assignments will be updated soon._
 ## 📝 Project Deliverables & Deadlines
 
 ### Initial Stage  
+```mermaid
+---
+config:
+      theme: redux
+---
+flowchart TD
+        Saturday( Saturday
+        Category 3 - Module) --> Sunday(Sunday
+        Review on Category 3) --> Monday(Monday
+        Category 4 - UML Diagram) --> Tuesday(Tuesday
+        Review on Category 4 & Connect each of them) --> Thursday(Thursday
+        Final review on both category 3 & 4) --> Friday(Friday
+        Submission)
+```
+```
+```
 **Deadline:** 1 August 2025 (Week 6)
 - 📄 Cover page
 - 🧠 Description of assignment idea
