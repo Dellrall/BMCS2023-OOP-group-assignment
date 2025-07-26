@@ -26,12 +26,13 @@ config:
       theme: redux
 ---
 flowchart TD
-        Saturday( Saturday
-        Category 3 - Module) --> Sunday(Sunday
-        Review on Category 3) --> Monday(Monday
-        Category 4 - UML Diagram) --> Tuesday(Tuesday
-        Review on Category 4 & Connect each of them) --> Thursday(Thursday
-        Final review on both category 3 & 4) --> Friday(Friday
+        Saturday( Saturday 26/7
+        Category 3 - Module) --> Sunday(Sunday 2 27/7
+        Review on Category 3) --> Monday(Monday 28/7
+        Category 4 - UML Diagram) --> Tuesday(Tuesday 29/7
+        Review on Category 4 & Connect each of them) --> Wednesday(Wednesday
+        Progress review) --> Thursday(Thursday 31/7
+        Final review on both category 3 & 4) --> Friday(Friday 1/8
         Submission)
 ```
 ```
