@@ -9,7 +9,7 @@ We aim to develop a professional, feature-rich rental system, focusing on core O
 - Oscar Lim
 - Wen Wei
 - Guan Chen
-- Neshwaren
+- Neeshwran
 
 _Role assignments will be updated soon._
 
