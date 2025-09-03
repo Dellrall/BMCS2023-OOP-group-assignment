@@ -9,5 +9,7 @@ package hillclimmer.VehicleModule;
  * @author las
  */
 public class DirtBike extends Vehicle{
-    
+    public DirtBike(String vehicleID, String vehicleModel, double modelPricing, String vehicleCon, boolean available) {
+        super(vehicleID, "Dirt Bike", vehicleModel, modelPricing, vehicleCon, available);
+    }
 }

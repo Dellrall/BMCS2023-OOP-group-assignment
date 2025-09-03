@@ -9,5 +9,7 @@ package hillclimmer.VehicleModule;
  * @author las
  */
 public class Crossover extends Vehicle{
-    
+    public Crossover(String vehicleID, String vehicleModel, double modelPricing, String vehicleCon, boolean available) {
+        super(vehicleID, "Crossover", vehicleModel, modelPricing, vehicleCon, available);
+    }
 }
