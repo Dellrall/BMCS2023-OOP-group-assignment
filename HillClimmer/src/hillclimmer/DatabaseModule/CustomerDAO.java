@@ -28,35 +28,41 @@ public class CustomerDAO extends DataAccessObject<Customer> {
                customer.getEmail() + "," +
                customer.getLicenseType() + "," +
                (customer.getLicenseExpiryDate() != null ? customer.getLicenseExpiryDate() : "") + "," +
-               customer.getAddress() + "," +
                customer.getAge() + "," +
                customer.getRegistrationDate() + "," +
                customer.getOutstandingBalance() + "," +
-               customer.isActive();
+               customer.isActive() + "," +
+               customer.getPassword();
     }
 
     @Override
     protected Customer csvToObject(String csvLine) {
-        String[] parts = csvLine.split(",");
-        if (parts.length >= 12) {
-            String customerID = parts[0];
-            String name = parts[1];
-            String icNumber = parts[2];
-            String phoneNo = parts[3];
-            String email = parts[4];
-            String licenseType = parts[5];
-            LocalDate licenseExpiryDate = parts[6].isEmpty() ? null : LocalDate.parse(parts[6]);
-            String address = parts[7];
-            int age = Integer.parseInt(parts[8]);
-            // registrationDate is set automatically in Customer constructor
-            double outstandingBalance = Double.parseDouble(parts[10]);
-            boolean isActive = Boolean.parseBoolean(parts[11]);
+        try {
+            String[] parts = csvLine.split(",");
+            if (parts.length >= 12) {  // Updated to expect 12 fields (removed address)
+                String customerID = parts[0];
+                String name = parts[1];
+                String icNumber = parts[2];
+                String phoneNo = parts[3];
+                String email = parts[4];
+                String licenseType = parts[5];
+                LocalDate licenseExpiryDate = parts[6].isEmpty() ? null : LocalDate.parse(parts[6]);
+                int age = Integer.parseInt(parts[7].trim());
+                String registrationDate = parts[8];
+                double outstandingBalance = Double.parseDouble(parts[9].trim());
+                boolean isActive = Boolean.parseBoolean(parts[10].trim());
+                String password = parts[11];
 
-            Customer customer = new Customer(customerID, name, icNumber, phoneNo, email,
-                licenseType, licenseExpiryDate, address, age, "password123"); // Default password for loaded customers
-            customer.setOutstandingBalance(outstandingBalance);
-            customer.setActive(isActive);
-            return customer;
+                Customer customer = new Customer(customerID, name, icNumber, phoneNo, email,
+                    licenseType, licenseExpiryDate, age, password);
+                customer.setOutstandingBalance(outstandingBalance);
+                customer.setActive(isActive);
+                customer.setRegistrationDate(registrationDate);
+                return customer;
+            }
+        } catch (Exception e) {
+            System.err.println("Error parsing customer CSV line: " + e.getMessage());
+            System.err.println("CSV line: " + csvLine);
         }
         return null;
     }

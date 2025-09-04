@@ -1,5 +1,5 @@
 /*
- * HillClimberDemo - Testing and Demonstration class for Hill Climber Vehicle Rental System
+ * HillClimmerDemo - Testing and Demonstration class for Hill Climber Vehicle Rental System
  * This class contains only testing and demonstration functionality
  * For production use, run HillClimmer.java instead
  */
@@ -22,7 +22,7 @@ import java.util.*;
  *
  * @author las
  */
-public class HillClimberDemo {
+public class HillClimmerDemo {
     private static CustomerDAO customerDAO = new CustomerDAO();
     private static VehicleManager vehicleManager;
     private static RentalManager rentalManager = new RentalManager();
@@ -54,7 +54,7 @@ public class HillClimberDemo {
         try {
             Customer sampleCustomer = new Customer("C001", "Muhammad Ali", "950101-14-5678",
                 "+60123456789", "muhammad@email.com", "B", LocalDate.of(2026, 12, 31),
-                "No. 123, Jalan Bukit Bintang, 55100 Kuala Lumpur", 29, "password123");
+                29, "password123");
             customerDAO.save(sampleCustomer);
         } catch (Exception e) {
             // Customer might already exist

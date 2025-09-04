@@ -10,7 +10,7 @@
  * ✅ Payment History & Receipts
  * ✅ Vehicle Inventory Management
  *
- * FOR TESTING ONLY: Run HillClimberDemo.java
+ * FOR TESTING ONLY: Run HillClimmerDemo.java
  * FOR PRODUCTION: This is the main application class
  */
 package hillclimmer;
@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.io.Console;
 
 /**
  * PRODUCTION Main Application Class for HillClimmer Malaysia Hill Climbing Vehicle Rental System
@@ -44,7 +45,92 @@ public class HillClimmer {
     private static Customer currentCustomer = null;
     private static boolean isManagerMode = false;
 
+    /**
+     * Reads password input with asterisks masking for privacy
+     * @param prompt The prompt message to display
+     * @return The entered password
+     */
+    private static String readPassword(String prompt) {
+        System.out.print(prompt);
+
+        // Try using Console first (most secure)
+        Console console = System.console();
+        if (console != null) {
+            char[] passwordArray = console.readPassword();
+            System.out.println(); // Move to next line
+            return new String(passwordArray);
+        }
+
+        // Fallback: Use Scanner for environments where Console is not available
+        // This works better with Ant and IDEs
+        String password = scanner.nextLine();
+
+        // Show asterisks for the length of the password
+        for (int i = 0; i < password.length(); i++) {
+            System.out.print("*");
+        }
+        System.out.println(); // Move to next line
+
+        return password.trim();
+    }
+
+    /**
+     * Clears the console screen
+     */
+    private static void clearScreen() {
+        try {
+            // Try ANSI escape codes first (works on most terminals)
+            System.out.print("\033[2J\033[H");
+            System.out.flush();
+        } catch (Exception e) {
+            // Fallback: print multiple newlines
+            for (int i = 0; i < 50; i++) {
+                System.out.println();
+            }
+        }
+    }
+
+    /**
+     * Switches to alternate screen buffer (preserves original screen)
+     */
+    private static void enterAlternateScreen() {
+        try {
+            System.out.print("\033[?1049h");
+            System.out.flush();
+        } catch (Exception e) {
+            // Fallback: just clear screen
+            clearScreen();
+        }
+    }
+
+    /**
+     * Switches back to main screen buffer
+     */
+    private static void exitAlternateScreen() {
+        try {
+            System.out.print("\033[?1049l");
+            System.out.flush();
+        } catch (Exception e) {
+            // No fallback needed
+        }
+    }
+
+    /**
+     * Clears screen and displays new content with a smooth transition
+     */
+    private static void transitionToScreen() {
+        clearScreen();
+        try {
+            Thread.sleep(100); // Small delay for smooth transition
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
     public static void main(String[] args) {
+        // Enter alternate screen buffer for clean experience
+        enterAlternateScreen();
+        
         System.out.println("=========================================");
         System.out.println("   🏔️  HILL CLIMBER VEHICLE RENTAL   🏔️");
         System.out.println("        Malaysia's Premier Hill");
@@ -55,6 +141,9 @@ public class HillClimmer {
 
         initializeSystem();
         runProductionMode();
+        
+        // Exit alternate screen buffer when done
+        exitAlternateScreen();
     }
 
     private static void initializeSystem() {
@@ -68,7 +157,7 @@ public class HillClimmer {
         try {
             Customer sampleCustomer = new Customer("C001", "Muhammad Ali", "950101-14-5678",
                 "+60123456789", "muhammad@email.com", "B", LocalDate.of(2026, 12, 31),
-                "No. 123, Jalan Bukit Bintang, 55100 Kuala Lumpur", 29, "password123");
+                29, "password123");
             customerDAO.save(sampleCustomer);
         } catch (Exception e) {
             // Customer might already exist
@@ -181,6 +270,14 @@ public class HillClimmer {
 
     private static void showMainMenu() {
         while (true) {
+            // Clear screen for clean menu display
+            transitionToScreen();
+            
+            System.out.println("=========================================");
+            System.out.println("   🏔️  HILL CLIMBER VEHICLE RENTAL   🏔️");
+            System.out.println("        Malaysia's Premier Hill");
+            System.out.println("        Climbing Vehicle Service");
+            System.out.println("=========================================");
             System.out.println("\n=== MAIN MENU ===");
             System.out.println("1. 🚗 Customer Login");
             System.out.println("2. 👨‍💼 Vehicle Manager Login");
@@ -224,14 +321,21 @@ public class HillClimmer {
     }
 
     private static void customerLogin() {
+        // Clear screen for login page
+        transitionToScreen();
+        
+        System.out.println("=========================================");
+        System.out.println("   🏔️  HILL CLIMBER VEHICLE RENTAL   🏔️");
+        System.out.println("        Malaysia's Premier Hill");
+        System.out.println("        Climbing Vehicle Service");
+        System.out.println("=========================================");
         System.out.println("\n=== CUSTOMER LOGIN ===");
         System.out.println("Please enter your credentials:");
 
         System.out.print("Customer ID (e.g., C001): ");
         String customerId = scanner.nextLine().trim();
 
-        System.out.print("Password: ");
-        String password = scanner.nextLine().trim();
+        String password = readPassword("Password: ");
 
         // Load customer from database
         Customer customer = customerDAO.load(customerId);
@@ -254,14 +358,21 @@ public class HillClimmer {
     }
 
     private static void managerLogin() {
+        // Clear screen for manager login page
+        transitionToScreen();
+        
+        System.out.println("=========================================");
+        System.out.println("   🏔️  HILL CLIMBER VEHICLE RENTAL   🏔️");
+        System.out.println("        Malaysia's Premier Hill");
+        System.out.println("        Climbing Vehicle Service");
+        System.out.println("=========================================");
         System.out.println("\n=== VEHICLE MANAGER LOGIN ===");
         System.out.println("Authorized personnel only");
 
         System.out.print("Manager ID: ");
         String managerId = scanner.nextLine().trim();
 
-        System.out.print("Access Code: ");
-        String accessCode = scanner.nextLine().trim();
+        String accessCode = readPassword("Access Code: ");
 
         // Simple authentication for demo (in real system, use proper authentication)
         if ("VM001".equals(managerId) && "admin123".equals(accessCode)) {
@@ -274,6 +385,14 @@ public class HillClimmer {
     }
 
     private static void customerRegistration() {
+        // Clear screen for registration page
+        transitionToScreen();
+        
+        System.out.println("=========================================");
+        System.out.println("   🏔️  HILL CLIMBER VEHICLE RENTAL   🏔️");
+        System.out.println("        Malaysia's Premier Hill");
+        System.out.println("        Climbing Vehicle Service");
+        System.out.println("=========================================");
         System.out.println("\n=== NEW CUSTOMER REGISTRATION ===");
         System.out.println("Please provide your information for registration:");
 
@@ -317,11 +436,7 @@ public class HillClimmer {
                 return;
             }
 
-            System.out.print("Full Address: ");
-            String address = scanner.nextLine().trim();
-
-            System.out.print("Create Password (min 6 characters): ");
-            String password = scanner.nextLine().trim();
+            String password = readPassword("Create Password (min 6 characters): ");
 
             if (password.length() < 6) {
                 System.out.println("❌ Password must be at least 6 characters long.");
@@ -333,7 +448,7 @@ public class HillClimmer {
 
             // Calculate age from IC
             Customer tempCustomer = new Customer(customerId, name, icNumber, phoneNo, email,
-                licenseType, licenseExpiry, address, 0, password);
+                licenseType, licenseExpiry, 0, password);
             int age = tempCustomer.getAgeFromIC();
 
             if (age < 18) {
@@ -342,7 +457,7 @@ public class HillClimmer {
             }
 
             Customer newCustomer = new Customer(customerId, name, icNumber, phoneNo, email,
-                licenseType, licenseExpiry, address, age, password);
+                licenseType, licenseExpiry, age, password);
 
             customerDAO.save(newCustomer);
 
@@ -359,6 +474,14 @@ public class HillClimmer {
 
     private static void showCustomerMenu() {
         while (currentCustomer != null) {
+            // Clear screen for customer menu
+            transitionToScreen();
+            
+            System.out.println("=========================================");
+            System.out.println("   🏔️  HILL CLIMBER VEHICLE RENTAL   🏔️");
+            System.out.println("        Malaysia's Premier Hill");
+            System.out.println("        Climbing Vehicle Service");
+            System.out.println("=========================================");
             System.out.println("\n=== CUSTOMER MENU ===");
             System.out.println("Welcome, " + currentCustomer.getName() + "!");
             System.out.println("Outstanding Balance: RM" + String.format("%.2f", currentCustomer.getOutstandingBalance()));
@@ -409,6 +532,14 @@ public class HillClimmer {
 
     private static void showManagerMenu() {
         while (isManagerMode) {
+            // Clear screen for manager menu
+            transitionToScreen();
+            
+            System.out.println("=========================================");
+            System.out.println("   🏔️  HILL CLIMBER VEHICLE RENTAL   🏔️");
+            System.out.println("        Malaysia's Premier Hill");
+            System.out.println("        Climbing Vehicle Service");
+            System.out.println("=========================================");
             System.out.println("\n=== VEHICLE MANAGER PANEL ===");
             System.out.println("Administrator Access");
             System.out.println("\n1. 📊 View All Vehicles");
@@ -603,11 +734,9 @@ public class HillClimmer {
                     System.out.println("✅ Email updated successfully!");
                     break;
                 case 3:
-                    System.out.print("Current password: ");
-                    String currentPass = scanner.nextLine().trim();
+                    String currentPass = readPassword("Current password: ");
                     if (currentCustomer.authenticate(currentPass)) {
-                        System.out.print("New password: ");
-                        String newPass = scanner.nextLine().trim();
+                        String newPass = readPassword("New password: ");
                         currentCustomer.updatePassword(newPass);
                         customerDAO.update(currentCustomer);
                         System.out.println("✅ Password changed successfully!");
@@ -882,6 +1011,14 @@ public class HillClimmer {
     }
 
     private static void showAbout() {
+        // Clear screen for about page
+        transitionToScreen();
+        
+        System.out.println("=========================================");
+        System.out.println("   🏔️  HILL CLIMBER VEHICLE RENTAL   🏔️");
+        System.out.println("        Malaysia's Premier Hill");
+        System.out.println("        Climbing Vehicle Service");
+        System.out.println("=========================================");
         System.out.println("\n=== ABOUT HILL CLIMBER ===");
         System.out.println("🏔️ Hill Climber Vehicle Rental");
         System.out.println("Malaysia Premier Hill Climbing Vehicle Service");
@@ -899,5 +1036,8 @@ public class HillClimmer {
         System.out.println("and equipment checks.");
         System.out.println("");
         System.out.println("Contact: +603-1234-5678 | info@hillclimber.my");
+        System.out.println("");
+        System.out.print("Press Enter to return to main menu...");
+        scanner.nextLine();
     }
 }

@@ -21,7 +21,6 @@ public class Customer {
     private String email;
     private String licenseType; // Malaysian license types: B, B2, D, etc.
     private LocalDate licenseExpiryDate;
-    private String address; // Malaysian address
     private int age;
     private String registrationDate;
     private String password; // For authentication
@@ -35,7 +34,7 @@ public class Customer {
 
     public Customer(String customerID, String name, String icNumber, String phoneNo,
                    String email, String licenseType, LocalDate licenseExpiryDate,
-                   String address, int age, String password) {
+                   int age, String password) {
         this.customerID = customerID;
         this.name = name;
         this.icNumber = icNumber;
@@ -43,7 +42,6 @@ public class Customer {
         this.email = email;
         this.licenseType = licenseType;
         this.licenseExpiryDate = licenseExpiryDate;
-        this.address = address;
         this.age = age;
         this.password = password;
         this.registrationDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
@@ -122,9 +120,9 @@ public class Customer {
     public String getEmail() { return email; }
     public String getLicenseType() { return licenseType; }
     public LocalDate getLicenseExpiryDate() { return licenseExpiryDate; }
-    public String getAddress() { return address; }
     public int getAge() { return age; }
     public String getRegistrationDate() { return registrationDate; }
+    public String getPassword() { return password; }
     public boolean isActive() { return isActive; }
     public double getOutstandingBalance() { return outstandingBalance; }
 
@@ -149,16 +147,16 @@ public class Customer {
         this.licenseExpiryDate = licenseExpiryDate;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
     public void setOutstandingBalance(double outstandingBalance) {
         this.outstandingBalance = outstandingBalance;
     }
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public void setRegistrationDate(String registrationDate) {
+        this.registrationDate = registrationDate;
     }
 
     public void updatePassword(String newPassword) {
@@ -179,7 +177,6 @@ public class Customer {
                "Email: " + email + "\n" +
                "License Type: " + licenseType + "\n" +
                "License Expiry: " + (licenseExpiryDate != null ? licenseExpiryDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "N/A") + "\n" +
-               "Address: " + address + "\n" +
                "Age: " + age + "\n" +
                "Registration Date: " + registrationDate + "\n" +
                "Outstanding Balance: RM" + String.format("%.2f", outstandingBalance) + "\n" +
