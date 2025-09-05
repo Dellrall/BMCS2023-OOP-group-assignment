@@ -6,6 +6,7 @@
 package hillclimmer.DatabaseModule;
 
 import hillclimmer.CustomerModule.SafetyCheck;
+import java.util.Date;
 
 /**
  * SafetyCheckDAO class extending DataAccessObject for SafetyCheck data management.
@@ -20,24 +21,48 @@ public class SafetyCheckDAO extends DataAccessObject<SafetyCheck> {
 
     @Override
     protected String objectToCSV(SafetyCheck safetyCheck) {
-        return safetyCheck.getQuizID() + "," +
-               safetyCheck.getMinPassScore();
+        return safetyCheck.getCheckID() + "," +
+               safetyCheck.getCustomerID() + "," +
+               safetyCheck.getScore() + "," +
+               safetyCheck.getTotalQuestions() + "," +
+               safetyCheck.isPassed() + "," +
+               (safetyCheck.getCompletedDate() != null ? safetyCheck.getCompletedDate().getTime() : "") + "," +
+               String.join(";", safetyCheck.getWrongAnswers());
     }
 
     @Override
     protected SafetyCheck csvToObject(String csvLine) {
-        String[] parts = csvLine.split(",");
-        if (parts.length >= 2) {
-            String quizID = parts[0];
-            int minPassScore = Integer.parseInt(parts[1]);
+        try {
+            String[] parts = csvLine.split(",");
+            if (parts.length >= 7) {
+                String checkID = parts[0];
+                String customerID = parts[1];
+                int score = Integer.parseInt(parts[2]);
+                int totalQuestions = Integer.parseInt(parts[3]);
+                boolean passed = Boolean.parseBoolean(parts[4]);
+                Date completedDate = parts[5].isEmpty() ? null : new Date(Long.parseLong(parts[5]));
+                String[] wrongAnswersArray = parts[6].split(";");
+                java.util.List<String> wrongAnswers = java.util.Arrays.asList(wrongAnswersArray);
 
-            return new SafetyCheck(quizID, minPassScore);
+                // Create SafetyCheck object and set all properties
+                SafetyCheck safetyCheck = new SafetyCheck(customerID);
+                safetyCheck.setCheckID(checkID);
+                safetyCheck.setScore(score);
+                safetyCheck.setTotalQuestions(totalQuestions);
+                safetyCheck.setPassed(passed);
+                safetyCheck.setCompletedDate(completedDate);
+                safetyCheck.setWrongAnswers(wrongAnswers);
+
+                return safetyCheck;
+            }
+        } catch (Exception e) {
+            System.err.println("Error parsing safety check CSV line: " + e.getMessage());
         }
         return null;
     }
 
     @Override
     protected String getId(SafetyCheck safetyCheck) {
-        return safetyCheck.getQuizID();
+        return safetyCheck.getCheckID();
     }
 }

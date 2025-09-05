@@ -7,6 +7,7 @@ package hillclimmer.DatabaseModule;
 import hillclimmer.CustomerModule.Customer;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Date;
 
 /**
  * CustomerDAO class extending DataAccessObject for Customer data management.
@@ -32,14 +33,19 @@ public class CustomerDAO extends DataAccessObject<Customer> {
                customer.getRegistrationDate() + "," +
                customer.getOutstandingBalance() + "," +
                customer.isActive() + "," +
-               customer.getPassword();
+               "\"" + (customer.getHashedPassword() != null ? customer.getHashedPassword() : "") + "\"" + "," +
+               "\"" + (customer.getSalt() != null ? customer.getSalt() : "") + "\"" + "," +
+               customer.isSafetyCheckPassed() + "," +
+               (customer.getSafetyCheckID() != null ? customer.getSafetyCheckID() : "") + "," +
+               (customer.getSafetyCheckDate() != null ? customer.getSafetyCheckDate().getTime() : "");
     }
 
     @Override
     protected Customer csvToObject(String csvLine) {
         try {
-            String[] parts = csvLine.split(",");
-            if (parts.length >= 12) {  // Updated to expect 12 fields (removed address)
+            // Handle quoted fields that may contain commas (like Base64 strings)
+            String[] parts = parseCSVLine(csvLine);
+            if (parts.length >= 12) {  // Support both old (12 fields) and new (16 fields) formats
                 String customerID = parts[0];
                 String name = parts[1];
                 String icNumber = parts[2];
@@ -52,12 +58,46 @@ public class CustomerDAO extends DataAccessObject<Customer> {
                 double outstandingBalance = Double.parseDouble(parts[9].trim());
                 boolean isActive = Boolean.parseBoolean(parts[10].trim());
                 String password = parts[11];
+                boolean safetyCheckPassed = parts.length > 12 ? Boolean.parseBoolean(parts[12].trim()) : false;
+                String safetyCheckID = parts.length > 13 && !parts[13].trim().isEmpty() ? parts[13].trim() : null;
+                Date safetyCheckDate = parts.length > 14 && !parts[14].trim().isEmpty() ?
+                    new Date(Long.parseLong(parts[14].trim())) : null;
 
+                // Handle both old and new formats
+                String hashedPassword = null;
+                String salt = null;
+
+                if (parts.length >= 16) {
+                    // New format with hashed password and salt
+                    hashedPassword = parts[11];  // Fixed: hashed password is at index 11
+                    salt = parts[12];            // Fixed: salt is at index 12
+                    safetyCheckPassed = parts.length > 13 ? Boolean.parseBoolean(parts[13].trim()) : false;
+                    safetyCheckID = parts.length > 14 && !parts[14].trim().isEmpty() ? parts[14].trim() : null;
+                    safetyCheckDate = parts.length > 15 && !parts[15].trim().isEmpty() ?
+                        new Date(Long.parseLong(parts[15].trim())) : null;
+                }
+
+                // Create customer with a temporary password (will be replaced)
                 Customer customer = new Customer(customerID, name, icNumber, phoneNo, email,
-                    licenseType, licenseExpiryDate, age, password);
+                    licenseType, licenseExpiryDate, age, "temp");
                 customer.setOutstandingBalance(outstandingBalance);
                 customer.setActive(isActive);
                 customer.setRegistrationDate(registrationDate);
+                customer.setSafetyCheckPassed(safetyCheckPassed);
+                customer.setSafetyCheckID(safetyCheckID);
+                customer.setSafetyCheckDate(safetyCheckDate);
+
+                // Set password information based on format
+                if (hashedPassword != null && salt != null && !hashedPassword.isEmpty() && !salt.isEmpty()) {
+                    // New format: use hashed password
+                    customer.setHashedPassword(hashedPassword);
+                    customer.setSalt(salt);
+                    customer.clearPlainPassword();
+                } else {
+                    // Old format: re-hash the plain text password
+                    customer.setPassword(password);
+                }
+
                 return customer;
             }
         } catch (Exception e) {
@@ -65,6 +105,33 @@ public class CustomerDAO extends DataAccessObject<Customer> {
             System.err.println("CSV line: " + csvLine);
         }
         return null;
+    }
+
+    /**
+     * Parse CSV line handling quoted fields that may contain commas
+     */
+    private String[] parseCSVLine(String line) {
+        java.util.List<String> parts = new java.util.ArrayList<>();
+        boolean inQuotes = false;
+        StringBuilder current = new StringBuilder();
+
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+
+            if (c == '"') {
+                inQuotes = !inQuotes;
+            } else if (c == ',' && !inQuotes) {
+                parts.add(current.toString().trim());
+                current = new StringBuilder();
+            } else {
+                current.append(c);
+            }
+        }
+
+        // Add the last part
+        parts.add(current.toString().trim());
+
+        return parts.toArray(new String[0]);
     }
 
     @Override

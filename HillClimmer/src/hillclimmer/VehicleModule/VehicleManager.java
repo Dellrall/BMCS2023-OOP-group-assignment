@@ -5,6 +5,7 @@
 package hillclimmer.VehicleModule;
 
 import hillclimmer.DatabaseModule.VehicleDAO;
+import hillclimmer.DatabaseModule.Manager;
 import java.util.*;
 
 /**
@@ -19,7 +20,24 @@ public class VehicleManager {
     private int modifierRules;
     private List<Vehicle> vehicles;
     private VehicleDAO vehicleDAO;
+    private Manager authenticatedManager;
 
+    // Constructor with Manager object for authentication
+    public VehicleManager(Manager manager) {
+        if (manager == null) {
+            throw new IllegalArgumentException("Manager cannot be null");
+        }
+        this.authenticatedManager = manager;
+        this.managerID = manager.getManagerID();
+        this.authorizeLv = manager.getAuthorizationLevel();
+        this.managerName = manager.getName();
+        this.modifierRules = manager.getAuthorizationLevel();
+        this.changeCount = 0;
+        this.vehicleDAO = new VehicleDAO();
+        this.vehicles = vehicleDAO.loadAll(); // Load from persistent storage
+    }
+
+    // Legacy constructor for backward compatibility
     public VehicleManager(String managerID, int authorizeLv, String managerName, int modifierRules) {
         this.managerID = managerID;
         this.authorizeLv = authorizeLv;

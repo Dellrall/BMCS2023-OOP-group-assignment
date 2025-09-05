@@ -34,6 +34,7 @@ import java.io.Console;
 public class HillClimmer {
     private static final Scanner scanner = new Scanner(System.in);
     private static CustomerDAO customerDAO = new CustomerDAO();
+    private static ManagerDAO managerDAO = new ManagerDAO();
     private static VehicleManager vehicleManager;
     private static RentalManager rentalManager = new RentalManager();
     private static DurationManager durationManager = new DurationManager();
@@ -41,6 +42,7 @@ public class HillClimmer {
 
     // Current logged in user
     private static Customer currentCustomer = null;
+    private static Manager currentManager = null;
     private static boolean isManagerMode = false;
 
     /**
@@ -554,7 +556,9 @@ public class HillClimmer {
 
             currentCustomer = customer;
             isManagerMode = false;
-            System.out.println("✅ Login successful! Welcome, " + customer.getName() + "!");
+            System.out.println("✅ Login successful!");
+            System.out.println("🎉 Welcome back, " + customer.getName() + "!");
+            System.out.println("🏔️ Ready to explore Malaysia's hill climbing adventures?");
             showCustomerMenu();
         } else {
             System.out.println("❌ Invalid customer ID or password. Please try again.");
@@ -576,13 +580,27 @@ public class HillClimmer {
         String managerId = readManagerId("Manager ID: ");
         String accessCode = readPassword("Access Code: ");
 
-        // Simple authentication for demo (in real system, use proper authentication)
-        if ("VM001".equals(managerId) && "admin123".equals(accessCode)) {
+        // Authenticate using ManagerDAO and managers.csv
+        Manager authenticatedManager = managerDAO.authenticate(managerId, accessCode);
+        
+        if (authenticatedManager != null) {
+            currentManager = authenticatedManager;
             isManagerMode = true;
-            System.out.println("✅ Manager login successful! Welcome to administration panel.");
+            
+            // Initialize managers with authenticated manager
+            vehicleManager = new VehicleManager(currentManager);
+            rentalManager = new RentalManager(currentManager);
+            
+            System.out.println("✅ Manager login successful!");
+            System.out.println("� Welcome back, " + currentManager.getName() + "!");
+            System.out.println("🔐 Authorization Level: " + currentManager.getAuthorizationLevel());
+            System.out.println("📊 Access to both Vehicle and Rental Management");
+            System.out.println("🏢 Ready to manage Hill Climber operations?");
+            
             showManagerMenu();
         } else {
             System.out.println("❌ Invalid manager credentials. Access denied.");
+            System.out.println("💡 Available Manager IDs: VM002, VM003, VM004, VM005, VM006");
         }
     }
 
@@ -626,6 +644,7 @@ public class HillClimmer {
             customerDAO.save(newCustomer);
 
             System.out.println("✅ Registration successful!");
+            System.out.println("🎉 Welcome to Hill Climber, " + name + "!");
             System.out.println("Your Customer ID is: " + customerId);
             System.out.println("Please remember this ID for login.");
             System.out.println("\n" + newCustomer.toString());
@@ -646,9 +665,9 @@ public class HillClimmer {
             System.out.println("        Malaysia's Premier Hill");
             System.out.println("        Climbing Vehicle Service");
             System.out.println("=========================================");
-            System.out.println("\n=== CUSTOMER MENU ===");
-            System.out.println("Welcome, " + currentCustomer.getName() + "!");
-            System.out.println("Outstanding Balance: RM" + String.format("%.2f", currentCustomer.getOutstandingBalance()));
+            System.out.println("\n=== CUSTOMER DASHBOARD ===");
+            System.out.println("👋 Hello, " + currentCustomer.getName() + "! Welcome to your dashboard.");
+            System.out.println("💰 Outstanding Balance: RM" + String.format("%.2f", currentCustomer.getOutstandingBalance()));
             System.out.println("\n1. 🚗 New Vehicle Rental");
             System.out.println("2. 📋 View My Rentals");
             System.out.println("3. 👤 My Profile");
@@ -675,7 +694,8 @@ public class HillClimmer {
                     makePayment();
                     break;
                 case 6:
-                    System.out.println("Thank you for using Hill Climber, " + currentCustomer.getName() + "!");
+                    System.out.println("👋 Thank you for using Hill Climber, " + currentCustomer.getName() + "!");
+                    System.out.println("🏔️ We hope to see you again for your next adventure!");
                     currentCustomer = null;
                     return;
                 default:
@@ -694,50 +714,86 @@ public class HillClimmer {
             System.out.println("        Malaysia's Premier Hill");
             System.out.println("        Climbing Vehicle Service");
             System.out.println("=========================================");
-            System.out.println("\n=== VEHICLE MANAGER PANEL ===");
-            System.out.println("Administrator Access");
-            System.out.println("\n1. 📊 View All Vehicles");
+            System.out.println("\n=== MANAGER ADMINISTRATION PANEL ===");
+            System.out.println("� Welcome back, " + (currentManager != null ? currentManager.getName() : "Manager") + "!");
+            System.out.println("🔐 Authorization Level: " + (currentManager != null ? currentManager.getAuthorizationLevel() : "N/A"));
+            System.out.println("🏢 Ready to manage Hill Climber operations?");
+            System.out.println("\n🚗 VEHICLE MANAGEMENT:");
+            System.out.println("1. 📊 View All Vehicles");
             System.out.println("2. ➕ Add New Vehicle");
             System.out.println("3. 🗑️  Remove Vehicle");
             System.out.println("4. ✏️  Update Vehicle Details");
-            System.out.println("5. 👥 View All Customers");
-            System.out.println("6. 📈 System Reports");
-            System.out.println("7. 🚪 Logout");
+            System.out.println("\n📅 RENTAL MANAGEMENT:");
+            System.out.println("5. 📋 View All Rentals");
+            System.out.println("6. ➕ Add New Rental");
+            System.out.println("7. �️  Remove Rental");
+            System.out.println("\n�👥 CUSTOMER MANAGEMENT:");
+            System.out.println("8. 👥 View All Customers");
+            System.out.println("\n📈 SYSTEM REPORTS:");
+            System.out.println("9. 📈 System Reports");
+            System.out.println("10. 🚪 Logout");
             
-            int choice = readInt("Please select an option (1-7): ", 1, 7);
+            int choice = readInt("Please select an option (1-10): ", 1, 10);
 
             switch (choice) {
                 case 1:
                     viewAllVehicles();
                     break;
                 case 2:
-                        addNewVehicle();
-                        break;
-                    case 3:
-                        removeVehicle();
-                        break;
-                    case 4:
-                        updateVehicleDetails();
-                        break;
-                    case 5:
-                        viewAllCustomers();
-                        break;
-                    case 6:
-                        showSystemReports();
-                        break;
-                    case 7:
-                        System.out.println("Manager logout successful.");
-                        isManagerMode = false;
-                        return;
-                    default:
-                        System.out.println("❌ Invalid option. Please select 1-7.");
-                }
+                    addNewVehicle();
+                    break;
+                case 3:
+                    removeVehicle();
+                    break;
+                case 4:
+                    updateVehicleDetails();
+                    break;
+                case 5:
+                    viewAllRentals();
+                    break;
+                case 6:
+                    addNewRental();
+                    break;
+                case 7:
+                    removeRental();
+                    break;
+                case 8:
+                    viewAllCustomers();
+                    break;
+                case 9:
+                    showSystemReports();
+                    break;
+                case 10:
+                    System.out.println("👋 Manager logout successful.");
+                    System.out.println("👤 Goodbye, " + (currentManager != null ? currentManager.getName() : "Manager") + "!");
+                    System.out.println("🏢 Thank you for managing Hill Climber operations.");
+                    currentManager = null;
+                    vehicleManager = null;
+                    rentalManager = new RentalManager(); // Reset to unauthenticated
+                    isManagerMode = false;
+                    return;
+                default:
+                    System.out.println("❌ Invalid option. Please select 1-10.");
+            }
         }
     }
 
     // Customer menu methods
     private static void newRental() {
         System.out.println("\n=== NEW VEHICLE RENTAL ===");
+
+        // SAFETY CHECK VERIFICATION - Required before booking
+        if (!currentCustomer.isSafetyCheckPassed()) {
+            System.out.println("🛡️  SAFETY CHECK REQUIRED");
+            System.out.println("=".repeat(50));
+            System.out.println("❌ You must pass the safety check before booking any vehicle.");
+            System.out.println("This is a mandatory requirement for all customers.");
+            System.out.println("Safety check includes traffic rules, penalties, and vehicle usage.");
+            System.out.println("=".repeat(50));
+            System.out.println("Please complete the safety check from the main menu first.");
+            System.out.println("Returning to customer menu...");
+            return;
+        }
 
         // Show available vehicles
         List<Vehicle> availableVehicles = vehicleManager.getAllVehicles().stream()
@@ -937,34 +993,35 @@ public class HillClimmer {
     }
 
     private static void safetyCheck() {
-        System.out.println("\n=== SAFETY CHECK ===");
-        System.out.println("Please answer the following safety questions:");
+        System.out.println("\n=== COMPREHENSIVE SAFETY ASSESSMENT ===");
 
-        String[] questions = {
-            "1. Do you have a valid driving license for the vehicle type?",
-            "2. Are you familiar with hill climbing safety procedures?",
-            "3. Do you have appropriate safety gear (helmet, gloves, etc.)?",
-            "4. Are you physically fit for hill climbing activities?",
-            "5. Do you understand the vehicle rental terms and conditions?"
-        };
-
-        int score = 0;
-        for (String question : questions) {
-            System.out.print(question + " (Y/N): ");
-            String answer = scanner.nextLine().trim().toUpperCase();
-            if ("Y".equals(answer)) {
-                score++;
-            }
+        // Check if customer has already passed safety check
+        if (currentCustomer.isSafetyCheckPassed()) {
+            System.out.println("✅ You have already passed the safety check!");
+            System.out.println("Safety Check ID: " + currentCustomer.getSafetyCheckID());
+            System.out.println("Completed: " + currentCustomer.getSafetyCheckDate());
+            System.out.println("You can proceed with vehicle bookings.");
+            return;
         }
 
-        System.out.println("\n=== SAFETY CHECK RESULT ===");
-        System.out.println("Your safety score: " + score + "/5");
+        // Conduct new safety check
+        SafetyCheck safetyCheck = new SafetyCheck(currentCustomer.getCustomerID());
+        boolean passed = safetyCheck.conductSafetyCheck();
 
-        if (score >= 4) {
-            System.out.println("✅ Safety check passed! You are eligible for vehicle rental.");
+        if (passed) {
+            // Update customer profile with safety check results
+            currentCustomer.setSafetyCheckPassed(true);
+            currentCustomer.setSafetyCheckID(safetyCheck.getCheckID());
+            currentCustomer.setSafetyCheckDate(safetyCheck.getCompletedDate());
+
+            // Save updated customer data
+            customerDAO.save(currentCustomer);
+
+            System.out.println("\n🎉 Safety check results saved to your profile!");
+            System.out.println("You can now book vehicles without retaking the assessment.");
         } else {
-            System.out.println("❌ Safety check failed. Please review safety guidelines before renting.");
-            System.out.println("Recommended: Complete a safety course or review safety materials.");
+            System.out.println("\n❌ Safety check failed. You must pass the assessment before booking vehicles.");
+            System.out.println("You can retake the safety check anytime from the main menu.");
         }
     }
 
@@ -1152,6 +1209,60 @@ public class HillClimmer {
         System.out.println("Active Rentals: " + rentalManager.getAllRentals().size());
         System.out.println("Pending Reminders: " + durationManager.getPendingReminders().size());
         System.out.println("Total Revenue: RM" + durationManager.getTotalRevenueFromActivePeriods());
+    }
+
+    // Rental Management Methods
+    private static void viewAllRentals() {
+        System.out.println("\n=== ALL RENTALS ===");
+        List<Rental> rentals = rentalManager.getAllRentals();
+        
+        if (rentals.isEmpty()) {
+            System.out.println("📭 No rentals found.");
+            return;
+        }
+        
+        System.out.println("📋 Current Rentals:");
+        System.out.println("=".repeat(80));
+        for (Rental rental : rentals) {
+            System.out.printf("ID: %d | Customer: %d | Vehicle: %d | Period: %s to %s | Cost: RM%.2f%n",
+                rental.getRentalId(), rental.getCustomerId(), rental.getVehicleId(),
+                rental.getStartDate(), rental.getEndDate(), rental.getTotalCost());
+        }
+        System.out.println("=".repeat(80));
+        System.out.println("Total Rentals: " + rentals.size());
+    }
+
+    private static void addNewRental() {
+        System.out.println("\n=== ADD NEW RENTAL ===");
+        
+        int customerId = readInt("Customer ID: ", 1, Integer.MAX_VALUE);
+        int vehicleId = readInt("Vehicle ID: ", 1, Integer.MAX_VALUE);
+        LocalDate startDate = readDate("Start Date (DD/MM/YYYY): ", true);
+        LocalDate endDate = readDate("End Date (DD/MM/YYYY): ", false);
+        double dailyRate = readDouble("Daily Rate (RM): ", 0, Double.MAX_VALUE);
+        
+        double totalCost = rentalManager.calculateTotalCost(startDate, endDate, dailyRate);
+        System.out.printf("Calculated Total Cost: RM%.2f%n", totalCost);
+        
+        String confirm = readString("Confirm rental creation? (y/n): ");
+        if (confirm.toLowerCase().startsWith("y")) {
+            rentalManager.addRental(customerId, vehicleId, startDate, endDate, totalCost);
+        } else {
+            System.out.println("❌ Rental creation cancelled.");
+        }
+    }
+
+    private static void removeRental() {
+        System.out.println("\n=== REMOVE RENTAL ===");
+        
+        int rentalId = readInt("Rental ID to remove: ", 1, Integer.MAX_VALUE);
+        
+        String confirm = readString("Are you sure you want to remove rental " + rentalId + "? (y/n): ");
+        if (confirm.toLowerCase().startsWith("y")) {
+            rentalManager.deleteRental(rentalId);
+        } else {
+            System.out.println("❌ Rental removal cancelled.");
+        }
     }
 
     private static void showAbout() {

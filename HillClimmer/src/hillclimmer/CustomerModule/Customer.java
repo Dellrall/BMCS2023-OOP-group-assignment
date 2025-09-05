@@ -7,6 +7,11 @@ package hillclimmer.CustomerModule;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
+import java.util.Date;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Base64;
 
 /**
  * Customer class for managing customer information in Malaysia Hill Climbing vehicle rental system.
@@ -23,14 +28,72 @@ public class Customer {
     private LocalDate licenseExpiryDate;
     private int age;
     private String registrationDate;
-    private String password; // For authentication
+    private String password; // For authentication (deprecated - use hashedPassword)
+    private String hashedPassword; // Hashed password with salt
+    private String salt; // Salt used for password hashing
     private boolean isActive;
     private double outstandingBalance;
+    private boolean safetyCheckPassed; // Safety check completion status
+    private String safetyCheckID; // ID of the safety check assessment
+    private Date safetyCheckDate; // Date when safety check was completed
 
     // Malaysian IC pattern: YYMMDD-PB-###G (12 digits + hyphen + 1 digit)
     private static final Pattern IC_PATTERN = Pattern.compile("\\d{6}-\\d{2}-\\d{4}");
     // Malaysian phone pattern: +60XXXXXXXXX or 0XXXXXXXXX
     private static final Pattern PHONE_PATTERN = Pattern.compile("(?:\\+60|0)[1-9]\\d{7,8}");
+
+    /**
+     * Generates a random salt for password hashing
+     * @return Base64 encoded salt string
+     */
+    private static String generateSalt() {
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[16]; // 128-bit salt
+        random.nextBytes(salt);
+        return Base64.getEncoder().encodeToString(salt);
+    }
+
+    /**
+     * Hashes a password with the provided salt using SHA-256
+     * @param password Plain text password
+     * @param salt Salt to use for hashing
+     * @return Base64 encoded hashed password
+     */
+    private static String hashPassword(String password, String salt) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            md.update(Base64.getDecoder().decode(salt));
+            byte[] hashedPassword = md.digest(password.getBytes());
+            return Base64.getEncoder().encodeToString(hashedPassword);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 algorithm not available", e);
+        }
+    }
+
+    /**
+     * Sets and hashes a new password with a new salt
+     * @param plainPassword Plain text password
+     */
+    public void setPassword(String plainPassword) {
+        this.salt = generateSalt();
+        this.hashedPassword = hashPassword(plainPassword, this.salt);
+        this.password = null; // Clear plain text password for security
+    }
+
+    /**
+     * Authenticates a password against the stored hash
+     * @param inputPassword Password to verify
+     * @return true if password matches, false otherwise
+     */
+    public boolean authenticatePassword(String inputPassword) {
+        if (this.hashedPassword == null || this.salt == null) {
+            // Fallback to plain text password for backward compatibility
+            return this.password != null && this.password.equals(inputPassword);
+        }
+
+        String inputHash = hashPassword(inputPassword, this.salt);
+        return this.hashedPassword.equals(inputHash);
+    }
 
     public Customer(String customerID, String name, String icNumber, String phoneNo,
                    String email, String licenseType, LocalDate licenseExpiryDate,
@@ -43,10 +106,11 @@ public class Customer {
         this.licenseType = licenseType;
         this.licenseExpiryDate = licenseExpiryDate;
         this.age = age;
-        this.password = password;
+        setPassword(password); // Hash and salt the password
         this.registrationDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         this.isActive = true;
         this.outstandingBalance = 0.0;
+        this.safetyCheckPassed = false; // New customers haven't passed safety check yet
     }
 
     // Validation methods for Malaysian context
@@ -109,7 +173,7 @@ public class Customer {
 
     // Authentication method
     public boolean authenticate(String inputPassword) {
-        return password != null && password.equals(inputPassword) && isActive;
+        return authenticatePassword(inputPassword) && isActive;
     }
 
     // Getters
@@ -125,6 +189,11 @@ public class Customer {
     public String getPassword() { return password; }
     public boolean isActive() { return isActive; }
     public double getOutstandingBalance() { return outstandingBalance; }
+    public boolean isSafetyCheckPassed() { return safetyCheckPassed; }
+    public String getSafetyCheckID() { return safetyCheckID; }
+    public Date getSafetyCheckDate() { return safetyCheckDate; }
+    public String getHashedPassword() { return hashedPassword; }
+    public String getSalt() { return salt; }
 
     // Setters with validation
     public void setPhoneNo(String phoneNo) {
@@ -155,6 +224,32 @@ public class Customer {
         isActive = active;
     }
 
+    public void setSafetyCheckPassed(boolean safetyCheckPassed) {
+        this.safetyCheckPassed = safetyCheckPassed;
+    }
+
+    public void setSafetyCheckID(String safetyCheckID) {
+        this.safetyCheckID = safetyCheckID;
+    }
+
+    public void setSafetyCheckDate(Date safetyCheckDate) {
+        this.safetyCheckDate = safetyCheckDate;
+    }
+
+    // Setters for password hashing (used by DAO)
+    public void setHashedPassword(String hashedPassword) {
+        this.hashedPassword = hashedPassword;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
+
+    // Special method for DAO to clear plain text password
+    public void clearPlainPassword() {
+        this.password = null;
+    }
+
     public void setRegistrationDate(String registrationDate) {
         this.registrationDate = registrationDate;
     }
@@ -181,6 +276,7 @@ public class Customer {
                "Registration Date: " + registrationDate + "\n" +
                "Outstanding Balance: RM" + String.format("%.2f", outstandingBalance) + "\n" +
                "Status: " + (isActive ? "Active" : "Inactive") + "\n" +
-               "License Valid: " + (isLicenseValid() ? "Yes" : "No");
+               "License Valid: " + (isLicenseValid() ? "Yes" : "No") + "\n" +
+               "Safety Check Passed: " + (safetyCheckPassed ? "Yes" : "No");
     }
 }
