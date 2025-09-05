@@ -415,7 +415,7 @@ public class HillClimmer {
 
     private static void initializeSystem() {
         // Initialize default vehicle manager
-        vehicleManager = new VehicleManager("VM001", "Level 2", "Ahmad Abdullah", 5);
+        vehicleManager = new VehicleManager("VM001", 2, "Ahmad Abdullah", 5);
 
         // Load vehicles from CSV file
         loadVehiclesFromCSV();

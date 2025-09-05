@@ -13,14 +13,14 @@ import java.util.*;
  */
 public class VehicleManager {
     private String managerID;
-    private String authorizeLv;
+    private int authorizeLv;
     private String managerName;
     private int changeCount;
     private int modifierRules;
     private List<Vehicle> vehicles;
     private VehicleDAO vehicleDAO;
 
-    public VehicleManager(String managerID, String authorizeLv, String managerName, int modifierRules) {
+    public VehicleManager(String managerID, int authorizeLv, String managerName, int modifierRules) {
         this.managerID = managerID;
         this.authorizeLv = authorizeLv;
         this.managerName = managerName;
@@ -86,7 +86,7 @@ public class VehicleManager {
     // Set authorization level
     public void setAuthorization(int requiredAuthLevel) {
         if (modifierRules >= requiredAuthLevel) {
-            this.authorizeLv = "Level " + requiredAuthLevel;
+            this.authorizeLv = requiredAuthLevel;
             changeCount++;
             System.out.println("Authorization level updated to " + requiredAuthLevel);
         } else {
@@ -132,9 +132,9 @@ public class VehicleManager {
     // Helper method to check permissions based on authorizeLv
     private boolean hasPermission(String action) {
         // Simple permission check; can be expanded
-        if ("Level 1".equals(authorizeLv) && (action.equals("add") || action.equals("remove"))) {
+        if (authorizeLv >= 1 && (action.equals("add") || action.equals("remove"))) {
             return true;
-        } else if ("Level 2".equals(authorizeLv)) {
+        } else if (authorizeLv >= 2) {
             return true; // Full access
         }
         return false;
