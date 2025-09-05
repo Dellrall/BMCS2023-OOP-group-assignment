@@ -41,6 +41,8 @@ public class Customer {
     private static final Pattern IC_PATTERN = Pattern.compile("\\d{6}-\\d{2}-\\d{4}");
     // Malaysian phone pattern: +60XXXXXXXXX or 0XXXXXXXXX
     private static final Pattern PHONE_PATTERN = Pattern.compile("(?:\\+60|0)[1-9]\\d{7,8}");
+    // Malaysian phone input pattern: allows various formats for input
+    private static final Pattern PHONE_INPUT_PATTERN = Pattern.compile("(?:\\+60|0)[1-9]\\d{7,8}|0\\d{2}-\\d{3}-\\d{4}|0\\d{2} \\d{3} \\d{4}");
 
     /**
      * Generates a random salt for password hashing
@@ -141,6 +143,32 @@ public class Customer {
 
     public static boolean isValidMalaysianPhone(String phoneNo) {
         return PHONE_PATTERN.matcher(phoneNo).matches();
+    }
+
+    /**
+     * Validates Malaysian phone number input formats
+     * @param phoneInput Phone number in input format
+     * @return true if valid input format
+     */
+    public static boolean isValidMalaysianPhoneInput(String phoneInput) {
+        return PHONE_INPUT_PATTERN.matcher(phoneInput).matches();
+    }
+
+    /**
+     * Normalizes phone number to +60XXXXXXXXX format
+     * @param phoneInput Phone number in any valid input format
+     * @return Normalized phone number
+     */
+    public static String normalizeMalaysianPhone(String phoneInput) {
+        if (phoneInput.startsWith("+60")) {
+            return phoneInput;
+        }
+        // Remove hyphens and spaces
+        String cleaned = phoneInput.replaceAll("[-\\s]", "");
+        if (cleaned.startsWith("0")) {
+            return "+60" + cleaned.substring(1);
+        }
+        return cleaned; // Should not happen if validated
     }
 
     public static boolean isValidLicenseType(String licenseType) {

@@ -46,11 +46,21 @@ public class HillClimmer {
     private static boolean isManagerMode = false;
 
     /**
+     * Custom exception for user exit requests
+     */
+    public static class UserExitException extends Exception {
+        public UserExitException(String message) {
+            super(message);
+        }
+    }
+
+    /**
      * Reads password input with asterisks masking for privacy
      * @param prompt The prompt message to display
      * @return The entered password
+     * @throws UserExitException if user enters "0" to exit
      */
-    private static String readPassword(String prompt) {
+    public static String readPassword(String prompt) throws UserExitException {
         System.out.print(prompt);
 
         // Try using Console first (most secure)
@@ -58,12 +68,20 @@ public class HillClimmer {
         if (console != null) {
             char[] passwordArray = console.readPassword();
             System.out.println(); // Move to next line
-            return new String(passwordArray);
+            String password = new String(passwordArray);
+            if (password.equals("0")) {
+                throw new UserExitException("User requested to exit to previous menu");
+            }
+            return password;
         }
 
         // Fallback: Use Scanner for environments where Console is not available
         // This works better with Ant and IDEs
-        String password = scanner.nextLine();
+        String password = scanner.nextLine().trim();
+
+        if (password.equals("0")) {
+            throw new UserExitException("User requested to exit to previous menu");
+        }
 
         // Show asterisks for the length of the password
         for (int i = 0; i < password.length(); i++) {
@@ -71,7 +89,7 @@ public class HillClimmer {
         }
         System.out.println(); // Move to next line
 
-        return password.trim();
+        return password;
     }
 
     /**
@@ -121,12 +139,17 @@ public class HillClimmer {
      * @param min Minimum acceptable value
      * @param max Maximum acceptable value
      * @return Valid integer input
+     * @throws UserExitException if user enters "0" to exit
      */
-    private static int readInt(String prompt, int min, int max) {
+    public static int readInt(String prompt, int min, int max) throws UserExitException {
         while (true) {
             try {
                 System.out.print(prompt);
                 String input = scanner.nextLine().trim();
+                
+                if (input.equals("0")) {
+                    throw new UserExitException("User requested to exit to previous menu");
+                }
                 
                 if (input.isEmpty()) {
                     System.out.println("❌ Input cannot be empty. Please enter a number between " + min + " and " + max + ".");
@@ -153,12 +176,17 @@ public class HillClimmer {
      * @param min Minimum acceptable value
      * @param max Maximum acceptable value
      * @return Valid double input
+     * @throws UserExitException if user enters "0" to exit
      */
-    private static double readDouble(String prompt, double min, double max) {
+    public static double readDouble(String prompt, double min, double max) throws UserExitException {
         while (true) {
             try {
                 System.out.print(prompt);
                 String input = scanner.nextLine().trim();
+                
+                if (input.equals("0")) {
+                    throw new UserExitException("User requested to exit to previous menu");
+                }
                 
                 if (input.isEmpty()) {
                     System.out.println("❌ Input cannot be empty. Please enter a valid amount.");
@@ -183,8 +211,9 @@ public class HillClimmer {
      * Reads and validates non-empty string input
      * @param prompt The prompt message
      * @return Valid non-empty string
+     * @throws UserExitException if user enters "0" to exit
      */
-    private static String readString(String prompt) {
+    public static String readString(String prompt) throws UserExitException {
         return readString(prompt, 1, Integer.MAX_VALUE);
     }
 
@@ -194,11 +223,16 @@ public class HillClimmer {
      * @param minLength Minimum length required
      * @param maxLength Maximum length allowed
      * @return Valid string input
+     * @throws UserExitException if user enters "0" to exit
      */
-    private static String readString(String prompt, int minLength, int maxLength) {
+    static String readString(String prompt, int minLength, int maxLength) throws UserExitException {
         while (true) {
             System.out.print(prompt);
             String input = scanner.nextLine().trim();
+            
+            if (input.equals("0")) {
+                throw new UserExitException("User requested to exit to previous menu");
+            }
             
             if (input.isEmpty()) {
                 System.out.println("❌ Input cannot be empty. Please enter a value.");
@@ -223,8 +257,9 @@ public class HillClimmer {
      * Reads and validates email input
      * @param prompt The prompt message
      * @return Valid email address
+     * @throws UserExitException if user enters "0" to exit
      */
-    private static String readEmail(String prompt) {
+    public static String readEmail(String prompt) throws UserExitException {
         while (true) {
             String email = readString(prompt);
             
@@ -248,12 +283,17 @@ public class HillClimmer {
      * @param prompt The prompt message
      * @param allowPastDates Whether to allow past dates
      * @return Valid LocalDate
+     * @throws UserExitException if user enters "0" to exit
      */
-    private static LocalDate readDate(String prompt, boolean allowPastDates) {
+    public static LocalDate readDate(String prompt, boolean allowPastDates) throws UserExitException {
         while (true) {
             try {
                 System.out.print(prompt);
                 String input = scanner.nextLine().trim();
+                
+                if (input.equals("0")) {
+                    throw new UserExitException("User requested to exit to previous menu");
+                }
                 
                 if (input.isEmpty()) {
                     System.out.println("❌ Date cannot be empty. Please enter a date in DD/MM/YYYY format.");
@@ -278,8 +318,9 @@ public class HillClimmer {
      * Reads and validates Malaysian IC number
      * @param prompt The prompt message
      * @return Valid IC number
+     * @throws UserExitException if user enters "0" to exit
      */
-    private static String readIC(String prompt) {
+    public static String readIC(String prompt) throws UserExitException {
         while (true) {
             String ic = readString(prompt);
             
@@ -295,18 +336,19 @@ public class HillClimmer {
     /**
      * Reads and validates Malaysian phone number
      * @param prompt The prompt message
-     * @return Valid phone number
+     * @return Valid phone number in +60XXXXXXXXX format
+     * @throws UserExitException if user enters "0" to exit
      */
-    private static String readPhone(String prompt) {
+    public static String readPhone(String prompt) throws UserExitException {
         while (true) {
             String phone = readString(prompt);
             
-            if (!Customer.isValidMalaysianPhone(phone)) {
-                System.out.println("❌ Invalid Malaysian phone number format. Please use +60XXXXXXXXX or 0XXXXXXXXX format.");
+            if (!Customer.isValidMalaysianPhoneInput(phone)) {
+                System.out.println("❌ Invalid Malaysian phone number format. Please use +60XXXXXXXXX, 0XXXXXXXXX, 0xx-xxx-xxxx, or 0xx xxx xxxx format.");
                 continue;
             }
             
-            return phone;
+            return Customer.normalizeMalaysianPhone(phone);
         }
     }
 
@@ -314,11 +356,16 @@ public class HillClimmer {
      * Reads and validates license type
      * @param prompt The prompt message
      * @return Valid license type
+     * @throws UserExitException if user enters "0" to exit
      */
-    private static String readLicenseType(String prompt) {
+    public static String readLicenseType(String prompt) throws UserExitException {
         while (true) {
             System.out.print(prompt);
             String licenseType = scanner.nextLine().trim().toUpperCase();
+            
+            if (licenseType.equals("0")) {
+                throw new UserExitException("User requested to exit to previous menu");
+            }
             
             if (!Customer.isValidLicenseType(licenseType)) {
                 System.out.println("❌ Invalid license type. Valid types: B, B2, D, DA, E, E1, E2");
@@ -334,8 +381,9 @@ public class HillClimmer {
      * @param prompt The prompt message
      * @param minLength Minimum password length
      * @return Valid password
+     * @throws UserExitException if user enters "0" to exit
      */
-    private static String readPassword(String prompt, int minLength) {
+    static String readPassword(String prompt, int minLength) throws UserExitException {
         while (true) {
             String password = readPassword(prompt);
             
@@ -352,8 +400,9 @@ public class HillClimmer {
      * Reads and validates customer ID format
      * @param prompt The prompt message
      * @return Valid customer ID
+     * @throws UserExitException if user enters "0" to exit
      */
-    private static String readCustomerId(String prompt) {
+    public static String readCustomerId(String prompt) throws UserExitException {
         while (true) {
             String customerId = readString(prompt).toUpperCase();
             
@@ -370,8 +419,9 @@ public class HillClimmer {
      * Reads and validates manager ID format
      * @param prompt The prompt message
      * @return Valid manager ID
+     * @throws UserExitException if user enters "0" to exit
      */
-    private static String readManagerId(String prompt) {
+    public static String readManagerId(String prompt) throws UserExitException {
         while (true) {
             String managerId = readString(prompt).toUpperCase();
             
@@ -622,29 +672,35 @@ public class HillClimmer {
             System.out.println("3. 📝 New Customer Registration");
             System.out.println("4. ℹ️  About HillClimmer");
             System.out.println("5. ❌ Exit System");
+            System.out.println("\n💡 Enter '0' at any input to return to this menu");
             
-            int choice = readInt("Please select an option (1-5): ", 1, 5);
+            try {
+                int choice = readInt("Please select an option (1-5): ", 1, 5);
 
-            switch (choice) {
-                case 1:
-                    customerLogin();
-                    break;
-                case 2:
-                    managerLogin();
-                    break;
-                case 3:
-                        customerRegistration();
+                switch (choice) {
+                    case 1:
+                        customerLogin();
                         break;
-                    case 4:
-                        showAbout();
+                    case 2:
+                        managerLogin();
                         break;
-                    case 5:
-                        System.out.println("Thank you for using HillClimmer! Selamat tinggal!");
-                        System.exit(0);
-                        break;
-                    default:
-                        System.out.println("❌ Invalid option. Please select 1-5.");
-                }
+                    case 3:
+                            customerRegistration();
+                            break;
+                        case 4:
+                            showAbout();
+                            break;
+                        case 5:
+                            System.out.println("Thank you for using HillClimmer! Selamat tinggal!");
+                            System.exit(0);
+                            break;
+                        default:
+                            System.out.println("❌ Invalid option. Please select 1-5.");
+                    }
+            } catch (UserExitException e) {
+                System.out.println("🔙 Returned to main menu.");
+                continue;
+            }
         }
     }
 
@@ -659,29 +715,34 @@ public class HillClimmer {
         System.out.println("=========================================");
         System.out.println("\n=== CUSTOMER LOGIN ===");
         System.out.println("Please enter your credentials:");
+        System.out.println("\n💡 Enter '0' at any input to return to main menu");
 
-        String customerId = readCustomerId("Customer ID (e.g., C001): ");
-        String password = readPassword("Password: ");
+        try {
+            String customerId = readCustomerId("Customer ID (e.g., C001): ");
+            String password = readPassword("Password: ");
 
-        // Load customer from database
-        Customer customer = customerDAO.load(customerId);
+            // Load customer from database
+            Customer customer = customerDAO.load(customerId);
 
-        if (customer != null && customer.authenticate(password)) {
-            if (!customer.isLicenseValid()) {
-                System.out.println("❌ Your driving license has expired. Please renew before renting vehicles.");
-                System.out.println("License expiry date: " +
-                    customer.getLicenseExpiryDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-                return;
+            if (customer != null && customer.authenticate(password)) {
+                if (!customer.isLicenseValid()) {
+                    System.out.println("❌ Your driving license has expired. Please renew before renting vehicles.");
+                    System.out.println("License expiry date: " +
+                        customer.getLicenseExpiryDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                    return;
+                }
+
+                currentCustomer = customer;
+                isManagerMode = false;
+                System.out.println("✅ Login successful!");
+                System.out.println("🎉 Welcome back, " + customer.getName() + "!");
+                System.out.println("🏔️ Ready to explore Malaysia's hill climbing adventures?");
+                showCustomerMenu();
+            } else {
+                System.out.println("❌ Invalid customer ID or password. Please try again.");
             }
-
-            currentCustomer = customer;
-            isManagerMode = false;
-            System.out.println("✅ Login successful!");
-            System.out.println("🎉 Welcome back, " + customer.getName() + "!");
-            System.out.println("🏔️ Ready to explore Malaysia's hill climbing adventures?");
-            showCustomerMenu();
-        } else {
-            System.out.println("❌ Invalid customer ID or password. Please try again.");
+        } catch (UserExitException e) {
+            System.out.println("🔙 Returned to main menu.");
         }
     }
 
@@ -696,31 +757,36 @@ public class HillClimmer {
         System.out.println("=========================================");
         System.out.println("\n=== VEHICLE MANAGER LOGIN ===");
         System.out.println("Authorized personnel only");
+        System.out.println("\n💡 Enter '0' at any input to return to main menu");
 
-        String managerId = readManagerId("Manager ID: ");
-        String accessCode = readPassword("Access Code: ");
+        try {
+            String managerId = readManagerId("Manager ID: ");
+            String accessCode = readPassword("Access Code: ");
 
-        // Authenticate using ManagerDAO and managers.csv
-        Manager authenticatedManager = managerDAO.authenticate(managerId, accessCode);
-        
-        if (authenticatedManager != null) {
-            currentManager = authenticatedManager;
-            isManagerMode = true;
+            // Authenticate using ManagerDAO and managers.csv
+            Manager authenticatedManager = managerDAO.authenticate(managerId, accessCode);
             
-            // Initialize managers with authenticated manager
-            vehicleManager = new VehicleManager(currentManager);
-            rentalManager = new RentalManager(currentManager);
+            if (authenticatedManager != null) {
+                currentManager = authenticatedManager;
+                isManagerMode = true;
+                
+                // Initialize managers with authenticated manager
+                vehicleManager = new VehicleManager(currentManager);
+                rentalManager = new RentalManager(currentManager);
             
-            System.out.println("✅ Manager login successful!");
-            System.out.println("� Welcome back, " + currentManager.getName() + "!");
-            System.out.println("🔐 Authorization Level: " + currentManager.getAuthorizationLevel());
-            System.out.println("📊 Access to both Vehicle and Rental Management");
-            System.out.println("🏢 Ready to manage HillClimmer operations?");
-            
-            showManagerMenu();
-        } else {
-            System.out.println("❌ Invalid manager credentials. Access denied.");
-            System.out.println("💡 Available Manager IDs: VM002, VM003, VM004, VM005, VM006");
+                System.out.println("✅ Manager login successful!");
+                System.out.println("� Welcome back, " + currentManager.getName() + "!");
+                System.out.println("🔐 Authorization Level: " + currentManager.getAuthorizationLevel());
+                System.out.println("📊 Access to both Vehicle and Rental Management");
+                System.out.println("🏢 Ready to manage HillClimmer operations?");
+                
+                showManagerMenu();
+            } else {
+                System.out.println("❌ Invalid manager credentials. Access denied.");
+                System.out.println("💡 Available Manager IDs: VM002, VM003, VM004, VM005, VM006");
+            }
+        } catch (UserExitException e) {
+            System.out.println("🔙 Returned to main menu.");
         }
     }
 
@@ -735,11 +801,12 @@ public class HillClimmer {
         System.out.println("=========================================");
         System.out.println("\n=== NEW CUSTOMER REGISTRATION ===");
         System.out.println("Please provide your information for registration:");
+        System.out.println("\n💡 Enter '0' at any input to return to main menu");
 
         try {
             String name = readString("Full Name (as per IC): ");
             String icNumber = readIC("IC Number (XXXXXX-XX-XXXX): ");
-            String phoneNo = readPhone("Phone Number (+60XXXXXXXXX or 0XXXXXXXXX): ");
+            String phoneNo = readPhone("Phone Number (you can enter in formats: +60XXXXXXXXX, 0XXXXXXXXX, 0xx-xxx-xxxx, or 0xx xxx xxxx): ");
             String email = readEmail("Email Address: ");
             String licenseType = readLicenseType("License Type (B, B2, D, DA, E, E1, E2): ");
             LocalDate licenseExpiry = readDate("License Expiry Date (DD/MM/YYYY): ", false);
@@ -769,6 +836,8 @@ public class HillClimmer {
             System.out.println("Please remember this ID for login.");
             System.out.println("\n" + newCustomer.toString());
 
+        } catch (UserExitException e) {
+            System.out.println("🔙 Returned to main menu.");
         } catch (Exception e) {
             System.out.println("❌ Registration failed: " + e.getMessage());
             System.out.println("Please try again.");
@@ -794,8 +863,10 @@ public class HillClimmer {
             System.out.println("4. 🔒 Safety Check");
             System.out.println("5. 💳 Make Payment");
             System.out.println("6. 🚪 Logout");
+            System.out.println("\n💡 Enter '0' at any input to return to this menu");
             
-            int choice = readInt("Please select an option (1-6): ", 1, 6);
+            try {
+                int choice = readInt("Please select an option (1-6): ", 1, 6);
 
             switch (choice) {
                 case 1:
@@ -820,6 +891,10 @@ public class HillClimmer {
                     return;
                 default:
                     System.out.println("❌ Invalid option. Please select 1-6.");
+            }
+            } catch (UserExitException e) {
+                System.out.println("🔙 Returned to customer menu.");
+                continue;
             }
         }
     }
@@ -852,8 +927,10 @@ public class HillClimmer {
             System.out.println("\n📈 SYSTEM REPORTS:");
             System.out.println("9. 📈 System Reports");
             System.out.println("10. 🚪 Logout");
+            System.out.println("\n💡 Enter '0' at any input to return to this menu");
             
-            int choice = readInt("Please select an option (1-10): ", 1, 10);
+            try {
+                int choice = readInt("Please select an option (1-10): ", 1, 10);
 
             switch (choice) {
                 case 1:
@@ -894,6 +971,10 @@ public class HillClimmer {
                     return;
                 default:
                     System.out.println("❌ Invalid option. Please select 1-10.");
+            }
+            } catch (UserExitException e) {
+                System.out.println("🔙 Returned to manager menu.");
+                continue;
             }
         }
     }
@@ -1359,34 +1440,44 @@ public class HillClimmer {
 
     private static void addNewRental() {
         System.out.println("\n=== ADD NEW RENTAL ===");
+        System.out.println("\n💡 Enter '0' at any input to cancel and return to manager menu");
         
-        int customerId = readInt("Customer ID: ", 1, Integer.MAX_VALUE);
-        int vehicleId = readInt("Vehicle ID: ", 1, Integer.MAX_VALUE);
-        LocalDate startDate = readDate("Start Date (DD/MM/YYYY): ", true);
-        LocalDate endDate = readDate("End Date (DD/MM/YYYY): ", false);
-        double dailyRate = readDouble("Daily Rate (RM): ", 0, Double.MAX_VALUE);
-        
-        double totalCost = rentalManager.calculateTotalCost(startDate, endDate, dailyRate);
-        System.out.printf("Calculated Total Cost: RM%.2f%n", totalCost);
-        
-        String confirm = readString("Confirm rental creation? (y/n): ");
-        if (confirm.toLowerCase().startsWith("y")) {
-            rentalManager.addRental(customerId, vehicleId, startDate, endDate, totalCost);
-        } else {
-            System.out.println("❌ Rental creation cancelled.");
+        try {
+            int customerId = readInt("Customer ID: ", 1, Integer.MAX_VALUE);
+            int vehicleId = readInt("Vehicle ID: ", 1, Integer.MAX_VALUE);
+            LocalDate startDate = readDate("Start Date (DD/MM/YYYY): ", true);
+            LocalDate endDate = readDate("End Date (DD/MM/YYYY): ", false);
+            double dailyRate = readDouble("Daily Rate (RM): ", 0, Double.MAX_VALUE);
+            
+            double totalCost = rentalManager.calculateTotalCost(startDate, endDate, dailyRate);
+            System.out.printf("Calculated Total Cost: RM%.2f%n", totalCost);
+            
+            String confirm = readString("Confirm rental creation? (y/n): ");
+            if (confirm.toLowerCase().startsWith("y")) {
+                rentalManager.addRental(customerId, vehicleId, startDate, endDate, totalCost);
+            } else {
+                System.out.println("❌ Rental creation cancelled.");
+            }
+        } catch (UserExitException e) {
+            System.out.println("🔙 Rental creation cancelled. Returned to manager menu.");
         }
     }
 
     private static void removeRental() {
         System.out.println("\n=== REMOVE RENTAL ===");
+        System.out.println("\n💡 Enter '0' at any input to cancel and return to manager menu");
         
-        int rentalId = readInt("Rental ID to remove: ", 1, Integer.MAX_VALUE);
-        
-        String confirm = readString("Are you sure you want to remove rental " + rentalId + "? (y/n): ");
-        if (confirm.toLowerCase().startsWith("y")) {
-            rentalManager.deleteRental(rentalId);
-        } else {
-            System.out.println("❌ Rental removal cancelled.");
+        try {
+            int rentalId = readInt("Rental ID to remove: ", 1, Integer.MAX_VALUE);
+            
+            String confirm = readString("Are you sure you want to remove rental " + rentalId + "? (y/n): ");
+            if (confirm.toLowerCase().startsWith("y")) {
+                rentalManager.deleteRental(rentalId);
+            } else {
+                System.out.println("❌ Rental removal cancelled.");
+            }
+        } catch (UserExitException e) {
+            System.out.println("🔙 Rental removal cancelled. Returned to manager menu.");
         }
     }
 
@@ -1429,5 +1520,16 @@ public class HillClimmer {
         System.out.println("\n" + "=".repeat(50));
         System.out.print("Press Enter to continue...");
         scanner.nextLine();
+    }
+
+    // Method to reset scanner for testing
+    public static void resetScannerForTesting() {
+        try {
+            java.lang.reflect.Field scannerField = HillClimmer.class.getDeclaredField("scanner");
+            scannerField.setAccessible(true);
+            scannerField.set(null, new Scanner(System.in));
+        } catch (Exception e) {
+            // Ignore for production
+        }
     }
 }
