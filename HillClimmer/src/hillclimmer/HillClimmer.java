@@ -573,6 +573,7 @@ public class HillClimmer {
 
             if (allVehicles == null) {
                 System.out.println("❌ No vehicle data available");
+                pauseForUserConfirmation();
                 return;
             }
 
@@ -910,7 +911,7 @@ public class HillClimmer {
             System.out.println("Safety check includes traffic rules, penalties, and vehicle usage.");
             System.out.println("=".repeat(50));
             System.out.println("Please complete the safety check from the main menu first.");
-            System.out.println("Returning to customer menu...");
+            pauseForUserConfirmation();
             return;
         }
 
@@ -921,6 +922,7 @@ public class HillClimmer {
 
         if (availableVehicles.isEmpty()) {
             System.out.println("❌ No vehicles are currently available for rental.");
+            pauseForUserConfirmation();
             return;
         }
 
@@ -936,12 +938,14 @@ public class HillClimmer {
             String input = scanner.nextLine().trim();
             if (input.isEmpty()) {
                 System.out.println("❌ Please enter a valid selection.");
+                pauseForUserConfirmation();
                 return;
             }
             int vehicleChoice = Integer.parseInt(input) - 1;
 
             if (vehicleChoice < 0 || vehicleChoice >= availableVehicles.size()) {
                 System.out.println("❌ Invalid vehicle selection.");
+                pauseForUserConfirmation();
                 return;
             }
 
@@ -957,6 +961,7 @@ public class HillClimmer {
 
             if (startDate.isAfter(endDate) || startDate.isBefore(LocalDate.now())) {
                 System.out.println("❌ Invalid date range.");
+                pauseForUserConfirmation();
                 return;
             }
 
@@ -994,6 +999,7 @@ public class HillClimmer {
 
         } catch (Exception e) {
             System.out.println("❌ Error creating rental: " + e.getMessage());
+            pauseForUserConfirmation();
         }
     }
 
@@ -1412,6 +1418,16 @@ public class HillClimmer {
         System.out.println("Contact: +603-1234-5678 | info@hillclimber.my");
         System.out.println("");
         System.out.print("Press Enter to return to main menu...");
+        scanner.nextLine();
+    }
+
+    /**
+     * Utility method to pause execution and wait for user confirmation
+     * Allows users to read error messages before proceeding
+     */
+    private static void pauseForUserConfirmation() {
+        System.out.println("\n" + "=".repeat(50));
+        System.out.print("Press Enter to continue...");
         scanner.nextLine();
     }
 }

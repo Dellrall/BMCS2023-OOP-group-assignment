@@ -1,7 +1,7 @@
 # 🏔️ HillClimber Malaysia Vehicle Rental System
 
 ## 📋 Overview
-A comprehensive Java-based vehicle rental system designed specifically for Malaysia's hill climbing market. Features secure authentication, role-based access control, and complete rental lifecycle management with Malaysian-specific validations.
+A comprehensive **cross-platform Java-based** vehicle rental system designed specifically for Malaysia's hill climbing market. Features secure authentication, role-based access control, and complete rental lifecycle management with Malaysian-specific validations. **Compatible with Windows, Linux, and macOS**.
 
 ## ✨ Key Features
 
@@ -36,25 +36,198 @@ A comprehensive Java-based vehicle rental system designed specifically for Malay
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Java 21 or higher
-- NetBeans IDE (recommended) or any Java IDE
+- **Java 21 or higher**
+- **NetBeans IDE (recommended)** or any Java IDE
+- **Terminal/Command Prompt** for command line execution
+
+### � System Requirements
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| **Operating System** | Windows 10/11, Linux (Ubuntu 18.04+), macOS 10.14+ | Windows 11, Ubuntu 20.04+, macOS 12.0+ |
+| **Java Version** | OpenJDK 21 or Oracle JDK 21 | OpenJDK 21 LTS |
+| **RAM** | 512 MB | 1 GB |
+| **Storage** | 50 MB | 100 MB |
+| **Display** | 1024x768 | 1920x1080 |
+
+### �📦 Installing Dependencies
+
+<details>
+<summary>🪟 Windows (Using winget)</summary>
+
+```powershell
+# Install Java 21 (OpenJDK)
+winget install --id Oracle.JavaRuntimeEnvironment.21 --source winget
+
+# Or install OpenJDK 21
+winget install --id Microsoft.OpenJDK.21 --source winget
+
+# Install NetBeans IDE (optional)
+winget install --id Apache.NetBeans --source winget
+```
+</details>
+
+<details>
+<summary>🪟 Windows (Using scoop)</summary>
+
+```powershell
+# Install scoop if not already installed
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+irm get.scoop.sh | iex
+
+# Install Java 21
+scoop bucket add java
+scoop install openjdk21
+
+# Install NetBeans IDE (optional)
+scoop install netbeans
+```
+</details>
+
+<details>
+<summary>🐧 Linux (Ubuntu/Debian)</summary>
+
+```bash
+# Update package list
+sudo apt update
+
+# Install OpenJDK 21
+sudo apt install openjdk-21-jdk
+
+# Install NetBeans IDE (optional)
+sudo snap install netbeans --classic
+```
+</details>
+
+<details>
+<summary>🐧 Linux (Using curl for manual installation)</summary>
+
+```bash
+# Download and install OpenJDK 21
+curl -O https://download.java.net/java/GA/jdk21.0.2/f2283984656d49d69e91c558476027ac/13/GPL/openjdk-21.0.2_linux-x64_bin.tar.gz
+tar -xzf openjdk-21.0.2_linux-x64_bin.tar.gz
+sudo mv jdk-21.0.2 /usr/local/
+export JAVA_HOME=/usr/local/jdk-21.0.2
+export PATH=$JAVA_HOME/bin:$PATH
+```
+</details>
 
 ### Running the Application
 
-#### Method 1: NetBeans IDE (Recommended)
+<details>
+<summary>🖥️ Method 1: NetBeans IDE (Recommended)</summary>
+
 1. Open the project in NetBeans
 2. Navigate to `src/hillclimmer/HillClimmer.java`
 3. Right-click → "Run File" (Shift+F6)
 4. Choose your user type and follow the prompts
+</details>
 
-#### Method 2: Command Line
+<details>
+<summary>🪟 Method 2: Command Line (Windows)</summary>
+
+```cmd
+cd HillClimber
+javac -d build/classes -sourcepath src --release 21 src/hillclimmer/*.java src/hillclimmer/*/*.java
+java -cp build/classes hillclimmer.HillClimmer
+```
+</details>
+
+<details>
+<summary>🐧 Method 3: Command Line (Linux/macOS)</summary>
+
 ```bash
 cd HillClimber
-javac -cp src src/hillclimmer/*.java src/hillclimmer/*/*.java
-java -cp src hillclimmer.HillClimmer
+javac -d build/classes -sourcepath src --release 21 src/hillclimmer/*.java src/hillclimmer/*/*.java
+java -cp build/classes hillclimmer.HillClimmer
 ```
+</details>
 
-## 👤 User Accounts & Credentials
+<details>
+<summary>🔧 Method 4: Using Maven/Gradle (Alternative)</summary>
+
+If you prefer using build tools:
+
+```bash
+# Using Maven
+mvn compile exec:java -Dexec.mainClass="hillclimmer.HillClimmer"
+
+# Using Gradle
+gradle build
+gradle run
+```
+</details>
+
+## � Troubleshooting
+
+### Common Issues & Solutions
+
+<details>
+<summary>☕ Java Version Issues</summary>
+
+```bash
+# Check Java version
+java -version
+
+# Set JAVA_HOME (Windows)
+setx JAVA_HOME "C:\Program Files\Java\jdk-21"
+
+# Set JAVA_HOME (Linux/macOS)
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+```
+</details>
+
+<details>
+<summary>🔨 Compilation Errors</summary>
+
+```bash
+# Clean and rebuild
+rm -rf build/
+mkdir build/classes
+
+# Compile with verbose output
+javac -d build/classes -sourcepath src --release 21 -verbose src/hillclimmer/*.java src/hillclimmer/*/*.java
+```
+</details>
+
+<details>
+<summary>⚠️ Runtime Errors</summary>
+
+```bash
+# Run with debug information
+java -cp build/classes -Djava.util.logging.level=INFO hillclimmer.HillClimmer
+
+# Check classpath
+java -cp build/classes hillclimmer.HillClimmer --demo
+```
+</details>
+
+<details>
+<summary>🔒 Permission Issues (Linux)</summary>
+
+```bash
+# Make scripts executable
+chmod +x *.sh
+
+# Run with proper permissions
+sudo java -cp build/classes hillclimmer.HillClimmer
+```
+</details>
+
+<details>
+<summary>🪟 Windows Path Issues</summary>
+
+```cmd
+# Add Java to PATH
+set PATH=%PATH%;"C:\Program Files\Java\jdk-21\bin"
+
+# Verify Java installation
+where java
+java -version
+```
+</details>
+
+## �👤 User Accounts & Credentials
 
 ### 👥 Customer Accounts
 | Customer ID | Name | IC Number | Password |
@@ -183,11 +356,11 @@ This project is developed for educational purposes as part of the OOP course ass
 
 ## 👥 Team Members
 
-- **Chin Wen Wei** (VM002) - Project Lead
-- **Lye Wei Lun** (VM003) - System Architect
-- **Neeshwran A/L Veera Chelvan** (VM004) - Security Specialist
-- **Oscar Lim Zheng You** (VM005) - Database Administrator
-- **Teh Guan Chen** (VM006) - Quality Assurance
+- **Lye Wei Lun** (VM003) - Project Lead
+- **Chin Wen Wei** (VM002) - Tester/QA
+- **Neeshwran A/L Veera Chelvan** (VM004) - Tester/QA
+- **Oscar Lim Zheng You** (VM005) - Tester/QA
+- **Teh Guan Chen** (VM006) - Tester/QA
 
 ---
 
