@@ -82,13 +82,6 @@ gantt
 
 ---
 
-## 📞 **Contact Information**
-
-**Project Lead**: Lye Wei Lun (VM003)  
-**Technical Support**: [HillClimmer/README.md](HillClimmer/README.md)
-
----
-
 **� Project Status**: **READY FOR PRODUCTION**  
 **📊 Completion**: **100%**  
 **⏰ Deadline**: September 12, 2025
