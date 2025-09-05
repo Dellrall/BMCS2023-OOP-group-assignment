@@ -397,39 +397,109 @@ public class HillClimmer {
     }
 
     public static void main(String[] args) {
-        // Enter alternate screen buffer for clean experience
-        enterAlternateScreen();
-        
-        System.out.println("=========================================");
-        System.out.println("   🏔️  HILL CLIMBER VEHICLE RENTAL   🏔️");
-        System.out.println("        Malaysia's Premier Hill");
-        System.out.println("        Climbing Vehicle Service");
-        System.out.println("=========================================");
-        System.out.println("          PRODUCTION VERSION");
-        System.out.println("=========================================");
+        // Initialize garbage collection monitoring
+        Runtime runtime = Runtime.getRuntime();
+        long initialMemory = runtime.totalMemory() - runtime.freeMemory();
 
-        initializeSystem();
-        runProductionMode();
-        
-        // Exit alternate screen buffer when done
-        exitAlternateScreen();
+        try {
+            // Enter alternate screen buffer for clean experience
+            enterAlternateScreen();
+
+            System.out.println("=========================================");
+            System.out.println("   🏔️  HILL CLIMBER VEHICLE RENTAL   🏔️");
+            System.out.println("        Malaysia's Premier Hill");
+            System.out.println("        Climbing Vehicle Service");
+            System.out.println("=========================================");
+            System.out.println("          PRODUCTION VERSION");
+            System.out.println("=========================================");
+
+            initializeSystem();
+            runProductionMode();
+
+        } catch (Exception e) {
+            System.err.println("\n❌ CRITICAL ERROR: " + e.getMessage());
+            e.printStackTrace();
+            System.err.println("\n🔄 Attempting graceful shutdown...");
+
+            // Attempt cleanup
+            try {
+                cleanupResources();
+            } catch (Exception cleanupError) {
+                System.err.println("❌ Cleanup failed: " + cleanupError.getMessage());
+            }
+
+        } catch (Throwable t) {
+            System.err.println("\n💥 FATAL ERROR: " + t.getMessage());
+            t.printStackTrace();
+
+        } finally {
+            // Always exit alternate screen buffer
+            try {
+                exitAlternateScreen();
+            } catch (Exception e) {
+                // Ignore cleanup errors in finally block
+            }
+
+            // Force garbage collection before exit
+            System.gc();
+            Thread.yield();
+
+            // Memory usage report
+            long finalMemory = runtime.totalMemory() - runtime.freeMemory();
+            long memoryUsed = finalMemory - initialMemory;
+
+            System.out.println("\n📊 Memory Usage Report:");
+            System.out.println("   Initial Memory: " + (initialMemory / 1024) + " KB");
+            System.out.println("   Final Memory: " + (finalMemory / 1024) + " KB");
+            System.out.println("   Memory Used: " + (memoryUsed / 1024) + " KB");
+            System.out.println("   🗑️ Garbage collection completed");
+
+            System.out.println("\n👋 Thank you for using HillClimber!");
+            System.out.println("🏔️ Safe travels and happy climbing!");
+        }
     }
 
     private static void initializeSystem() {
-        // Initialize default vehicle manager
-        vehicleManager = new VehicleManager("VM001", 2, "Ahmad Abdullah", 5);
-
-        // Load vehicles from CSV file
-        loadVehiclesFromCSV();
-
-        // Add sample customer for testing
         try {
-            Customer sampleCustomer = new Customer("C001", "Muhammad Ali", "950101-14-5678",
-                "+60123456789", "muhammad@email.com", "B", LocalDate.of(2026, 12, 31),
-                29, "password123");
-            customerDAO.save(sampleCustomer);
+            System.out.println("🔧 Initializing HillClimber system...");
+
+            // Initialize default vehicle manager with exception handling
+            try {
+                vehicleManager = new VehicleManager("VM001", 2, "Ahmad Abdullah", 5);
+                System.out.println("   ✅ Vehicle manager initialized");
+            } catch (Exception e) {
+                System.err.println("   ❌ Vehicle manager initialization failed: " + e.getMessage());
+                throw new RuntimeException("Failed to initialize vehicle manager", e);
+            }
+
+            // Load vehicles from CSV file with exception handling
+            try {
+                loadVehiclesFromCSV();
+                System.out.println("   ✅ Vehicles loaded from CSV");
+            } catch (Exception e) {
+                System.err.println("   ❌ Vehicle loading failed: " + e.getMessage());
+                throw new RuntimeException("Failed to load vehicles", e);
+            }
+
+            // Add sample customer for testing with exception handling
+            try {
+                Customer sampleCustomer = new Customer("C001", "Muhammad Ali", "950101-14-5678",
+                    "+60123456789", "muhammad@email.com", "B", LocalDate.of(2026, 12, 31),
+                    29, "password123");
+                customerDAO.save(sampleCustomer);
+                System.out.println("   ✅ Sample customer created");
+            } catch (Exception e) {
+                System.out.println("   ⚠️ Sample customer creation skipped (may already exist): " + e.getMessage());
+            }
+
+            System.out.println("✅ System initialization completed successfully");
+
+        } catch (RuntimeException e) {
+            System.err.println("❌ System initialization failed: " + e.getMessage());
+            throw e;
         } catch (Exception e) {
-            // Customer might already exist
+            System.err.println("❌ Unexpected error during initialization: " + e.getMessage());
+            throw new RuntimeException("System initialization failed", e);
         }
     }
 
@@ -442,48 +512,97 @@ public class HillClimmer {
         }
     }
 
+    private static void cleanupResources() {
+        System.out.println("🧹 Cleaning up resources...");
+
+        try {
+            // Clear current user sessions
+            currentCustomer = null;
+            currentManager = null;
+            isManagerMode = false;
+
+            // Force garbage collection
+            System.gc();
+            Thread.sleep(100); // Allow GC to complete
+
+            // Clear scanner buffer if possible
+            if (scanner != null) {
+                // Note: Scanner doesn't have a direct close method for System.in
+                // but we can clear any pending input
+            }
+
+            System.out.println("   ✅ Resources cleaned up successfully");
+
+        } catch (Exception e) {
+            System.err.println("   ❌ Resource cleanup error: " + e.getMessage());
+        }
+    }
+
     private static void runProductionMode() {
-        System.out.println("Running in PRODUCTION MODE");
-        System.out.println("Loading vehicle inventory from CSV...");
+        try {
+            System.out.println("Running in PRODUCTION MODE");
+            System.out.println("Loading vehicle inventory from CSV...");
 
-        // Display vehicle statistics
-        displayVehicleStatistics();
+            // Display vehicle statistics with exception handling
+            try {
+                displayVehicleStatistics();
+            } catch (Exception e) {
+                System.err.println("⚠️ Error displaying vehicle statistics: " + e.getMessage());
+                System.err.println("Continuing with system startup...");
+            }
 
-        System.out.println("\n=== SYSTEM READY ===");
-        System.out.println("✅ Vehicle inventory loaded successfully");
-        System.out.println("✅ All modules initialized");
-        System.out.println("✅ System ready for operations");
+            System.out.println("\n=== SYSTEM READY ===");
+            System.out.println("✅ Vehicle inventory loaded successfully");
+            System.out.println("✅ All modules initialized");
+            System.out.println("✅ System ready for operations");
 
-        // Start the main menu system directly
-        showMainMenu();
+            // Start the main menu system directly
+            showMainMenu();
+
+        } catch (Exception e) {
+            System.err.println("❌ Error in production mode: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Production mode failed", e);
+        }
     }
 
     private static void displayVehicleStatistics() {
-        System.out.println("\n=== VEHICLE INVENTORY STATISTICS ===");
-        List<Vehicle> allVehicles = vehicleManager.getAllVehicles();
+        try {
+            System.out.println("\n=== VEHICLE INVENTORY STATISTICS ===");
+            List<Vehicle> allVehicles = vehicleManager.getAllVehicles();
 
-        // Count vehicles by type
-        long mountainBikes = allVehicles.stream().filter(v -> v.getVehicleType().equals("Mountain Bike")).count();
-        long dirtBikes = allVehicles.stream().filter(v -> v.getVehicleType().equals("Dirt Bike")).count();
-        long buggies = allVehicles.stream().filter(v -> v.getVehicleType().equals("Buggy")).count();
-        long crossovers = allVehicles.stream().filter(v -> v.getVehicleType().equals("Crossover")).count();
-        long availableVehicles = allVehicles.stream().filter(Vehicle::isAvailable).count();
+            if (allVehicles == null) {
+                System.out.println("❌ No vehicle data available");
+                return;
+            }
 
-        System.out.println("Total Vehicles: " + allVehicles.size());
-        System.out.println("🚵 Mountain Bikes: " + mountainBikes);
-        System.out.println("🏍️  Dirt Bikes: " + dirtBikes);
-        System.out.println("🚙 Buggies: " + buggies);
-        System.out.println("🚗 Crossovers: " + crossovers);
-        System.out.println("✅ Available for Rent: " + availableVehicles);
-        System.out.println("❌ Currently Rented: " + (allVehicles.size() - availableVehicles));
+            // Count vehicles by type
+            long mountainBikes = allVehicles.stream().filter(v -> v.getVehicleType().equals("Mountain Bike")).count();
+            long dirtBikes = allVehicles.stream().filter(v -> v.getVehicleType().equals("Dirt Bike")).count();
+            long buggies = allVehicles.stream().filter(v -> v.getVehicleType().equals("Buggy")).count();
+            long crossovers = allVehicles.stream().filter(v -> v.getVehicleType().equals("Crossover")).count();
+            long availableVehicles = allVehicles.stream().filter(Vehicle::isAvailable).count();
 
-        // Show price range
-        double minPrice = allVehicles.stream().mapToDouble(Vehicle::getModelPricing).min().orElse(0);
-        double maxPrice = allVehicles.stream().mapToDouble(Vehicle::getModelPricing).max().orElse(0);
-        double avgPrice = allVehicles.stream().mapToDouble(Vehicle::getModelPricing).average().orElse(0);
+            System.out.println("Total Vehicles: " + allVehicles.size());
+            System.out.println("🚵 Mountain Bikes: " + mountainBikes);
+            System.out.println("🏍️  Dirt Bikes: " + dirtBikes);
+            System.out.println("🚙 Buggies: " + buggies);
+            System.out.println("🚗 Crossovers: " + crossovers);
+            System.out.println("✅ Available for Rent: " + availableVehicles);
+            System.out.println("❌ Currently Rented: " + (allVehicles.size() - availableVehicles));
 
-        System.out.println("💰 Price Range: RM" + String.format("%.0f", minPrice) + " - RM" + String.format("%.0f", maxPrice));
-        System.out.println("📊 Average Price: RM" + String.format("%.1f", avgPrice));
+            // Show price range
+            double minPrice = allVehicles.stream().mapToDouble(Vehicle::getModelPricing).min().orElse(0);
+            double maxPrice = allVehicles.stream().mapToDouble(Vehicle::getModelPricing).max().orElse(0);
+            double avgPrice = allVehicles.stream().mapToDouble(Vehicle::getModelPricing).average().orElse(0);
+
+            System.out.println("💰 Price Range: RM" + String.format("%.0f", minPrice) + " - RM" + String.format("%.0f", maxPrice));
+            System.out.println("📊 Average Price: RM" + String.format("%.1f", avgPrice));
+
+        } catch (Exception e) {
+            System.err.println("❌ Error calculating vehicle statistics: " + e.getMessage());
+            throw new RuntimeException("Vehicle statistics calculation failed", e);
+        }
     }
 
     private static void showMainMenu() {

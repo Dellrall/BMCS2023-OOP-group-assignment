@@ -71,14 +71,14 @@ public class SafetyCheck {
     public SafetyCheck(String customerID) {
         this.customerID = customerID;
         this.score = 0;
-        this.totalQuestions = 15; // 5 from each category
+        this.totalQuestions = 10; // Random selection of 10 questions total
         this.passed = false;
         this.wrongAnswers = new ArrayList<>();
         this.checkID = "SC" + System.currentTimeMillis();
     }
 
     /**
-     * Conducts the complete safety check assessment
+     * Conducts the complete safety check assessment with random question selection
      * @return true if passed, false if failed
      */
     public boolean conductSafetyCheck() {
@@ -87,24 +87,33 @@ public class SafetyCheck {
         System.out.println("🛡️  VEHICLE RENTAL SAFETY ASSESSMENT");
         System.out.println("=".repeat(60));
         System.out.println("You must pass this safety check before booking any vehicle.");
+        System.out.println("Total questions: " + totalQuestions + " (randomly selected by priority)");
         System.out.println("Minimum passing score: 80% (" + (int)(totalQuestions * 0.8) + "/" + totalQuestions + " correct)");
         System.out.println("=".repeat(60));
 
-        // Traffic Rules Section
-        System.out.println("\n🚦 TRAFFIC RULES SECTION");
-        conductQuestionSet(scanner, TRAFFIC_QUESTIONS, "Traffic Rules");
+        // Generate random questions based on priority
+        List<Question> selectedQuestions = selectRandomQuestions();
 
-        // Penalties Section
-        System.out.println("\n⚖️  PENALTIES & REGULATIONS SECTION");
-        conductQuestionSet(scanner, PENALTY_QUESTIONS, "Penalties");
+        // Conduct the assessment
+        for (int i = 0; i < selectedQuestions.size(); i++) {
+            Question q = selectedQuestions.get(i);
+            System.out.println("\nQuestion " + (i + 1) + " [" + q.sectionName + "]");
+            System.out.println(q.questionText);
+            for (int j = 0; j < 4; j++) {
+                System.out.println(q.options[j]);
+            }
 
-        // Vehicle Usage Section
-        System.out.println("\n🚗 VEHICLE USAGE & SAFETY SECTION");
-        conductQuestionSet(scanner, USAGE_QUESTIONS, "Vehicle Usage");
+            System.out.print("Your answer (A/B/C/D): ");
+            String answer = scanner.nextLine().toUpperCase().trim();
 
-        // Sanity Check Section
-        System.out.println("\n🧠 BASIC SAFETY AWARENESS SECTION");
-        conductQuestionSet(scanner, SANITY_QUESTIONS, "Basic Safety");
+            if (answer.equals(q.correctAnswer)) {
+                System.out.println("✅ Correct!");
+                score++;
+            } else {
+                System.out.println("❌ Incorrect. Correct answer: " + q.correctAnswer);
+                wrongAnswers.add(q.sectionName + " Q" + (i + 1) + ": " + q.questionText);
+            }
+        }
 
         // Calculate results
         this.completedDate = new Date();
@@ -116,26 +125,65 @@ public class SafetyCheck {
         return passed;
     }
 
-    private void conductQuestionSet(Scanner scanner, String[][] questions, String sectionName) {
-        System.out.println("\n--- " + sectionName.toUpperCase() + " ---");
+    /**
+     * Selects 10 random questions based on priority weights
+     */
+    public List<Question> selectRandomQuestions() {
+        List<Question> selectedQuestions = new ArrayList<>();
+        Random random = new Random();
 
-        for (int i = 0; i < Math.min(5, questions.length); i++) {
-            System.out.println("\nQuestion " + (i + 1) + ":");
-            System.out.println(questions[i][0]);
-            for (int j = 1; j <= 4; j++) {
-                System.out.println(questions[i][j]);
+        // Priority distribution: Traffic (4), Penalties (3), Usage (2), Sanity (1)
+        int[] questionCounts = {4, 3, 2, 1};
+        String[][][] questionPools = {TRAFFIC_QUESTIONS, PENALTY_QUESTIONS, USAGE_QUESTIONS, SANITY_QUESTIONS};
+        String[] sectionNames = {"traffic rules", "penalties", "usage guidelines", "sanity checks"};
+
+        for (int section = 0; section < questionPools.length; section++) {
+            String[][] questionPool = questionPools[section];
+            String sectionName = sectionNames[section];
+            int questionsNeeded = questionCounts[section];
+
+            // Create list of available indices
+            List<Integer> availableIndices = new ArrayList<>();
+            for (int i = 0; i < questionPool.length; i++) {
+                availableIndices.add(i);
             }
 
-            System.out.print("Your answer (A/B/C/D): ");
-            String answer = scanner.nextLine().toUpperCase().trim();
+            // Randomly select questions for this section
+            for (int i = 0; i < questionsNeeded && !availableIndices.isEmpty(); i++) {
+                int randomIndex = random.nextInt(availableIndices.size());
+                int questionIndex = availableIndices.get(randomIndex);
+                availableIndices.remove(randomIndex);
 
-            if (answer.equals(questions[i][5])) {
-                System.out.println("✅ Correct!");
-                score++;
-            } else {
-                System.out.println("❌ Incorrect. Correct answer: " + questions[i][5]);
-                wrongAnswers.add(sectionName + " Q" + (i + 1) + ": " + questions[i][0]);
+                String[] questionData = questionPool[questionIndex];
+                Question question = new Question(
+                    questionData[0], // question text
+                    Arrays.copyOfRange(questionData, 1, 5), // options A-D
+                    questionData[5], // correct answer
+                    sectionName // section name
+                );
+                selectedQuestions.add(question);
             }
+        }
+
+        // Shuffle the final list to randomize order
+        Collections.shuffle(selectedQuestions);
+        return selectedQuestions;
+    }
+
+    /**
+     * Inner class to represent a question
+     */
+    public static class Question {
+        public String questionText;
+        public String[] options;
+        public String correctAnswer;
+        public String sectionName;
+
+        Question(String questionText, String[] options, String correctAnswer, String sectionName) {
+            this.questionText = questionText;
+            this.options = options;
+            this.correctAnswer = correctAnswer;
+            this.sectionName = sectionName;
         }
     }
 
