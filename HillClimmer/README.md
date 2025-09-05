@@ -1,4 +1,4 @@
-# 🏔️ HillClimber Malaysia Vehicle Rental System
+# 🏔️ HillClimmer Malaysia Vehicle Rental System
 
 ## 📋 Overview
 A comprehensive **cross-platform Java-based** vehicle rental system designed specifically for Malaysia's hill climbing market. Features secure authentication, role-based access control, and complete rental lifecycle management with Malaysian-specific validations. **Compatible with Windows, Linux, and macOS**.
@@ -127,7 +127,7 @@ export PATH=$JAVA_HOME/bin:$PATH
 <summary>🪟 Method 2: Command Line (Windows)</summary>
 
 ```cmd
-cd HillClimber
+cd HillClimmer
 javac -d build/classes -sourcepath src --release 21 src/hillclimmer/*.java src/hillclimmer/*/*.java
 java -cp build/classes hillclimmer.HillClimmer
 ```
@@ -137,7 +137,7 @@ java -cp build/classes hillclimmer.HillClimmer
 <summary>🐧 Method 3: Command Line (Linux/macOS)</summary>
 
 ```bash
-cd HillClimber
+cd HillClimmer
 javac -d build/classes -sourcepath src --release 21 src/hillclimmer/*.java src/hillclimmer/*/*.java
 java -cp build/classes hillclimmer.HillClimmer
 ```
@@ -261,7 +261,7 @@ java -version
 ## 📁 Project Structure
 
 ```
-HillClimber/
+HillClimmer/
 ├── src/hillclimmer/
 │   ├── HillClimmer.java          # Main application
 │   ├── CustomerModule/
@@ -339,7 +339,7 @@ HillClimber/
 ### Debug Mode:
 ```bash
 # Enable verbose logging
-java -cp src -Djava.util.logging.level=INFO hillclimmer.HillClimber
+java -cp src -Djava.util.logging.level=INFO hillclimmer.HillClimmer
 ```
 
 ## 🤝 Contributing
@@ -364,4 +364,4 @@ This project is developed for educational purposes as part of the OOP course ass
 
 ---
 
-**🏔️ Ready to explore Malaysia's hill climbing adventures with HillClimber! 🚀**
+**🏔️ Ready to explore Malaysia's hill climbing adventures with HillClimmer! 🚀**

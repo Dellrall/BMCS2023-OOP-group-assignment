@@ -1,6 +1,6 @@
 /*
  * User Creation Script
- * Creates sample users for testing the HillClimber system
+ * Creates sample users for testing the HillClimmer system
  */
 package test;
 

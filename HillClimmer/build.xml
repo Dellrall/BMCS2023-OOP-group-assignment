@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="HillClimber" default="default" basedir="." xmlns:nbm="http://www.netbeans.org/ns/nb-module-project/3">
-    <description>Builds, tests, and runs the project HillClimber.</description>
+<project name="HillClimmer" default="default" basedir="." xmlns:nbm="http://www.netbeans.org/ns/nb-module-project/3">
+    <description>Builds, tests, and runs the project HillClimmer.</description>
     <import file="nbproject/build-impl.xml"/>
     
     <target name="-pre-init">
@@ -23,7 +23,7 @@
     </target>
     
     <target name="jar" depends="compile" description="Create a JAR file.">
-        <jar destfile="dist/HillClimber.jar" basedir="build/classes">
+        <jar destfile="dist/HillClimmer.jar" basedir="build/classes">
             <manifest>
                 <attribute name="Main-Class" value="hillclimmer.HillClimmer"/>
                 <attribute name="Class-Path" value="."/>

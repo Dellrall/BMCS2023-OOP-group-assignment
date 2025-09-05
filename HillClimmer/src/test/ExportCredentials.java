@@ -18,7 +18,7 @@ public class ExportCredentials {
     public static void main(String[] args) {
         String homeDir = System.getProperty("user.home");
         String downloadsPath = homeDir + "/Downloads";
-        String outputFile = downloadsPath + "/HillClimber_User_Credentials.txt";
+        String outputFile = downloadsPath + "/HillClimmer_User_Credentials.txt";
 
         // Create Downloads directory if it doesn't exist
         try {
@@ -35,7 +35,7 @@ public class ExportCredentials {
         // Export credentials
         try (FileWriter writer = new FileWriter(outputFile)) {
             writer.write("=========================================\n");
-            writer.write("   🏔️  HILL CLIMBER VEHICLE RENTAL   🏔️\n");
+            writer.write("   🏔️  HillClimmer VEHICLE RENTAL   🏔️\n");
             writer.write("        User Credentials Export\n");
             writer.write("=========================================\n\n");
 
@@ -96,7 +96,7 @@ public class ExportCredentials {
             // Usage Instructions
             writer.write("📋 USAGE INSTRUCTIONS\n");
             writer.write("=====================\n\n");
-            writer.write("1. Start the HillClimber application\n");
+            writer.write("1. Start the HillClimmer application\n");
             writer.write("2. Choose 'Customer Login' or 'Vehicle Manager Login'\n");
             writer.write("3. Enter the username/ID and password from above\n");
             writer.write("4. Enjoy testing the system!\n\n");

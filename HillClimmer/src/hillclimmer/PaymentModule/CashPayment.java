@@ -20,7 +20,7 @@ public class CashPayment extends Payment {
 
     public CashPayment(String paymentID, double totalAmount, String timestamp, String customerID) {
         super(paymentID, totalAmount, "Cash", "Pending", timestamp, customerID);
-        this.paymentLocation = "Hill Climber Main Counter";
+        this.paymentLocation = "HillClimmer Main Counter";
         this.cashierName = "";
         this.paymentDeadline = LocalDateTime.now().plusDays(7); // 7 days to pay
         this.isPaid = false;
@@ -84,7 +84,7 @@ public class CashPayment extends Payment {
     }
 
     private void generatePaymentSlip() {
-        this.paymentSlip = "=== HILL CLIMBER CASH PAYMENT SLIP ===\n" +
+        this.paymentSlip = "=== HillClimmer CASH PAYMENT SLIP ===\n" +
                           "Payment ID: " + paymentID + "\n" +
                           "Reference Number: " + referenceNumber + "\n" +
                           "Customer ID: " + customerID + "\n" +
@@ -103,7 +103,7 @@ public class CashPayment extends Payment {
     }
 
     private void updatePaymentSlip() {
-        this.paymentSlip = "=== HILL CLIMBER CASH PAYMENT RECEIPT ===\n" +
+        this.paymentSlip = "=== HillClimmer CASH PAYMENT RECEIPT ===\n" +
                           "Payment ID: " + paymentID + "\n" +
                           "Reference Number: " + referenceNumber + "\n" +
                           "Customer ID: " + customerID + "\n" +

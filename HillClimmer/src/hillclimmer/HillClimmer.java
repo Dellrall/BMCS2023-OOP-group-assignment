@@ -406,7 +406,7 @@ public class HillClimmer {
             enterAlternateScreen();
 
             System.out.println("=========================================");
-            System.out.println("   🏔️  HILL CLIMBER VEHICLE RENTAL   🏔️");
+            System.out.println("   🏔️  HillClimmer VEHICLE RENTAL   🏔️");
             System.out.println("        Malaysia's Premier Hill");
             System.out.println("        Climbing Vehicle Service");
             System.out.println("=========================================");
@@ -454,14 +454,14 @@ public class HillClimmer {
             System.out.println("   Memory Used: " + (memoryUsed / 1024) + " KB");
             System.out.println("   🗑️ Garbage collection completed");
 
-            System.out.println("\n👋 Thank you for using HillClimber!");
+            System.out.println("\n👋 Thank you for using HillClimmer!");
             System.out.println("🏔️ Safe travels and happy climbing!");
         }
     }
 
     private static void initializeSystem() {
         try {
-            System.out.println("🔧 Initializing HillClimber system...");
+            System.out.println("🔧 Initializing HillClimmer system...");
 
             // Initialize default vehicle manager with exception handling
             try {
@@ -612,7 +612,7 @@ public class HillClimmer {
             transitionToScreen();
             
             System.out.println("=========================================");
-            System.out.println("   🏔️  HILL CLIMBER VEHICLE RENTAL   🏔️");
+            System.out.println("   🏔️  HillClimmer VEHICLE RENTAL   🏔️");
             System.out.println("        Malaysia's Premier Hill");
             System.out.println("        Climbing Vehicle Service");
             System.out.println("=========================================");
@@ -620,7 +620,7 @@ public class HillClimmer {
             System.out.println("1. 🚗 Customer Login");
             System.out.println("2. 👨‍💼 Vehicle Manager Login");
             System.out.println("3. 📝 New Customer Registration");
-            System.out.println("4. ℹ️  About Hill Climber");
+            System.out.println("4. ℹ️  About HillClimmer");
             System.out.println("5. ❌ Exit System");
             
             int choice = readInt("Please select an option (1-5): ", 1, 5);
@@ -639,7 +639,7 @@ public class HillClimmer {
                         showAbout();
                         break;
                     case 5:
-                        System.out.println("Thank you for using Hill Climber! Selamat tinggal!");
+                        System.out.println("Thank you for using HillClimmer! Selamat tinggal!");
                         System.exit(0);
                         break;
                     default:
@@ -653,7 +653,7 @@ public class HillClimmer {
         transitionToScreen();
         
         System.out.println("=========================================");
-        System.out.println("   🏔️  HILL CLIMBER VEHICLE RENTAL   🏔️");
+        System.out.println("   🏔️  HillClimmer VEHICLE RENTAL   🏔️");
         System.out.println("        Malaysia's Premier Hill");
         System.out.println("        Climbing Vehicle Service");
         System.out.println("=========================================");
@@ -690,7 +690,7 @@ public class HillClimmer {
         transitionToScreen();
         
         System.out.println("=========================================");
-        System.out.println("   🏔️  HILL CLIMBER VEHICLE RENTAL   🏔️");
+        System.out.println("   🏔️  HillClimmer VEHICLE RENTAL   🏔️");
         System.out.println("        Malaysia's Premier Hill");
         System.out.println("        Climbing Vehicle Service");
         System.out.println("=========================================");
@@ -715,7 +715,7 @@ public class HillClimmer {
             System.out.println("� Welcome back, " + currentManager.getName() + "!");
             System.out.println("🔐 Authorization Level: " + currentManager.getAuthorizationLevel());
             System.out.println("📊 Access to both Vehicle and Rental Management");
-            System.out.println("🏢 Ready to manage Hill Climber operations?");
+            System.out.println("🏢 Ready to manage HillClimmer operations?");
             
             showManagerMenu();
         } else {
@@ -729,7 +729,7 @@ public class HillClimmer {
         transitionToScreen();
         
         System.out.println("=========================================");
-        System.out.println("   🏔️  HILL CLIMBER VEHICLE RENTAL   🏔️");
+        System.out.println("   🏔️  HillClimmer VEHICLE RENTAL   🏔️");
         System.out.println("        Malaysia's Premier Hill");
         System.out.println("        Climbing Vehicle Service");
         System.out.println("=========================================");
@@ -764,7 +764,7 @@ public class HillClimmer {
             customerDAO.save(newCustomer);
 
             System.out.println("✅ Registration successful!");
-            System.out.println("🎉 Welcome to Hill Climber, " + name + "!");
+            System.out.println("🎉 Welcome to HillClimmer, " + name + "!");
             System.out.println("Your Customer ID is: " + customerId);
             System.out.println("Please remember this ID for login.");
             System.out.println("\n" + newCustomer.toString());
@@ -781,7 +781,7 @@ public class HillClimmer {
             transitionToScreen();
             
             System.out.println("=========================================");
-            System.out.println("   🏔️  HILL CLIMBER VEHICLE RENTAL   🏔️");
+            System.out.println("   🏔️  HillClimmer VEHICLE RENTAL   🏔️");
             System.out.println("        Malaysia's Premier Hill");
             System.out.println("        Climbing Vehicle Service");
             System.out.println("=========================================");
@@ -814,7 +814,7 @@ public class HillClimmer {
                     makePayment();
                     break;
                 case 6:
-                    System.out.println("👋 Thank you for using Hill Climber, " + currentCustomer.getName() + "!");
+                    System.out.println("👋 Thank you for using HillClimmer, " + currentCustomer.getName() + "!");
                     System.out.println("🏔️ We hope to see you again for your next adventure!");
                     currentCustomer = null;
                     return;
@@ -830,14 +830,14 @@ public class HillClimmer {
             transitionToScreen();
             
             System.out.println("=========================================");
-            System.out.println("   🏔️  HILL CLIMBER VEHICLE RENTAL   🏔️");
+            System.out.println("   🏔️  HillClimmer VEHICLE RENTAL   🏔️");
             System.out.println("        Malaysia's Premier Hill");
             System.out.println("        Climbing Vehicle Service");
             System.out.println("=========================================");
             System.out.println("\n=== MANAGER ADMINISTRATION PANEL ===");
             System.out.println("� Welcome back, " + (currentManager != null ? currentManager.getName() : "Manager") + "!");
             System.out.println("🔐 Authorization Level: " + (currentManager != null ? currentManager.getAuthorizationLevel() : "N/A"));
-            System.out.println("🏢 Ready to manage Hill Climber operations?");
+            System.out.println("🏢 Ready to manage HillClimmer operations?");
             System.out.println("\n🚗 VEHICLE MANAGEMENT:");
             System.out.println("1. 📊 View All Vehicles");
             System.out.println("2. ➕ Add New Vehicle");
@@ -886,7 +886,7 @@ public class HillClimmer {
                 case 10:
                     System.out.println("👋 Manager logout successful.");
                     System.out.println("👤 Goodbye, " + (currentManager != null ? currentManager.getName() : "Manager") + "!");
-                    System.out.println("🏢 Thank you for managing Hill Climber operations.");
+                    System.out.println("🏢 Thank you for managing HillClimmer operations.");
                     currentManager = null;
                     vehicleManager = null;
                     rentalManager = new RentalManager(); // Reset to unauthenticated
@@ -1395,12 +1395,12 @@ public class HillClimmer {
         transitionToScreen();
         
         System.out.println("=========================================");
-        System.out.println("   🏔️  HILL CLIMBER VEHICLE RENTAL   🏔️");
+        System.out.println("   🏔️  HillClimmer VEHICLE RENTAL   🏔️");
         System.out.println("        Malaysia's Premier Hill");
         System.out.println("        Climbing Vehicle Service");
         System.out.println("=========================================");
-        System.out.println("\n=== ABOUT HILL CLIMBER ===");
-        System.out.println("🏔️ Hill Climber Vehicle Rental");
+        System.out.println("\n=== ABOUT HillClimmer ===");
+        System.out.println("🏔️ HillClimmer Vehicle Rental");
         System.out.println("Malaysia Premier Hill Climbing Vehicle Service");
         System.out.println("");
         System.out.println("We provide high-quality vehicles for hill climbing");
@@ -1415,7 +1415,7 @@ public class HillClimmer {
         System.out.println("Safety First: All rentals include safety briefings");
         System.out.println("and equipment checks.");
         System.out.println("");
-        System.out.println("Contact: +603-1234-5678 | info@hillclimber.my");
+        System.out.println("Contact: +603-1234-5678 | info@hillclimmer.my");
         System.out.println("");
         System.out.print("Press Enter to return to main menu...");
         scanner.nextLine();

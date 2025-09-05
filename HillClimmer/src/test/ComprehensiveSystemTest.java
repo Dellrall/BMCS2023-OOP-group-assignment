@@ -19,7 +19,7 @@ import java.lang.ref.WeakReference;
 import java.lang.ref.ReferenceQueue;
 
 /**
- * Comprehensive test suite for HillClimber system
+ * Comprehensive test suite for HillClimmer system
  * Tests all functions, flows, exception handling, and memory management
  * @author las
  */
@@ -33,7 +33,7 @@ public class ComprehensiveSystemTest {
     private static List<WeakReference<?>> monitoredObjects = new ArrayList<>();
 
     public static void main(String[] args) {
-        System.out.println("🧪 COMPREHENSIVE HILLCLIMBER SYSTEM TEST SUITE");
+        System.out.println("🧪 COMPREHENSIVE HILLCLIMMER SYSTEM TEST SUITE");
         System.out.println("============================================");
         System.out.println("Testing all functions, flows, exceptions, and memory management");
         System.out.println();
@@ -744,7 +744,7 @@ public class ComprehensiveSystemTest {
 
         if (failedTests == 0) {
             System.out.println("\n🎉 ALL TESTS PASSED! System is fully functional.");
-            System.out.println("🏔️ HillClimber is ready for production use!");
+            System.out.println("🏔️ HillClimmer is ready for production use!");
         } else {
             System.out.println("\n⚠️ SOME TESTS FAILED! Review and fix issues before production.");
         }

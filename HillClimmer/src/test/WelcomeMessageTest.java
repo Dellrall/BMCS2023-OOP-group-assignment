@@ -43,7 +43,7 @@ public class WelcomeMessageTest {
             System.out.println("👋 Welcome back, " + manager.getName() + "!");
             System.out.println("🔐 Authorization Level: " + manager.getAuthorizationLevel());
             System.out.println("📊 Access to both Vehicle and Rental Management");
-            System.out.println("🏢 Ready to manage Hill Climber operations?");
+            System.out.println("🏢 Ready to manage HillClimmer operations?");
         } else {
             System.out.println("❌ Authentication failed");
         }

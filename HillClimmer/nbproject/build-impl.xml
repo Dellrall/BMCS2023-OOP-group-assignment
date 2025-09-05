@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="HillClimber-impl" default="default" basedir="..">
+<project name="HillClimmer-impl" default="default" basedir="..">
     <property file="nbproject/private/private.properties"/>
     <property file="nbproject/project.properties"/>
     
