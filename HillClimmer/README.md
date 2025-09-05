@@ -77,7 +77,7 @@ The application includes sample data for testing:
 ## System Requirements
 - Java 8 or higher
 - NetBeans IDE (recommended for debugging)
-- CSV files are created automatically in the project directory
+- CSV files are created automatically in the data folder
 
 ## Quick Start
 1. Open in NetBeans

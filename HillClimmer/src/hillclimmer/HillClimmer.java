@@ -10,7 +10,6 @@
  * ✅ Payment History & Receipts
  * ✅ Vehicle Inventory Management
  *
- * FOR TESTING ONLY: Run HillClimmerDemo.java
  * FOR PRODUCTION: This is the main application class
  */
 package hillclimmer;
@@ -22,7 +21,6 @@ import hillclimmer.RentalModule.*;
 import hillclimmer.DurationModule.*;
 import hillclimmer.DatabaseModule.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.io.Console;
@@ -112,6 +110,275 @@ public class HillClimmer {
             System.out.flush();
         } catch (Exception e) {
             // No fallback needed
+        }
+    }
+
+    /**
+     * Reads and validates integer input within a specified range
+     * @param prompt The prompt message
+     * @param min Minimum acceptable value
+     * @param max Maximum acceptable value
+     * @return Valid integer input
+     */
+    private static int readInt(String prompt, int min, int max) {
+        while (true) {
+            try {
+                System.out.print(prompt);
+                String input = scanner.nextLine().trim();
+                
+                if (input.isEmpty()) {
+                    System.out.println("❌ Input cannot be empty. Please enter a number between " + min + " and " + max + ".");
+                    continue;
+                }
+                
+                int value = Integer.parseInt(input);
+                
+                if (value < min || value > max) {
+                    System.out.println("❌ Please enter a number between " + min + " and " + max + ".");
+                    continue;
+                }
+                
+                return value;
+            } catch (NumberFormatException e) {
+                System.out.println("❌ Invalid number format. Please enter a valid number between " + min + " and " + max + ".");
+            }
+        }
+    }
+
+    /**
+     * Reads and validates double input within a specified range
+     * @param prompt The prompt message
+     * @param min Minimum acceptable value
+     * @param max Maximum acceptable value
+     * @return Valid double input
+     */
+    private static double readDouble(String prompt, double min, double max) {
+        while (true) {
+            try {
+                System.out.print(prompt);
+                String input = scanner.nextLine().trim();
+                
+                if (input.isEmpty()) {
+                    System.out.println("❌ Input cannot be empty. Please enter a valid amount.");
+                    continue;
+                }
+                
+                double value = Double.parseDouble(input);
+                
+                if (value < min || value > max) {
+                    System.out.println("❌ Please enter an amount between " + String.format("%.2f", min) + " and " + String.format("%.2f", max) + ".");
+                    continue;
+                }
+                
+                return value;
+            } catch (NumberFormatException e) {
+                System.out.println("❌ Invalid number format. Please enter a valid decimal number.");
+            }
+        }
+    }
+
+    /**
+     * Reads and validates non-empty string input
+     * @param prompt The prompt message
+     * @return Valid non-empty string
+     */
+    private static String readString(String prompt) {
+        return readString(prompt, 1, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Reads and validates string input with length constraints
+     * @param prompt The prompt message
+     * @param minLength Minimum length required
+     * @param maxLength Maximum length allowed
+     * @return Valid string input
+     */
+    private static String readString(String prompt, int minLength, int maxLength) {
+        while (true) {
+            System.out.print(prompt);
+            String input = scanner.nextLine().trim();
+            
+            if (input.isEmpty()) {
+                System.out.println("❌ Input cannot be empty. Please enter a value.");
+                continue;
+            }
+            
+            if (input.length() < minLength) {
+                System.out.println("❌ Input must be at least " + minLength + " characters long.");
+                continue;
+            }
+            
+            if (input.length() > maxLength) {
+                System.out.println("❌ Input cannot exceed " + maxLength + " characters.");
+                continue;
+            }
+            
+            return input;
+        }
+    }
+
+    /**
+     * Reads and validates email input
+     * @param prompt The prompt message
+     * @return Valid email address
+     */
+    private static String readEmail(String prompt) {
+        while (true) {
+            String email = readString(prompt);
+            
+            // Basic email validation
+            if (!email.contains("@") || !email.contains(".")) {
+                System.out.println("❌ Invalid email format. Please enter a valid email address (e.g., user@example.com).");
+                continue;
+            }
+            
+            if (email.length() < 5) {
+                System.out.println("❌ Email address is too short. Please enter a valid email address.");
+                continue;
+            }
+            
+            return email;
+        }
+    }
+
+    /**
+     * Reads and validates date input in DD/MM/YYYY format
+     * @param prompt The prompt message
+     * @param allowPastDates Whether to allow past dates
+     * @return Valid LocalDate
+     */
+    private static LocalDate readDate(String prompt, boolean allowPastDates) {
+        while (true) {
+            try {
+                System.out.print(prompt);
+                String input = scanner.nextLine().trim();
+                
+                if (input.isEmpty()) {
+                    System.out.println("❌ Date cannot be empty. Please enter a date in DD/MM/YYYY format.");
+                    continue;
+                }
+                
+                LocalDate date = LocalDate.parse(input, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                
+                if (!allowPastDates && date.isBefore(LocalDate.now())) {
+                    System.out.println("❌ Date cannot be in the past. Please enter a future date.");
+                    continue;
+                }
+                
+                return date;
+            } catch (Exception e) {
+                System.out.println("❌ Invalid date format. Please enter a date in DD/MM/YYYY format (e.g., 31/12/2025).");
+            }
+        }
+    }
+
+    /**
+     * Reads and validates Malaysian IC number
+     * @param prompt The prompt message
+     * @return Valid IC number
+     */
+    private static String readIC(String prompt) {
+        while (true) {
+            String ic = readString(prompt);
+            
+            if (!Customer.isValidIC(ic)) {
+                System.out.println("❌ Invalid IC number format. Please use XXXXXX-XX-XXXX format (e.g., 950101-14-5678).");
+                continue;
+            }
+            
+            return ic;
+        }
+    }
+
+    /**
+     * Reads and validates Malaysian phone number
+     * @param prompt The prompt message
+     * @return Valid phone number
+     */
+    private static String readPhone(String prompt) {
+        while (true) {
+            String phone = readString(prompt);
+            
+            if (!Customer.isValidMalaysianPhone(phone)) {
+                System.out.println("❌ Invalid Malaysian phone number format. Please use +60XXXXXXXXX or 0XXXXXXXXX format.");
+                continue;
+            }
+            
+            return phone;
+        }
+    }
+
+    /**
+     * Reads and validates license type
+     * @param prompt The prompt message
+     * @return Valid license type
+     */
+    private static String readLicenseType(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String licenseType = scanner.nextLine().trim().toUpperCase();
+            
+            if (!Customer.isValidLicenseType(licenseType)) {
+                System.out.println("❌ Invalid license type. Valid types: B, B2, D, DA, E, E1, E2");
+                continue;
+            }
+            
+            return licenseType;
+        }
+    }
+
+    /**
+     * Reads and validates password with minimum length
+     * @param prompt The prompt message
+     * @param minLength Minimum password length
+     * @return Valid password
+     */
+    private static String readPassword(String prompt, int minLength) {
+        while (true) {
+            String password = readPassword(prompt);
+            
+            if (password.length() < minLength) {
+                System.out.println("❌ Password must be at least " + minLength + " characters long.");
+                continue;
+            }
+            
+            return password;
+        }
+    }
+
+    /**
+     * Reads and validates customer ID format
+     * @param prompt The prompt message
+     * @return Valid customer ID
+     */
+    private static String readCustomerId(String prompt) {
+        while (true) {
+            String customerId = readString(prompt).toUpperCase();
+            
+            if (!customerId.matches("C\\d{3,}")) {
+                System.out.println("❌ Invalid customer ID format. Please use format CXXX (e.g., C001).");
+                continue;
+            }
+            
+            return customerId;
+        }
+    }
+
+    /**
+     * Reads and validates manager ID format
+     * @param prompt The prompt message
+     * @return Valid manager ID
+     */
+    private static String readManagerId(String prompt) {
+        while (true) {
+            String managerId = readString(prompt).toUpperCase();
+            
+            if (!managerId.matches("VM\\d{3,}")) {
+                System.out.println("❌ Invalid manager ID format. Please use format VMXXX (e.g., VM001).");
+                continue;
+            }
+            
+            return managerId;
         }
     }
 
@@ -217,57 +484,6 @@ public class HillClimmer {
         System.out.println("📊 Average Price: RM" + String.format("%.1f", avgPrice));
     }
 
-    private static void demonstrateKeyFeatures() {
-        System.out.println("\n=== KEY FEATURES DEMONSTRATION ===");
-
-        // Test Malaysian validation
-        System.out.println("🇲🇾 Testing Malaysian Validations:");
-        boolean icValid = Customer.isValidIC("950101-14-5678");
-        boolean phoneValid = Customer.isValidMalaysianPhone("+60123456789");
-        boolean licenseValid = Customer.isValidLicenseType("B");
-
-        System.out.println("  • IC Validation (950101-14-5678): " + (icValid ? "✅ VALID" : "❌ INVALID"));
-        System.out.println("  • Phone Validation (+60123456789): " + (phoneValid ? "✅ VALID" : "❌ INVALID"));
-        System.out.println("  • License Validation (B): " + (licenseValid ? "✅ VALID" : "❌ INVALID"));
-
-        // Test duration management
-        System.out.println("\n⏰ Testing Duration Management:");
-        try {
-            LocalDate startDate = LocalDate.now();
-            LocalDate endDate = startDate.plusDays(3);
-            durationManager.createBasicRentalPeriod(1, startDate, endDate, 75.0);
-            System.out.println("  • Rental period created: " + startDate + " to " + endDate);
-            System.out.println("  • Active periods: " + durationManager.getActiveRentalPeriods().size());
-        } catch (Exception e) {
-            System.out.println("  • Duration management test: " + e.getMessage());
-        }
-
-        // Test payment processing
-        System.out.println("\n💳 Testing Payment Processing:");
-        try {
-            Payment payment = Payment.createPayment("Credit Card", "DEMO001", 150.0,
-                LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), "C001");
-            payment.updateStatus("Paid"); // Mark as paid for demo
-            transactionManager.recordTransaction(payment);
-            System.out.println("  • Payment processed: RM150.00 via Credit Card");
-            System.out.println("  • Transaction recorded successfully");
-        } catch (Exception e) {
-            System.out.println("  • Payment processing test: " + e.getMessage());
-        }
-
-        // Test reminder system
-        System.out.println("\n🔔 Testing Reminder System:");
-        try {
-            durationManager.createReturnReminder(1, LocalDateTime.now().plusDays(2));
-            durationManager.createPaymentReminder(1, LocalDateTime.now().plusDays(1), 200.0);
-            System.out.println("  • Return reminder created for 2 days from now");
-            System.out.println("  • Payment reminder created for tomorrow");
-            System.out.println("  • Total reminders: " + durationManager.getAllReminders().size());
-        } catch (Exception e) {
-            System.out.println("  • Reminder system test: " + e.getMessage());
-        }
-    }
-
     private static void showMainMenu() {
         while (true) {
             // Clear screen for clean menu display
@@ -284,24 +500,17 @@ public class HillClimmer {
             System.out.println("3. 📝 New Customer Registration");
             System.out.println("4. ℹ️  About Hill Climber");
             System.out.println("5. ❌ Exit System");
-            System.out.print("Please select an option (1-5): ");
+            
+            int choice = readInt("Please select an option (1-5): ", 1, 5);
 
-            try {
-                String input = scanner.nextLine().trim();
-                if (input.isEmpty()) {
-                    System.out.println("❌ Please enter a valid option.");
-                    continue;
-                }
-                int choice = Integer.parseInt(input);
-
-                switch (choice) {
-                    case 1:
-                        customerLogin();
-                        break;
-                    case 2:
-                        managerLogin();
-                        break;
-                    case 3:
+            switch (choice) {
+                case 1:
+                    customerLogin();
+                    break;
+                case 2:
+                    managerLogin();
+                    break;
+                case 3:
                         customerRegistration();
                         break;
                     case 4:
@@ -314,9 +523,6 @@ public class HillClimmer {
                     default:
                         System.out.println("❌ Invalid option. Please select 1-5.");
                 }
-            } catch (NumberFormatException e) {
-                System.out.println("❌ Please enter a valid number.");
-            }
         }
     }
 
@@ -332,9 +538,7 @@ public class HillClimmer {
         System.out.println("\n=== CUSTOMER LOGIN ===");
         System.out.println("Please enter your credentials:");
 
-        System.out.print("Customer ID (e.g., C001): ");
-        String customerId = scanner.nextLine().trim();
-
+        String customerId = readCustomerId("Customer ID (e.g., C001): ");
         String password = readPassword("Password: ");
 
         // Load customer from database
@@ -369,9 +573,7 @@ public class HillClimmer {
         System.out.println("\n=== VEHICLE MANAGER LOGIN ===");
         System.out.println("Authorized personnel only");
 
-        System.out.print("Manager ID: ");
-        String managerId = scanner.nextLine().trim();
-
+        String managerId = readManagerId("Manager ID: ");
         String accessCode = readPassword("Access Code: ");
 
         // Simple authentication for demo (in real system, use proper authentication)
@@ -397,51 +599,13 @@ public class HillClimmer {
         System.out.println("Please provide your information for registration:");
 
         try {
-            System.out.print("Full Name (as per IC): ");
-            String name = scanner.nextLine().trim();
-
-            System.out.print("IC Number (XXXXXX-XX-XXXX): ");
-            String icNumber = scanner.nextLine().trim();
-
-            if (!Customer.isValidIC(icNumber)) {
-                System.out.println("❌ Invalid IC number format. Please use XXXXXX-XX-XXXX format.");
-                return;
-            }
-
-            System.out.print("Phone Number (+60XXXXXXXXX or 0XXXXXXXXX): ");
-            String phoneNo = scanner.nextLine().trim();
-
-            if (!Customer.isValidMalaysianPhone(phoneNo)) {
-                System.out.println("❌ Invalid Malaysian phone number format.");
-                return;
-            }
-
-            System.out.print("Email Address: ");
-            String email = scanner.nextLine().trim();
-
-            System.out.print("License Type (B, B2, D, DA, E, E1, E2): ");
-            String licenseType = scanner.nextLine().trim().toUpperCase();
-
-            if (!Customer.isValidLicenseType(licenseType)) {
-                System.out.println("❌ Invalid license type. Valid types: B, B2, D, DA, E, E1, E2");
-                return;
-            }
-
-            System.out.print("License Expiry Date (DD/MM/YYYY): ");
-            String expiryInput = scanner.nextLine().trim();
-            LocalDate licenseExpiry = LocalDate.parse(expiryInput, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-
-            if (licenseExpiry.isBefore(LocalDate.now())) {
-                System.out.println("❌ License expiry date cannot be in the past.");
-                return;
-            }
-
-            String password = readPassword("Create Password (min 6 characters): ");
-
-            if (password.length() < 6) {
-                System.out.println("❌ Password must be at least 6 characters long.");
-                return;
-            }
+            String name = readString("Full Name (as per IC): ");
+            String icNumber = readIC("IC Number (XXXXXX-XX-XXXX): ");
+            String phoneNo = readPhone("Phone Number (+60XXXXXXXXX or 0XXXXXXXXX): ");
+            String email = readEmail("Email Address: ");
+            String licenseType = readLicenseType("License Type (B, B2, D, DA, E, E1, E2): ");
+            LocalDate licenseExpiry = readDate("License Expiry Date (DD/MM/YYYY): ", false);
+            String password = readPassword("Create Password (min 6 characters): ", 6);
 
             // Generate customer ID
             String customerId = "C" + String.format("%03d", customerDAO.getAll().size() + 1);
@@ -491,41 +655,31 @@ public class HillClimmer {
             System.out.println("4. 🔒 Safety Check");
             System.out.println("5. 💳 Make Payment");
             System.out.println("6. 🚪 Logout");
-            System.out.print("Please select an option (1-6): ");
+            
+            int choice = readInt("Please select an option (1-6): ", 1, 6);
 
-            try {
-                String input = scanner.nextLine().trim();
-                if (input.isEmpty()) {
-                    System.out.println("❌ Please enter a valid option.");
-                    continue;
-                }
-                int choice = Integer.parseInt(input);
-
-                switch (choice) {
-                    case 1:
-                        newRental();
-                        break;
-                    case 2:
-                        viewRentals();
-                        break;
-                    case 3:
-                        viewProfile();
-                        break;
-                    case 4:
-                        safetyCheck();
-                        break;
-                    case 5:
-                        makePayment();
-                        break;
-                    case 6:
-                        System.out.println("Thank you for using Hill Climber, " + currentCustomer.getName() + "!");
-                        currentCustomer = null;
-                        return;
-                    default:
-                        System.out.println("❌ Invalid option. Please select 1-6.");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("❌ Please enter a valid number.");
+            switch (choice) {
+                case 1:
+                    newRental();
+                    break;
+                case 2:
+                    viewRentals();
+                    break;
+                case 3:
+                    viewProfile();
+                    break;
+                case 4:
+                    safetyCheck();
+                    break;
+                case 5:
+                    makePayment();
+                    break;
+                case 6:
+                    System.out.println("Thank you for using Hill Climber, " + currentCustomer.getName() + "!");
+                    currentCustomer = null;
+                    return;
+                default:
+                    System.out.println("❌ Invalid option. Please select 1-6.");
             }
         }
     }
@@ -549,21 +703,14 @@ public class HillClimmer {
             System.out.println("5. 👥 View All Customers");
             System.out.println("6. 📈 System Reports");
             System.out.println("7. 🚪 Logout");
-            System.out.print("Please select an option (1-7): ");
+            
+            int choice = readInt("Please select an option (1-7): ", 1, 7);
 
-            try {
-                String input = scanner.nextLine().trim();
-                if (input.isEmpty()) {
-                    System.out.println("❌ Please enter a valid option.");
-                    continue;
-                }
-                int choice = Integer.parseInt(input);
-
-                switch (choice) {
-                    case 1:
-                        viewAllVehicles();
-                        break;
-                    case 2:
+            switch (choice) {
+                case 1:
+                    viewAllVehicles();
+                    break;
+                case 2:
                         addNewVehicle();
                         break;
                     case 3:
@@ -585,9 +732,6 @@ public class HillClimmer {
                     default:
                         System.out.println("❌ Invalid option. Please select 1-7.");
                 }
-            } catch (NumberFormatException e) {
-                System.out.println("❌ Please enter a valid number.");
-            }
         }
     }
 

@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class ReminderDAO extends DataAccessObject<Reminder> {
 
     public ReminderDAO() {
-        super("reminders.csv");
+        super("data/reminders.csv");
     }
 
     @Override

@@ -15,7 +15,7 @@ import hillclimmer.PaymentModule.CashPayment;
 public class PaymentDAO extends DataAccessObject<Payment> {
 
     public PaymentDAO() {
-        super("payments.csv");
+        super("data/payments.csv");
     }
 
     @Override

@@ -15,7 +15,7 @@ import hillclimmer.CustomerModule.SafetyCheck;
 public class SafetyCheckDAO extends DataAccessObject<SafetyCheck> {
 
     public SafetyCheckDAO() {
-        super("safetychecks.csv");
+        super("data/safetychecks.csv");
     }
 
     @Override

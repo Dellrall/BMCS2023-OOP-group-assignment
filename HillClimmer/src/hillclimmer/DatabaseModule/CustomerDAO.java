@@ -16,7 +16,7 @@ import java.util.List;
 public class CustomerDAO extends DataAccessObject<Customer> {
 
     public CustomerDAO() {
-        super("customers.csv"); // File for storing customer data
+        super("data/customers.csv"); // File for storing customer data
     }
 
     @Override
