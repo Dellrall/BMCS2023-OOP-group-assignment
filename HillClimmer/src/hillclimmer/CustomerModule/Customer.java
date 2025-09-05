@@ -121,7 +121,7 @@ public class Customer {
             return false;
         }
 
-        // Extract birth date from IC
+        // Extract birth date from IC (YYMMDD format)
         String datePart = icNumber.substring(0, 6);
         try {
             int year = Integer.parseInt(datePart.substring(0, 2));

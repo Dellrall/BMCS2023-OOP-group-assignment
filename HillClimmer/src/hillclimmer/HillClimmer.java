@@ -715,14 +715,22 @@ public class HillClimmer {
         System.out.println("=========================================");
         System.out.println("\n=== CUSTOMER LOGIN ===");
         System.out.println("Please enter your credentials:");
+        System.out.println("💡 You can login using either Customer ID (e.g., C001) or Email address");
         System.out.println("\n💡 Enter '0' at any input to return to main menu");
 
         try {
-            String customerId = readCustomerId("Customer ID (e.g., C001): ");
+            String loginInput = readString("Customer ID or Email: ");
             String password = readPassword("Password: ");
 
-            // Load customer from database
-            Customer customer = customerDAO.load(customerId);
+            Customer customer = null;
+            
+            // Try to find customer by ID first
+            if (loginInput.toUpperCase().matches("C\\d{3,}")) {
+                customer = customerDAO.load(loginInput.toUpperCase());
+            } else {
+                // Try to find customer by email
+                customer = customerDAO.findByEmail(loginInput);
+            }
 
             if (customer != null && customer.authenticate(password)) {
                 if (!customer.isLicenseValid()) {
@@ -739,7 +747,7 @@ public class HillClimmer {
                 System.out.println("🏔️ Ready to explore Malaysia's hill climbing adventures?");
                 showCustomerMenu();
             } else {
-                System.out.println("❌ Invalid customer ID or password. Please try again.");
+                System.out.println("❌ Invalid customer ID/email or password. Please try again.");
             }
         } catch (UserExitException e) {
             System.out.println("🔙 Returned to main menu.");
@@ -757,6 +765,7 @@ public class HillClimmer {
         System.out.println("=========================================");
         System.out.println("\n=== VEHICLE MANAGER LOGIN ===");
         System.out.println("Authorized personnel only");
+        System.out.println("💡 Login using Manager ID (e.g., VM002)");
         System.out.println("\n💡 Enter '0' at any input to return to main menu");
 
         try {
