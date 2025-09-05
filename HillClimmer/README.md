@@ -1,13 +1,18 @@
 # 🏔️ HillClimmer Malaysia Vehicle Rental System
 
+**Version 2.0** | *Last Updated: September 5, 2025*
+
 ## 📋 Overview
 A comprehensive **cross-platform Java-based** vehicle rental system designed specifically for Malaysia's hill climbing market. Features secure authentication, role-based access control, and complete rental lifecycle management with Malaysian-specific validations. **Compatible with Windows, Linux, and macOS**.
+
+**✨ Recent Updates**: Enhanced login system with email/ID options, improved phone number handling, and comprehensive input validation fixes.
 
 ## ✨ Key Features
 
 ### 🔐 **Advanced Security & Authentication**
 - **SHA-256 Password Hashing** with unique salts for all users
 - **Role-Based Access Control** with 5 authorization levels
+- **Flexible Login Options**: Login with Customer ID or Email address
 - **Manager Authentication** via secure CSV database
 - **Secure Session Management** with personalized welcome messages
 
@@ -27,11 +32,33 @@ A comprehensive **cross-platform Java-based** vehicle rental system designed spe
 - **Payment Integration**: Multiple payment methods with receipts
 
 ### 🇲🇾 **Malaysia-Specific Features**
-- **IC Validation**: Malaysian IC format (XXXXXX-XX-XXXX)
-- **Phone Validation**: +60XXXXXXXXX or 0XXXXXXXXX formats
+- **IC Validation**: Malaysian IC format (XXXXXX-XX-XXXX) with date validation
+- **Phone Validation**: Multiple formats (+60XXXXXXXXX, 0XXXXXXXXX, 0xx-xxx-xxxx, 0xx xxx xxxx) with auto-normalization
 - **License Types**: B, B2, D, DA, E, E1, E2 validation
 - **Age Calculation**: Automatic age from IC number
 - **Location Support**: Malaysian addresses and regions
+
+## 🆕 Recent Enhancements (v2.0)
+
+### 🔑 **Enhanced Login System**
+- **Flexible Customer Login**: Login using Customer ID (C001) or Email address
+- **Improved User Experience**: Clear prompts indicating available login options
+- **Backward Compatibility**: Existing ID-based login continues to work
+
+### 📱 **Advanced Phone Number Handling**
+- **Multiple Input Formats**: Support for +60XXXXXXXXX, 0XXXXXXXXX, 0xx-xxx-xxxx, 0xx xxx xxxx
+- **Auto-Normalization**: All phone numbers stored in standard +60XXXXXXXXX format
+- **Input Validation**: Real-time validation with user-friendly error messages
+
+### 🔄 **Improved Input Validation**
+- **While Loop Fixes**: All input methods now properly allow re-entry after validation errors
+- **Exit Functionality**: "0" input consistently exits to main menu from any input prompt
+- **Error Recovery**: Users can retry input without losing progress
+
+### 🧪 **Enhanced Testing Suite**
+- **Comprehensive Test Coverage**: New test files for recent enhancements
+- **Validation Testing**: IC format, phone normalization, login logic verification
+- **Organized Test Structure**: All tests properly located in `src/test/` directory
 
 ## 🚀 Quick Start
 
@@ -110,6 +137,53 @@ sudo mv jdk-21.0.2 /usr/local/
 export JAVA_HOME=/usr/local/jdk-21.0.2
 export PATH=$JAVA_HOME/bin:$PATH
 ```
+</details>
+
+### 🔨 Building the Project
+
+HillClimmer supports both **Ant** (traditional) and **Gradle** (modern) build systems. Choose the method that works best for your workflow.
+
+<details>
+<summary>🐜 Method 1: Ant Build (Traditional)</summary>
+
+```bash
+# Compile the project
+ant compile
+
+# Run the application
+ant run
+
+# Create JAR file
+ant jar
+
+# Clean build files
+ant clean
+```
+</details>
+
+<details>
+<summary>🦎 Method 2: Gradle Build (Modern)</summary>
+
+```bash
+# Compile the project
+./gradlew build
+
+# Run the application
+./gradlew run
+
+# Create JAR file
+./gradlew jar
+
+# Clean build files
+./gradlew clean
+```
+
+**Benefits of Gradle:**
+- ✅ Faster incremental builds
+- ✅ Better dependency management
+- ✅ Modern build features
+- ✅ Cross-platform compatibility
+- ✅ IDE integration
 </details>
 
 ### Running the Application
@@ -230,14 +304,16 @@ java -version
 ## �👤 User Accounts & Credentials
 
 ### 👥 Customer Accounts
-| Customer ID | Name | IC Number | Password |
-|-------------|------|-----------|----------|
-| C001 | Muhammad Ali | 950101-14-5678 | password123 |
-| C002 | Jeremy Clarkson | 850101-01-1234 | TopGear2025! |
-| C003 | Richard Hammond | 880202-02-2345 | HammondRacing! |
-| C004 | James May | 820303-03-3456 | CaptainSlow! |
-| C005 | Sabine Schmitz | 790404-04-4567 | QueenOfNurburgring! |
-| C006 | Chris Evans | 860505-05-5678 | TopGearHost! |
+| Customer ID | Name | IC Number | Email | Password |
+|-------------|------|-----------|-------|----------|
+| C001 | Muhammad Ali | 950101-14-5678 | muhammad@email.com | password123 |
+| C002 | Jeremy Clarkson | 850101-01-1234 | jeremy@topgear.com | TopGear2025! |
+| C003 | Richard Hammond | 880202-02-2345 | richard@topgear.com | HammondRacing! |
+| C004 | James May | 820303-03-3456 | james@topgear.com | CaptainSlow! |
+| C005 | Sabine Schmitz | 790404-04-4567 | sabine@topgear.com | QueenOfNurburgring! |
+| C006 | Chris Evans | 860505-05-5678 | chris@topgear.com | TopGearHost! |
+
+**💡 Login Options**: Customers can login using either Customer ID (C001) or Email address (muhammad@email.com)
 
 ### 👨‍💼 Manager Accounts
 | Manager ID | Name | Password | Level | Permissions |
@@ -291,13 +367,17 @@ HillClimmer/
 │   ├── rentals.csv               # Rental records
 │   └── payments.csv              # Payment history
 └── test/
-    └── [Test classes...]         # Unit tests
+    ├── AuthenticationTest.java     # Authentication testing
+    ├── ComprehensiveSystemTest.java # Full system testing
+    ├── ExitInputTest.java          # Input validation testing
+    ├── RecentEnhancementsTest.java # Latest features testing
+    └── [Additional test files...]  # Specialized test suites
 ```
 
 ## 🎯 Application Workflow
 
 ### For Customers:
-1. **Register** or **Login** with personalized welcome
+1. **Register** or **Login** with Customer ID or Email address
 2. **Complete Safety Check** (required for rentals)
 3. **Browse Available Vehicles** with real-time inventory
 4. **Book Rental** with automatic cost calculation
@@ -322,11 +402,14 @@ HillClimmer/
 
 ## 📊 System Statistics
 
-- **6 Sample Customers** with complete profiles
+- **6 Sample Customers** with complete profiles and email addresses
 - **5 Manager Accounts** with different authorization levels
 - **70+ Vehicles** across multiple categories
 - **CSV-Based Storage** for all data persistence
 - **Real-time Updates** for inventory and bookings
+- **Flexible Login Options** (ID or Email for customers)
+- **Multi-Format Phone Support** with auto-normalization
+- **Comprehensive Test Suite** with 20+ test files
 
 ## 🐛 Troubleshooting
 
@@ -361,6 +444,25 @@ This project is developed for educational purposes as part of the OOP course ass
 - **Neeshwran A/L Veera Chelvan** (VM004) - Tester/QA
 - **Oscar Lim Zheng You** (VM005) - Tester/QA
 - **Teh Guan Chen** (VM006) - Tester/QA
+
+---
+
+## 📝 Changelog
+
+### Version 2.0 (September 5, 2025)
+- ✅ **Enhanced Login System**: Customers can now login using either ID or email address
+- ✅ **Advanced Phone Validation**: Support for multiple Malaysian phone formats with auto-normalization
+- ✅ **Improved Input Validation**: Fixed while loop behavior for all input methods
+- ✅ **Enhanced IC Validation**: Added date validation for Malaysian IC numbers
+- ✅ **Comprehensive Testing**: Added RecentEnhancementsTest.java and organized test suite
+- ✅ **User Experience**: Clear prompts and error messages throughout the application
+- ✅ **Gradle Integration**: Added modern Gradle build system alongside existing Ant setup
+
+### Version 1.0 (Initial Release)
+- ✅ Basic vehicle rental system with customer and manager portals
+- ✅ Malaysian-specific validations and formatting
+- ✅ Role-based access control and security features
+- ✅ Complete rental lifecycle management
 
 ---
 
