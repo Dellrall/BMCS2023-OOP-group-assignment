@@ -1,9 +1,9 @@
 /*
  * RentalPeriodDAO class extending DataAccessObject for RentalPeriod data management.
  */
-package hillclimmer.DurationModule;
+package hillclimmer.DatabaseModule;
 
-import hillclimmer.DatabaseModule.DataAccessObject;
+import hillclimmer.DurationModule.RentalPeriod;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +16,11 @@ public class RentalPeriodDAO extends DataAccessObject<RentalPeriod> {
 
     public RentalPeriodDAO() {
         super("data/rentalperiods.csv");
+    }
+
+    @Override
+    protected String getId(RentalPeriod period) {
+        return String.valueOf(period.getPeriodId());
     }
 
     @Override
@@ -48,48 +53,36 @@ public class RentalPeriodDAO extends DataAccessObject<RentalPeriod> {
 
             RentalPeriod period = new RentalPeriod(periodId, rentalId, startDate, endDate, dailyRate, includesInsurance);
             period.setStatus(status);
-            if (!notes.isEmpty()) {
-                period.setNotes(notes);
-            }
+            period.setNotes(notes);
             return period;
         }
         return null;
     }
 
-    @Override
-    protected String getId(RentalPeriod period) {
-        return String.valueOf(period.getPeriodId());
-    }
-
-    // Additional query methods
-    public List<RentalPeriod> getActiveRentalPeriods() {
+    // Additional methods specific to RentalPeriodDAO
+    public List<RentalPeriod> getActivePeriods() {
         return loadAll().stream()
-                .filter(RentalPeriod::isActive)
+                .filter(period -> "ACTIVE".equals(period.getStatus()))
                 .collect(Collectors.toList());
     }
 
-    public List<RentalPeriod> getRentalPeriodsByRentalId(int rentalId) {
+    public List<RentalPeriod> getPeriodsByRentalId(int rentalId) {
         return loadAll().stream()
-                .filter(p -> p.getRentalId() == rentalId)
+                .filter(period -> period.getRentalId() == rentalId)
                 .collect(Collectors.toList());
     }
 
-    public List<RentalPeriod> getOverdueRentalPeriods() {
+    public double getTotalRevenueFromActivePeriods() {
         return loadAll().stream()
-                .filter(RentalPeriod::isOverdue)
-                .collect(Collectors.toList());
-    }
-
-    public List<RentalPeriod> getRentalPeriodsByStatus(String status) {
-        return loadAll().stream()
-                .filter(p -> status.equals(p.getStatus()))
-                .collect(Collectors.toList());
-    }
-
-    public double getTotalRevenue() {
-        return loadAll().stream()
-                .filter(RentalPeriod::isActive)
+                .filter(period -> "ACTIVE".equals(period.getStatus()))
                 .mapToDouble(RentalPeriod::getTotalCost)
                 .sum();
+    }
+
+    public List<RentalPeriod> getOverduePeriods() {
+        LocalDate today = LocalDate.now();
+        return loadAll().stream()
+                .filter(period -> "ACTIVE".equals(period.getStatus()) && period.getEndDate().isBefore(today))
+                .collect(Collectors.toList());
     }
 }
