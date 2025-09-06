@@ -27,7 +27,7 @@ public class WelcomeMessageTest {
         testManagerWelcome(managerDAO, "VM006", "TehSecure789!", "Teh Guan Chen");
 
         System.out.println("\n📋 Testing Customer Welcome Messages:");
-        testCustomerWelcome(customerDAO, "C001", "password123", "Muhammad Ali");
+        testCustomerWelcome(customerDAO, "C001", "AliSecure123!", "Muhammad Ali");
         testCustomerWelcome(customerDAO, "C002", "TopGear2025!", "Jeremy Clarkson");
 
         System.out.println("\n✅ Welcome Message Test Completed!");

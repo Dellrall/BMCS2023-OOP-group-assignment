@@ -104,7 +104,19 @@ public class SafetyCheck {
             }
 
             System.out.print("Your answer (A/B/C/D): ");
-            String answer = scanner.nextLine().toUpperCase().trim();
+            String answer = "";
+            boolean validInput = false;
+            
+            while (!validInput) {
+                answer = scanner.nextLine().toUpperCase().trim();
+                
+                if (answer.matches("[A-D]")) {
+                    validInput = true;
+                } else {
+                    System.out.println("❌ Invalid input! Please enter only A, B, C, or D.");
+                    System.out.print("Your answer (A/B/C/D): ");
+                }
+            }
 
             if (answer.equals(q.correctAnswer)) {
                 System.out.println("✅ Correct!");

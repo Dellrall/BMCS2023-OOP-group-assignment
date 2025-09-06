@@ -344,7 +344,7 @@ public class HillClimmer {
             String phone = readString(prompt);
             
             if (!Customer.isValidMalaysianPhoneInput(phone)) {
-                System.out.println("❌ Invalid Malaysian phone number format. Please use +60XXXXXXXXX, 0XXXXXXXXX, 0xx-xxx-xxxx, or 0xx xxx xxxx format.");
+                System.out.println("❌ Invalid Malaysian phone number format. Please use +60XXXXXXXXX or 01XXXXXXXXX format.");
                 continue;
             }
             
@@ -535,7 +535,7 @@ public class HillClimmer {
             try {
                 Customer sampleCustomer = new Customer("C001", "Muhammad Ali", "950101-14-5678",
                     "+60123456789", "muhammad@email.com", "B", LocalDate.of(2026, 12, 31),
-                    29, "password123");
+                    29, "AliSecure123!");
                 customerDAO.save(sampleCustomer);
                 System.out.println("   ✅ Sample customer created");
             } catch (Exception e) {
@@ -933,13 +933,15 @@ public class HillClimmer {
             System.out.println("7. �️  Remove Rental");
             System.out.println("\n�👥 CUSTOMER MANAGEMENT:");
             System.out.println("8. 👥 View All Customers");
-            System.out.println("\n📈 SYSTEM REPORTS:");
-            System.out.println("9. 📈 System Reports");
-            System.out.println("10. 🚪 Logout");
+            System.out.println("\n� ACCOUNT MANAGEMENT:");
+            System.out.println("9. 🔑 Change Password");
+            System.out.println("\n�📈 SYSTEM REPORTS:");
+            System.out.println("10. 📈 System Reports");
+            System.out.println("11. 🚪 Logout");
             System.out.println("\n💡 Enter '0' at any input to return to this menu");
             
             try {
-                int choice = readInt("Please select an option (1-10): ", 1, 10);
+                int choice = readInt("Please select an option (1-11): ", 1, 11);
 
             switch (choice) {
                 case 1:
@@ -967,9 +969,12 @@ public class HillClimmer {
                     viewAllCustomers();
                     break;
                 case 9:
-                    showSystemReports();
+                    changeManagerPassword();
                     break;
                 case 10:
+                    showSystemReports();
+                    break;
+                case 11:
                     System.out.println("👋 Manager logout successful.");
                     System.out.println("👤 Goodbye, " + (currentManager != null ? currentManager.getName() : "Manager") + "!");
                     System.out.println("🏢 Thank you for managing HillClimmer operations.");
@@ -1323,6 +1328,29 @@ public class HillClimmer {
     }
 
     // Manager menu methods
+    private static void changeManagerPassword() {
+        System.out.println("\n🔐 CHANGE MANAGER PASSWORD");
+        System.out.println("==========================");
+
+        if (currentManager == null) {
+            System.out.println("❌ No manager logged in.");
+            return;
+        }
+
+        try {
+            String currentPass = readPassword("Current password: ");
+            if (currentManager.authenticatePassword(currentPass)) {
+                String newPass = readPassword("New password: ");
+                currentManager.updatePassword(newPass);
+                managerDAO.update(currentManager);
+                System.out.println("✅ Manager password changed successfully!");
+            } else {
+                System.out.println("❌ Current password is incorrect.");
+            }
+        } catch (Exception e) {
+            System.out.println("❌ Error changing password: " + e.getMessage());
+        }
+    }
     private static void viewAllVehicles() {
         System.out.println("\n=== ALL VEHICLES ===");
         List<Vehicle> vehicles = vehicleManager.getAllVehicles();

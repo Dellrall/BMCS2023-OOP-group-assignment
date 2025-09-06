@@ -21,10 +21,10 @@ public class CreateUsers {
 
         // Top Gear inspired customers
         createCustomer(customerDAO, "C002", "Jeremy Clarkson", "850101-01-1234", "+60123456780", "jeremy@topgear.com", "B", LocalDate.of(2028, 12, 31), 39, "TopGear2025!");
-        createCustomer(customerDAO, "C003", "Richard Hammond", "880202-02-2345", "+60123456781", "richard@topgear.com", "B", LocalDate.of(2027, 6, 15), 35, "HammondRacing!");
-        createCustomer(customerDAO, "C004", "James May", "820303-03-3456", "+60123456782", "james@topgear.com", "B", LocalDate.of(2029, 3, 20), 42, "CaptainSlow!");
-        createCustomer(customerDAO, "C005", "Sabine Schmitz", "790404-04-4567", "+60123456783", "sabine@topgear.com", "B", LocalDate.of(2026, 8, 10), 45, "QueenOfNurburgring!");
-        createCustomer(customerDAO, "C006", "Chris Evans", "860505-05-5678", "+60123456784", "chris@topgear.com", "B", LocalDate.of(2030, 1, 5), 38, "TopGearHost!");
+        createCustomer(customerDAO, "C003", "Richard Hammond", "880202-02-2345", "+60123456781", "richard@topgear.com", "B", LocalDate.of(2027, 6, 15), 35, "HammondRacing123!");
+        createCustomer(customerDAO, "C004", "James May", "820303-03-3456", "+60123456782", "james@topgear.com", "B", LocalDate.of(2029, 3, 20), 42, "CaptainSlow456!");
+        createCustomer(customerDAO, "C005", "Sabine Schmitz", "790404-04-4567", "+60123456783", "sabine@topgear.com", "B", LocalDate.of(2026, 8, 10), 45, "QueenOfNurburgring789!");
+        createCustomer(customerDAO, "C006", "Chris Evans", "860505-05-5678", "+60123456784", "chris@topgear.com", "B", LocalDate.of(2030, 1, 5), 38, "TopGearHostABC!");
 
         System.out.println("\n✅ Sample customers created successfully!");
         System.out.println("You can now login with the provided credentials.");

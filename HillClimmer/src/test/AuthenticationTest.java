@@ -32,12 +32,12 @@ public class AuthenticationTest {
 
         // Test existing customers
         String[][] testCases = {
-            {"C001", "password123", "Muhammad Ali"},
+            {"C001", "AliSecure123!", "Muhammad Ali"},
             {"C002", "TopGear2025!", "Jeremy Clarkson"},
-            {"C003", "HammondRacing!", "Richard Hammond"},
-            {"C004", "CaptainSlow!", "James May"},
-            {"C005", "QueenOfNurburgring!", "Sabine Schmitz"},
-            {"C006", "TopGearHost!", "Chris Evans"}
+            {"C003", "HammondRacing123!", "Richard Hammond"},
+            {"C004", "CaptainSlow456!", "James May"},
+            {"C005", "QueenOfNurburgring789!", "Sabine Schmitz"},
+            {"C006", "TopGearHostABC!", "Chris Evans"}
         };
 
         int passed = 0;

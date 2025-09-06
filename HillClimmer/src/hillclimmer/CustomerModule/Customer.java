@@ -44,6 +44,10 @@ public class Customer {
     // Malaysian phone input pattern: allows various formats for input
     private static final Pattern PHONE_INPUT_PATTERN = Pattern.compile("(?:\\+60|0)[1-9]\\d{7,8}|0\\d{2}-\\d{3}-\\d{4}|0\\d{2} \\d{3} \\d{4}");
 
+    // Password validation patterns
+    private static final Pattern HEX_PATTERN = Pattern.compile("[0-9a-fA-F]");
+    private static final Pattern SYMBOL_PATTERN = Pattern.compile("[!@#$%^&*()_+=\\-\\[\\]{}|;:,.<>?]");
+
     /**
      * Generates a random salt for password hashing
      * @return Base64 encoded salt string
@@ -77,6 +81,9 @@ public class Customer {
      * @param plainPassword Plain text password
      */
     public void setPassword(String plainPassword) {
+        if (!isValidPassword(plainPassword)) {
+            throw new IllegalArgumentException("Password must be at least 6 characters long and contain both hexadecimal (0-9, a-f, A-F) and symbol (!@#$%^&*() etc.) characters");
+        }
         this.salt = generateSalt();
         this.hashedPassword = hashPassword(plainPassword, this.salt);
         this.password = null; // Clear plain text password for security
@@ -181,6 +188,22 @@ public class Customer {
         return false;
     }
 
+    /**
+     * Validates password requirements: at least 6 characters, contains hex and symbol characters
+     * @param password Password to validate
+     * @return true if password meets requirements
+     */
+    public static boolean isValidPassword(String password) {
+        if (password == null || password.length() < 6) {
+            return false;
+        }
+
+        boolean hasHex = HEX_PATTERN.matcher(password).find();
+        boolean hasSymbol = SYMBOL_PATTERN.matcher(password).find();
+
+        return hasHex && hasSymbol;
+    }
+
     public boolean isLicenseValid() {
         return licenseExpiryDate != null && licenseExpiryDate.isAfter(LocalDate.now());
     }
@@ -283,11 +306,13 @@ public class Customer {
     }
 
     public void updatePassword(String newPassword) {
-        if (newPassword != null && newPassword.length() >= 6) {
-            this.password = newPassword;
-        } else {
-            throw new IllegalArgumentException("Password must be at least 6 characters long");
+        if (!isValidPassword(newPassword)) {
+            throw new IllegalArgumentException("Password must be at least 6 characters long and contain both hexadecimal (0-9, a-f, A-F) and symbol (!@#$%^&*() etc.) characters");
         }
+        // Properly hash the new password with a new salt
+        this.salt = generateSalt();
+        this.hashedPassword = hashPassword(newPassword, this.salt);
+        this.password = null; // Clear plain text password for security
     }
 
     @Override

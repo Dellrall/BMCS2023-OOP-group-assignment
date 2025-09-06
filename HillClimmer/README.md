@@ -306,12 +306,12 @@ java -version
 ### 👥 Customer Accounts
 | Customer ID | Name | IC Number | Email | Password |
 |-------------|------|-----------|-------|----------|
-| C001 | Muhammad Ali | 950101-14-5678 | muhammad@email.com | password123 |
+| C001 | Muhammad Ali | 950101-14-5678 | muhammad@email.com | AliSecure123! |
 | C002 | Jeremy Clarkson | 850101-01-1234 | jeremy@topgear.com | TopGear2025! |
-| C003 | Richard Hammond | 880202-02-2345 | richard@topgear.com | HammondRacing! |
-| C004 | James May | 820303-03-3456 | james@topgear.com | CaptainSlow! |
-| C005 | Sabine Schmitz | 790404-04-4567 | sabine@topgear.com | QueenOfNurburgring! |
-| C006 | Chris Evans | 860505-05-5678 | chris@topgear.com | TopGearHost! |
+| C003 | Richard Hammond | 880202-02-2345 | richard@topgear.com | HammondRacing123! |
+| C004 | James May | 820303-03-3456 | james@topgear.com | CaptainSlow456! |
+| C005 | Sabine Schmitz | 790404-04-4567 | sabine@topgear.com | QueenOfNurburgring789! |
+| C006 | Chris Evans | 860505-05-5678 | chris@topgear.com | TopGearHostABC! |
 
 **💡 Login Options**: Customers can login using either Customer ID (C001) or Email address (muhammad@email.com)
 

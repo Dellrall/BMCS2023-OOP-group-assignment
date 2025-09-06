@@ -10,7 +10,7 @@
 **HillClimmer** is a production-ready vehicle rental management system built with Java 21, featuring:
 - ✅ **Modular Architecture**: 7 specialized modules (Customer, Vehicle, Payment, Rental, Duration, Database, Core)
 - ✅ **Malaysian Localization**: IC validation, phone formats, license types, and cultural adaptations
-- ✅ **Security Features**: SHA-256 password hashing with unique salts
+- ✅ **Security Features**: SHA-256 password hashing with unique salts, strong password requirements (6+ chars with hex and symbols)
 - ✅ **Data Persistence**: CSV-based storage with comprehensive DAO implementation
 - ✅ **Testing Coverage**: 100% test coverage with exception handling
 - ✅ **Cross-Platform**: Windows, Linux, and macOS compatibility

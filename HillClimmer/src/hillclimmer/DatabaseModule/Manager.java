@@ -7,6 +7,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.regex.Pattern;
 
 /**
  * Manager class for vehicle managers with authentication and authorization levels
@@ -18,6 +19,10 @@ public class Manager {
     private String hashedPassword;
     private String salt;
     private int authorizationLevel;
+
+    // Password validation patterns
+    private static final Pattern HEX_PATTERN = Pattern.compile("[0-9a-fA-F]");
+    private static final Pattern SYMBOL_PATTERN = Pattern.compile("[!@#$%^&*()_+=\\-\\[\\]{}|;:,.<>?]");
 
     /**
      * Constructor for creating a new manager
@@ -56,8 +61,39 @@ public class Manager {
      * Sets and hashes a new password with a new salt
      */
     public void setPassword(String plainPassword) {
+        if (!isValidPassword(plainPassword)) {
+            throw new IllegalArgumentException("Password must be at least 6 characters long and contain both hexadecimal (0-9, a-f, A-F) and symbol (!@#$%^&*() etc.) characters");
+        }
         this.salt = generateSalt();
         this.hashedPassword = hashPassword(plainPassword, this.salt);
+    }
+
+    /**
+     * Validates password requirements: at least 6 characters, contains hex and symbol characters
+     * @param password Password to validate
+     * @return true if password meets requirements
+     */
+    public static boolean isValidPassword(String password) {
+        if (password == null || password.length() < 6) {
+            return false;
+        }
+
+        boolean hasHex = HEX_PATTERN.matcher(password).find();
+        boolean hasSymbol = SYMBOL_PATTERN.matcher(password).find();
+
+        return hasHex && hasSymbol;
+    }
+
+    /**
+     * Updates password with new hashing and salt (allows changing to same password)
+     */
+    public void updatePassword(String newPassword) {
+        if (!isValidPassword(newPassword)) {
+            throw new IllegalArgumentException("Password must be at least 6 characters long and contain both hexadecimal (0-9, a-f, A-F) and symbol (!@#$%^&*() etc.) characters");
+        }
+        // Always generate new salt for security, even for same password
+        this.salt = generateSalt();
+        this.hashedPassword = hashPassword(newPassword, this.salt);
     }
 
     /**

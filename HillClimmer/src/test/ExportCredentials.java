@@ -47,12 +47,12 @@ public class ExportCredentials {
             writer.write("==========================================\n\n");
 
             String[][] customers = {
-                {"C001", "Muhammad Ali", "password123", "Original sample user"},
+                {"C001", "Muhammad Ali", "AliSecure123!", "Original sample user"},
                 {"C002", "Jeremy Clarkson", "TopGear2025!", "Top Gear Presenter"},
-                {"C003", "Richard Hammond", "HammondRacing!", "Top Gear Enthusiast"},
-                {"C004", "James May", "CaptainSlow!", "Top Gear Engineer"},
-                {"C005", "Sabine Schmitz", "QueenOfNurburgring!", "Top Gear Racing Driver"},
-                {"C006", "Chris Evans", "TopGearHost!", "Top Gear Host"}
+                {"C003", "Richard Hammond", "HammondRacing123!", "Top Gear Enthusiast"},
+                {"C004", "James May", "CaptainSlow456!", "Top Gear Engineer"},
+                {"C005", "Sabine Schmitz", "QueenOfNurburgring789!", "Top Gear Racing Driver"},
+                {"C006", "Chris Evans", "TopGearHostABC!", "Top Gear Host"}
             };
 
             for (String[] customer : customers) {
