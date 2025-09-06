@@ -833,8 +833,8 @@ public class HillClimmer {
             LocalDate licenseExpiry = readDate("License Expiry Date (DD/MM/YYYY): ", false);
             String password = readPassword("Create Password (min 6 characters): ", 6);
 
-            // Generate customer ID
-            String customerId = "C" + String.format("%03d", customerDAO.getAll().size() + 1);
+            // Generate customer ID using DAO's consistent ID generation
+            String customerId = customerDAO.generateNextCustomerId();
 
             // Calculate age from IC
             Customer tempCustomer = new Customer(customerId, name, icNumber, phoneNo, email,

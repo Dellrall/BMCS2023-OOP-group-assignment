@@ -16,7 +16,7 @@ import java.util.*;
 public class InvoiceDAO extends DataAccessObject<Invoice> {
 
     public InvoiceDAO() {
-        super("data/invoices.csv");
+        super(System.getProperty("user.dir") + "/data/invoices.csv");
     }
 
     @Override

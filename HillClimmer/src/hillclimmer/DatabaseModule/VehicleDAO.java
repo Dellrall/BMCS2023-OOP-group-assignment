@@ -14,7 +14,7 @@ import hillclimmer.VehicleModule.*;
 public class VehicleDAO extends DataAccessObject<Vehicle> {
 
     public VehicleDAO() {
-        super("data/vehicles.csv"); // File for storing vehicle data
+        super(System.getProperty("user.dir") + "/data/vehicles.csv"); // File for storing vehicle data
     }
 
     @Override

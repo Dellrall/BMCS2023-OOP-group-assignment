@@ -15,7 +15,7 @@ import hillclimmer.PaymentModule.CashPayment;
 public class PaymentDAO extends DataAccessObject<Payment> {
 
     public PaymentDAO() {
-        super("data/payments.csv");
+        super(System.getProperty("user.dir") + "/data/payments.csv");
     }
 
     @Override

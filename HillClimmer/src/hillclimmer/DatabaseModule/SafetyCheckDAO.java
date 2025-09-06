@@ -16,7 +16,7 @@ import java.util.Date;
 public class SafetyCheckDAO extends DataAccessObject<SafetyCheck> {
 
     public SafetyCheckDAO() {
-        super("data/safetychecks.csv");
+        super(System.getProperty("user.dir") + "/data/safetychecks.csv");
     }
 
     @Override

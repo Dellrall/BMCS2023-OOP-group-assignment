@@ -12,7 +12,7 @@ import java.util.List;
 public class ManagerDAO extends DataAccessObject<Manager> {
 
     public ManagerDAO() {
-        super("data/managers.csv");
+        super(System.getProperty("user.dir") + "/data/managers.csv");
     }
 
     @Override

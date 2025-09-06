@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class RentalDAO extends DataAccessObject<Rental> {
     
     public RentalDAO() {
-        super("data/rentals.csv");
+        super(System.getProperty("user.dir") + "/data/rentals.csv");
     }
     
     @Override

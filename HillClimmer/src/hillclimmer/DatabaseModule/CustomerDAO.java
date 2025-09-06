@@ -17,7 +17,7 @@ import java.util.Date;
 public class CustomerDAO extends DataAccessObject<Customer> {
 
     public CustomerDAO() {
-        super("data/customers.csv"); // File for storing customer data
+        super(System.getProperty("user.dir") + "/data/customers.csv"); // File for storing customer data
     }
 
     @Override
@@ -160,20 +160,10 @@ public class CustomerDAO extends DataAccessObject<Customer> {
     
     @Override
     protected Customer generateNewId(Customer customer, java.util.List<Customer> existingCustomers) {
-        // Generate new customer ID based on existing customers
-        int maxId = existingCustomers.stream()
-                .mapToInt(c -> {
-                    try {
-                        return Integer.parseInt(c.getCustomerID().substring(1));
-                    } catch (NumberFormatException e) {
-                        return 0;
-                    }
-                })
-                .max()
-                .orElse(0);
+        // Use the same ID generation logic as the public method
+        String newCustomerId = generateNextCustomerId();
         
         // Create new customer with generated ID
-        String newCustomerId = "C" + String.format("%03d", maxId + 1);
         Customer newCustomer = new Customer(newCustomerId, customer.getName(), customer.getIcNumber(),
                                           customer.getPhoneNo(), customer.getEmail(), customer.getLicenseType(),
                                           customer.getLicenseExpiryDate(), customer.getAge(), "TempPass123!");
@@ -200,6 +190,27 @@ public class CustomerDAO extends DataAccessObject<Customer> {
     public List<Customer> getAll() {
         return loadAll();
     }
+    
+    /**
+     * Generate the next available customer ID based on existing customers
+     * Uses max ID approach for consistency and robustness
+     */
+    public String generateNextCustomerId() {
+        List<Customer> existingCustomers = loadAll();
+        int maxId = existingCustomers.stream()
+                .mapToInt(c -> {
+                    try {
+                        return Integer.parseInt(c.getCustomerID().substring(1));
+                    } catch (NumberFormatException e) {
+                        return 0;
+                    }
+                })
+                .max()
+                .orElse(0);
+        
+        return "C" + String.format("%03d", maxId + 1);
+    }
+    
     public Customer findByEmail(String email) {
         for (Customer c : loadAll()) {
             if (c.getEmail().equals(email)) {
