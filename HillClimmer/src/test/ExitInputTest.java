@@ -1,6 +1,6 @@
 /*
  * Exit Input Feature Test Suite
- * Tests the "0" exit functionality throughout the HillClimber system
+ * Tests the "0" exit functionality throughout the HillClimmer system
  */
 package test;
 

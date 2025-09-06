@@ -7,6 +7,59 @@ A comprehensive **cross-platform Java-based** vehicle rental system designed spe
 
 **✨ Recent Updates**: Enhanced ID generation system, fixed rental ID mismatch issues, comprehensive DAO improvements, reverted to Ant build system for stability, and completed all major bug fixes for improved system reliability.
 
+---
+
+## 📖 Documentation
+
+- **[📚 Comprehensive User Guide](UserGuide.md)** - Complete guide with test accounts, portal tutorials, safety questions, and troubleshooting
+- **[🐛 Bug Tracking](bugs.md)** - Known issues and resolution status  
+- **[📋 Requirements](requirements.txt)** - System dependencies and setup requirements
+
+---
+
+## 📋 Changelog
+
+### Version 2.2 (September 6, 2025) - Bug Fixes Release
+- ✅ **Bug #1**: Removed long format for phone number and simplified input format display
+- ✅ **Bug #2**: Limited answer options within a-d with proper loop validation
+- ✅ **Bug #3**: Fixed password reset loop to properly validate 6+ character minimum
+- ✅ **Bug #4**: Resolved error when changing current password to same new password
+- ✅ **Bug #5**: Fixed login issue where old password still worked after password change
+- ✅ **Bug #6**: Fixed outstanding balance display after booking confirmation
+- ✅ **Bug #7**: Resolved rental ID mismatch between creation and history views
+- ✅ **Bug #8**: Improved error handling with try-catch and user-friendly date validation messages
+- ✅ **Bug #9**: Fixed system report crash after customer login and rental (null pointer exception)
+- ✅ **Bug #10**: Fixed revenue tracking for admin-added rentals (missing reminders and system reports)
+- ✅ **Bug #11**: Fixed rental history pagination to show more than 2 rentals (added page navigation)
+- ✅ **Bug #12**: Added vehicle type validation during addition (prevents invalid selections)
+- ✅ **Bug #13**: Implemented condition selection (a,b,c) and auto-generated vehicle IDs (MB001, DB001, BG001, CR001)
+- ✅ **Bug #14**: Enhanced vehicle update functionality to include price and availability updates
+
+### Version 2.1 (September 6, 2025)
+- ✅ **Advanced ID Generation System**: Implemented automatic ID generation for all DAO classes
+- ✅ **Fixed Rental ID Mismatch**: Resolved rental ID inconsistencies between creation and history views
+- ✅ **Enhanced Data Integrity**: All DAOs now check existing CSV data and generate unique IDs
+- ✅ **Comprehensive DAO Improvements**: Added generateNewId methods to CustomerDAO, InvoiceDAO, and all other DAO classes
+- ✅ **Build System Optimization**: Reverted to Ant build system for improved stability and reliability
+- ✅ **Consistent ID Formats**: Standardized ID generation (C001, R001, V001, P001, etc.)
+- ✅ **Conflict Prevention**: New entities won't overwrite existing data in CSV files
+- ✅ **Payment Integration**: Rental IDs remain consistent throughout the entire payment process
+
+### Version 2.0 (September 5, 2025)
+- ✅ **Enhanced Login System**: Customers can now login using either ID or email address
+- ✅ **Advanced Phone Validation**: Support for multiple Malaysian phone formats with auto-normalization
+- ✅ **Improved Input Validation**: Fixed while loop behavior for all input methods
+- ✅ **Enhanced IC Validation**: Added date validation for Malaysian IC numbers
+- ✅ **Comprehensive Testing**: Added RecentEnhancementsTest.java and organized test suite
+- ✅ **User Experience**: Clear prompts and error messages throughout the application
+- ✅ **Gradle Integration**: Added modern Gradle build system alongside existing Ant setup
+
+### Version 1.0 (Initial Release)
+- ✅ Basic vehicle rental system with customer and manager portals
+- ✅ Malaysian-specific validations and formatting
+- ✅ Role-based access control and security features
+- ✅ Complete rental lifecycle management
+
 ## ✨ Key Features
 
 ### 🔐 **Advanced Security & Authentication**
@@ -90,7 +143,7 @@ A comprehensive **cross-platform Java-based** vehicle rental system designed spe
 - **NetBeans IDE (recommended)** or any Java IDE
 - **Terminal/Command Prompt** for command line execution
 
-### � System Requirements
+### 💻 System Requirements
 
 | Component | Minimum | Recommended |
 |-----------|---------|-------------|
@@ -100,7 +153,7 @@ A comprehensive **cross-platform Java-based** vehicle rental system designed spe
 | **Storage** | 50 MB | 100 MB |
 | **Display** | 1024x768 | 1920x1080 |
 
-### �📦 Installing Dependencies
+### 📦 Installing Dependencies
 
 <details>
 <summary>🪟 Windows (Using winget)</summary>
@@ -232,108 +285,6 @@ ant run
 ```
 </details>
 
-## � Troubleshooting
-
-### Common Issues & Solutions
-
-<details>
-<summary>☕ Java Version Issues</summary>
-
-```bash
-# Check Java version
-java -version
-
-# Set JAVA_HOME (Windows)
-setx JAVA_HOME "C:\Program Files\Java\jdk-21"
-
-# Set JAVA_HOME (Linux/macOS)
-export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
-```
-</details>
-
-<details>
-<summary>🔨 Compilation Errors</summary>
-
-```bash
-# Clean and rebuild
-rm -rf build/
-mkdir build/classes
-
-# Compile with verbose output
-javac -d build/classes -sourcepath src --release 21 -verbose src/hillclimmer/*.java src/hillclimmer/*/*.java
-```
-</details>
-
-<details>
-<summary>⚠️ Runtime Errors</summary>
-
-```bash
-# Run with debug information
-java -cp build/classes -Djava.util.logging.level=INFO hillclimmer.HillClimmer
-
-# Check classpath
-java -cp build/classes hillclimmer.HillClimmer --demo
-```
-</details>
-
-<details>
-<summary>🔒 Permission Issues (Linux)</summary>
-
-```bash
-# Make scripts executable
-chmod +x *.sh
-
-# Run with proper permissions
-sudo java -cp build/classes hillclimmer.HillClimmer
-```
-</details>
-
-<details>
-<summary>🪟 Windows Path Issues</summary>
-
-```cmd
-# Add Java to PATH
-set PATH=%PATH%;"C:\Program Files\Java\jdk-21\bin"
-
-# Verify Java installation
-where java
-java -version
-```
-</details>
-
-## �👤 User Accounts & Credentials
-
-### 👥 Customer Accounts
-| Customer ID | Name | IC Number | Email | Password |
-|-------------|------|-----------|-------|----------|
-| C001 | Muhammad Ali | 950101-14-5678 | muhammad@email.com | AliSecure123! |
-| C002 | Jeremy Clarkson | 850101-01-1234 | jeremy@topgear.com | TopGear2025! |
-| C003 | Richard Hammond | 880202-02-2345 | richard@topgear.com | HammondRacing123! |
-| C004 | James May | 820303-03-3456 | james@topgear.com | CaptainSlow456! |
-| C005 | Sabine Schmitz | 790404-04-4567 | sabine@topgear.com | QueenOfNurburgring789! |
-| C006 | Chris Evans | 860505-05-5678 | chris@topgear.com | TopGearHostABC! |
-
-**💡 Login Options**: Customers can login using either Customer ID (C001) or Email address (muhammad@email.com)
-
-### 👨‍💼 Manager Accounts
-| Manager ID | Name | Password | Level | Permissions |
-|------------|------|----------|-------|-------------|
-| VM002 | Chin Wen Wei | Manager123! | 1 | View Only |
-| VM003 | Lye Wei Lun | SecurePass456! | 5 | Full Admin |
-| VM004 | Neeshwran A/L Veera Chelvan | Nurburg2025! | 3 | Standard Admin |
-| VM005 | Oscar Lim Zheng You | OscarRacing! | 4 | Advanced Admin |
-| VM006 | Teh Guan Chen | TehSecure789! | 5 | Full Admin |
-
-## 🔐 Authorization Levels
-
-| Level | Permissions | Description |
-|-------|-------------|-------------|
-| **1** | View Only | Can view vehicles and rentals |
-| **2** | Basic Admin | Can add/remove vehicles and rentals |
-| **3** | Standard Admin | All CRUD operations on vehicles |
-| **4** | Advanced Admin | Full access + admin functions |
-| **5** | Super Admin | Complete system control |
-
 ## 📁 Project Structure
 
 ```
@@ -433,20 +384,6 @@ HillClimmer/
 - **Enhanced Vehicle Management** with condition selection and price/availability updates
 - **14 Critical Bug Fixes** implemented for improved system reliability
 
-## 🐛 Troubleshooting
-
-### Common Issues:
-- **Compilation Errors**: Ensure Java 21+ and correct classpath
-- **File Not Found**: CSV files are auto-created in `/data/` folder
-- **Login Issues**: Check credentials in managers.csv/customers.csv
-- **Permission Errors**: Verify manager authorization levels
-
-### Debug Mode:
-```bash
-# Enable verbose logging
-java -cp src -Djava.util.logging.level=INFO hillclimmer.HillClimmer
-```
-
 ## 🤝 Contributing
 
 1. Fork the repository
@@ -466,51 +403,6 @@ This project is developed for educational purposes as part of the OOP course ass
 - **Neeshwran A/L Veera Chelvan** (VM004) - Tester/QA
 - **Oscar Lim Zheng You** (VM005) - Tester/QA
 - **Teh Guan Chen** (VM006) - Tester/QA
-
----
-
-## 📝 Changelog
-
-### Version 2.2 (September 6, 2025) - Bug Fixes Release
-- ✅ **Bug #1**: Removed long format for phone number and simplified input format display
-- ✅ **Bug #2**: Limited answer options within a-d with proper loop validation
-- ✅ **Bug #3**: Fixed password reset loop to properly validate 6+ character minimum
-- ✅ **Bug #4**: Resolved error when changing current password to same new password
-- ✅ **Bug #5**: Fixed login issue where old password still worked after password change
-- ✅ **Bug #6**: Fixed outstanding balance display after booking confirmation
-- ✅ **Bug #7**: Resolved rental ID mismatch between creation and history views
-- ✅ **Bug #8**: Improved error handling with try-catch and user-friendly date validation messages
-- ✅ **Bug #9**: Fixed system report crash after customer login and rental (null pointer exception)
-- ✅ **Bug #10**: Fixed revenue tracking for admin-added rentals (missing reminders and system reports)
-- ✅ **Bug #11**: Fixed rental history pagination to show more than 2 rentals (added page navigation)
-- ✅ **Bug #12**: Added vehicle type validation during addition (prevents invalid selections)
-- ✅ **Bug #13**: Implemented condition selection (a,b,c) and auto-generated vehicle IDs (MB001, DB001, BG001, CR001)
-- ✅ **Bug #14**: Enhanced vehicle update functionality to include price and availability updates
-
-### Version 2.1 (September 6, 2025)
-- ✅ **Advanced ID Generation System**: Implemented automatic ID generation for all DAO classes
-- ✅ **Fixed Rental ID Mismatch**: Resolved rental ID inconsistencies between creation and history views
-- ✅ **Enhanced Data Integrity**: All DAOs now check existing CSV data and generate unique IDs
-- ✅ **Comprehensive DAO Improvements**: Added generateNewId methods to CustomerDAO, InvoiceDAO, and all other DAO classes
-- ✅ **Build System Optimization**: Reverted to Ant build system for improved stability and reliability
-- ✅ **Consistent ID Formats**: Standardized ID generation (C001, R001, V001, P001, etc.)
-- ✅ **Conflict Prevention**: New entities won't overwrite existing data in CSV files
-- ✅ **Payment Integration**: Rental IDs remain consistent throughout the entire payment process
-
-### Version 2.0 (September 5, 2025)
-- ✅ **Enhanced Login System**: Customers can now login using either ID or email address
-- ✅ **Advanced Phone Validation**: Support for multiple Malaysian phone formats with auto-normalization
-- ✅ **Improved Input Validation**: Fixed while loop behavior for all input methods
-- ✅ **Enhanced IC Validation**: Added date validation for Malaysian IC numbers
-- ✅ **Comprehensive Testing**: Added RecentEnhancementsTest.java and organized test suite
-- ✅ **User Experience**: Clear prompts and error messages throughout the application
-- ✅ **Gradle Integration**: Added modern Gradle build system alongside existing Ant setup
-
-### Version 1.0 (Initial Release)
-- ✅ Basic vehicle rental system with customer and manager portals
-- ✅ Malaysian-specific validations and formatting
-- ✅ Role-based access control and security features
-- ✅ Complete rental lifecycle management
 
 ---
 
