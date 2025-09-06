@@ -23,11 +23,11 @@
 
 | Role | Name | ID | Module Responsibility |
 |------|------|----|----------------------|
-| **Project Lead** | Lye Wei Lun | VM003 | System Architecture & Integration |
-| **Tester/QA** | Chin Wen Wei | VM002 | Customer Module & Authentication |
-| **Tester/QA** | Neeshwran A/L Veera Chelvan | VM004 | Database Module & Data Persistence |
-| **Tester/QA** | Oscar Lim Zheng You | VM005 | Payment Module & Transactions |
-| **Tester/QA** | Teh Guan Chen | VM006 | Vehicle Module & Inventory |
+| **Project Lead** | Lye Wei Lun | VM003 | Vehicle & Database Module |
+| **Tester/QA** | Chin Wen Wei | VM002 | Rental Module |
+| **Tester/QA** | Neeshwran A/L Veera Chelvan | VM004 | Duration Module |
+| **Tester/QA** | Oscar Lim Zheng You | VM005 | Customer Module |
+| **Tester/QA** | Teh Guan Chen | VM006 | Payment Module |
 
 ---
 
