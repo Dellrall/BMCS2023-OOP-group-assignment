@@ -63,6 +63,37 @@ public class InvoiceDAO extends DataAccessObject<Invoice> {
     protected String getId(Invoice invoice) {
         return invoice.getInvoiceID();
     }
+    
+    @Override
+    protected Invoice generateNewId(Invoice invoice, java.util.List<Invoice> existingInvoices) {
+        // Generate new invoice ID based on existing invoices
+        int maxId = existingInvoices.stream()
+                .mapToInt(i -> {
+                    try {
+                        return Integer.parseInt(i.getInvoiceID().substring(1));
+                    } catch (NumberFormatException e) {
+                        return 0;
+                    }
+                })
+                .max()
+                .orElse(0);
+        
+        // Create new invoice with generated ID
+        String newInvoiceId = "I" + String.format("%03d", maxId + 1);
+        Invoice newInvoice = new Invoice(newInvoiceId, invoice.getVehicleID(), invoice.getCustomerID(),
+                                       invoice.getIssueDate(), invoice.getDueDate());
+        
+        // Copy items and discount
+        for (String item : invoice.getItemList()) {
+            String[] itemParts = item.split(":");
+            if (itemParts.length == 2) {
+                newInvoice.addItem(itemParts[0], Double.parseDouble(itemParts[1]));
+            }
+        }
+        newInvoice.applyDiscount(invoice.getDiscount());
+        
+        return newInvoice;
+    }
 
     // Additional methods
     public List<Invoice> getInvoicesByCustomer(String customerID) {

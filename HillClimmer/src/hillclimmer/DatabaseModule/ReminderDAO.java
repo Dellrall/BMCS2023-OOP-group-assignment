@@ -34,6 +34,20 @@ public class ReminderDAO extends DataAccessObject<Reminder> {
     protected String getId(Reminder reminder) {
         return String.valueOf(reminder.getReminderId());
     }
+    
+    @Override
+    protected Reminder generateNewId(Reminder reminder, java.util.List<Reminder> existingReminders) {
+        // Generate new reminder ID based on existing reminders
+        int maxId = existingReminders.stream()
+                .mapToInt(Reminder::getReminderId)
+                .max()
+                .orElse(0);
+        
+        // Create new reminder with generated ID
+        return new Reminder(maxId + 1, reminder.getReminderType(), reminder.getMessage(), 
+                          reminder.getDueDate(), reminder.getAssociatedId(), 
+                          reminder.getPriority());
+    }
 
     @Override
     protected Reminder csvToObject(String csvLine) {

@@ -22,6 +22,26 @@ public class RentalPeriodDAO extends DataAccessObject<RentalPeriod> {
     protected String getId(RentalPeriod period) {
         return String.valueOf(period.getPeriodId());
     }
+    
+    @Override
+    protected RentalPeriod generateNewId(RentalPeriod period, java.util.List<RentalPeriod> existingPeriods) {
+        // Generate new period ID based on existing periods
+        int maxId = existingPeriods.stream()
+                .mapToInt(RentalPeriod::getPeriodId)
+                .max()
+                .orElse(0);
+        
+        // Create new rental period with generated ID
+        RentalPeriod newPeriod = new RentalPeriod(maxId + 1, period.getRentalId(), 
+                                                period.getStartDate(), period.getEndDate(), 
+                                                period.getDailyRate(), period.isIncludesInsurance());
+        newPeriod.setStatus(period.getStatus());
+        if (period.getNotes() != null) {
+            newPeriod.setNotes(period.getNotes());
+        }
+        
+        return newPeriod;
+    }
 
     @Override
     protected String objectToCSV(RentalPeriod period) {
@@ -39,22 +59,26 @@ public class RentalPeriodDAO extends DataAccessObject<RentalPeriod> {
 
     @Override
     protected RentalPeriod csvToObject(String csvLine) {
-        String[] parts = csvLine.split(",");
-        if (parts.length >= 10) {
-            int periodId = Integer.parseInt(parts[0]);
-            int rentalId = Integer.parseInt(parts[1]);
-            LocalDate startDate = LocalDate.parse(parts[2]);
-            LocalDate endDate = LocalDate.parse(parts[3]);
-            // Skip createdDate and totalCost as they are calculated/set automatically
-            String status = parts[5];
-            double dailyRate = Double.parseDouble(parts[6]);
-            boolean includesInsurance = Boolean.parseBoolean(parts[8]);
-            String notes = parts[9].replace(";", ",");
+        try {
+            String[] parts = csvLine.split(",");
+            if (parts.length >= 10) {
+                int periodId = Integer.parseInt(parts[0]);
+                int rentalId = Integer.parseInt(parts[1]);
+                LocalDate startDate = LocalDate.parse(parts[2]);
+                LocalDate endDate = LocalDate.parse(parts[3]);
+                // Skip createdDate and totalCost as they are calculated/set automatically
+                String status = parts[5];
+                double dailyRate = Double.parseDouble(parts[6]);
+                boolean includesInsurance = Boolean.parseBoolean(parts[8]);
+                String notes = parts[9].replace(";", ",");
 
-            RentalPeriod period = new RentalPeriod(periodId, rentalId, startDate, endDate, dailyRate, includesInsurance);
-            period.setStatus(status);
-            period.setNotes(notes);
-            return period;
+                RentalPeriod period = new RentalPeriod(periodId, rentalId, startDate, endDate, dailyRate, includesInsurance);
+                period.setStatus(status);
+                period.setNotes(notes);
+                return period;
+            }
+        } catch (Exception e) {
+            System.err.println("Warning: Skipping corrupted rental period CSV line. Error: " + e.getMessage());
         }
         return null;
     }

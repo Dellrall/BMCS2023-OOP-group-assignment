@@ -43,6 +43,8 @@ public abstract class DataAccessObject<T> {
         synchronized (fileLock) {
             List<T> allObjects = loadAll();
             boolean exists = false;
+            
+            // Check if object already exists
             for (int i = 0; i < allObjects.size(); i++) {
                 if (getId(allObjects.get(i)).equals(getId(object))) {
                     allObjects.set(i, object);
@@ -50,12 +52,26 @@ public abstract class DataAccessObject<T> {
                     break;
                 }
             }
+            
             if (!exists) {
+                // Generate new ID if the object doesn't exist and ID is default (0 or empty)
+                String currentId = getId(object);
+                if (currentId.equals("0") || currentId.isEmpty()) {
+                    object = generateNewId(object, allObjects);
+                }
                 allObjects.add(object);
             }
+            
             // Always rewrite the entire file to ensure data integrity
             writeAllToFile(allObjects);
         }
+    }
+
+    // Generate new unique ID for the object
+    protected T generateNewId(T object, List<T> existingObjects) {
+        // This method should be overridden by subclasses that need ID generation
+        // Default implementation returns the object as-is
+        return object;
     }
 
     // Load object by ID

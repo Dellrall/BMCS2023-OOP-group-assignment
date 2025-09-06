@@ -65,4 +65,32 @@ public class SafetyCheckDAO extends DataAccessObject<SafetyCheck> {
     protected String getId(SafetyCheck safetyCheck) {
         return safetyCheck.getCheckID();
     }
+    
+    @Override
+    protected SafetyCheck generateNewId(SafetyCheck safetyCheck, java.util.List<SafetyCheck> existingChecks) {
+        // Generate new safety check ID based on existing checks
+        int maxId = existingChecks.stream()
+                .mapToInt(check -> {
+                    try {
+                        return Integer.parseInt(check.getCheckID().substring(2)); // Remove "SC" prefix
+                    } catch (NumberFormatException e) {
+                        return 0;
+                    }
+                })
+                .max()
+                .orElse(0);
+        
+        String newCheckId = "SC" + String.format("%03d", maxId + 1);
+        
+        // Create new safety check with generated ID
+        SafetyCheck newCheck = new SafetyCheck(safetyCheck.getCustomerID());
+        newCheck.setCheckID(newCheckId);
+        newCheck.setScore(safetyCheck.getScore());
+        newCheck.setTotalQuestions(safetyCheck.getTotalQuestions());
+        newCheck.setPassed(safetyCheck.isPassed());
+        newCheck.setCompletedDate(safetyCheck.getCompletedDate());
+        newCheck.setWrongAnswers(safetyCheck.getWrongAnswers());
+        
+        return newCheck;
+    }
 }

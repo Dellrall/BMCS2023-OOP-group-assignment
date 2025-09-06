@@ -33,15 +33,17 @@ public class CreditCardPayment extends Payment {
         System.out.println("Amount to pay: RM" + String.format("%.2f", totalAmount));
         System.out.println("Reference Number: " + referenceNumber);
 
-        // Collect card details
-        System.out.print("Enter card number (16 digits): ");
-        this.cardNumber = getUserInput();
+        // Collect card details with flexible input
+        System.out.print("Enter card number (16 digits, spaces/dashes allowed): ");
+        String cardInput = getUserInput();
+        this.cardNumber = normalizeCardNumber(cardInput);
 
         System.out.print("Enter card holder name: ");
         this.cardHolderName = getUserInput();
 
-        System.out.print("Enter expiry date (MM/YY): ");
-        this.expiryDate = getUserInput();
+        System.out.print("Enter expiry date (MM/YY or MM-YY or MM YY): ");
+        String expiryInput = getUserInput();
+        this.expiryDate = normalizeExpiryDate(expiryInput);
 
         System.out.print("Enter CVV (3 digits): ");
         this.cvv = getUserInput();
@@ -77,6 +79,32 @@ public class CreditCardPayment extends Payment {
             this.paymentStatus = "Failed";
             System.out.println("❌ Payment declined by card issuer.");
         }
+    }
+
+    /**
+     * Normalizes card number by removing spaces and dashes
+     * @param cardInput Card number with possible spaces/dashes
+     * @return Cleaned card number
+     */
+    public String normalizeCardNumber(String cardInput) {
+        return cardInput.replaceAll("[\\s-]", "");
+    }
+
+    /**
+     * Normalizes expiry date to MM/YY format
+     * @param expiryInput Expiry date in various formats
+     * @return Normalized expiry date
+     */
+    public String normalizeExpiryDate(String expiryInput) {
+        // Remove spaces and replace dashes with slashes
+        String cleaned = expiryInput.replaceAll("\\s", "").replace("-", "/");
+
+        // If no separator exists and we have 4 digits, add slash between MM and YY
+        if (!cleaned.contains("/") && cleaned.length() == 4) {
+            cleaned = cleaned.substring(0, 2) + "/" + cleaned.substring(2);
+        }
+
+        return cleaned;
     }
 
     private boolean isValidCardDetails() {

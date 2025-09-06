@@ -1,11 +1,11 @@
 # 🏔️ HillClimmer Malaysia Vehicle Rental System
 
-**Version 2.0** | *Last Updated: September 5, 2025*
+**Version 2.1** | *Last Updated: September 6, 2025*
 
 ## 📋 Overview
 A comprehensive **cross-platform Java-based** vehicle rental system designed specifically for Malaysia's hill climbing market. Features secure authentication, role-based access control, and complete rental lifecycle management with Malaysian-specific validations. **Compatible with Windows, Linux, and macOS**.
 
-**✨ Recent Updates**: Enhanced login system with email/ID options, improved phone number handling, and comprehensive input validation fixes.
+**✨ Recent Updates**: Enhanced ID generation system, fixed rental ID mismatch issues, comprehensive DAO improvements, and reverted to Ant build system for stability.
 
 ## ✨ Key Features
 
@@ -38,7 +38,7 @@ A comprehensive **cross-platform Java-based** vehicle rental system designed spe
 - **Age Calculation**: Automatic age from IC number
 - **Location Support**: Malaysian addresses and regions
 
-## 🆕 Recent Enhancements (v2.0)
+## 🆕 Recent Enhancements (v2.1)
 
 ### 🔑 **Enhanced Login System**
 - **Flexible Customer Login**: Login using Customer ID (C001) or Email address
@@ -54,6 +54,17 @@ A comprehensive **cross-platform Java-based** vehicle rental system designed spe
 - **While Loop Fixes**: All input methods now properly allow re-entry after validation errors
 - **Exit Functionality**: "0" input consistently exits to main menu from any input prompt
 - **Error Recovery**: Users can retry input without losing progress
+
+### 🆔 **Advanced ID Generation System**
+- **Automatic ID Generation**: All DAO classes now generate unique IDs automatically
+- **Conflict Prevention**: New entities won't overwrite existing CSV data
+- **Consistent Format**: Standardized ID formats (C001, R001, V001, etc.)
+- **Data Integrity**: Prevents ID conflicts across all entity types
+
+### 🛠️ **Fixed Rental ID Mismatch**
+- **Consistent ID Usage**: Rental IDs now match between creation and history views
+- **Payment Integration**: Rental IDs remain consistent throughout payment process
+- **Data Synchronization**: Fixed synchronization issues between rental creation and management
 
 ### 🧪 **Enhanced Testing Suite**
 - **Comprehensive Test Coverage**: New test files for recent enhancements
@@ -141,10 +152,10 @@ export PATH=$JAVA_HOME/bin:$PATH
 
 ### 🔨 Building the Project
 
-HillClimmer supports both **Ant** (traditional) and **Gradle** (modern) build systems. Choose the method that works best for your workflow.
+HillClimmer uses the **Ant build system** for reliable and consistent builds across all platforms.
 
 <details>
-<summary>🐜 Method 1: Ant Build (Traditional)</summary>
+<summary>🐜 Ant Build System</summary>
 
 ```bash
 # Compile the project
@@ -159,31 +170,13 @@ ant jar
 # Clean build files
 ant clean
 ```
-</details>
 
-<details>
-<summary>🦎 Method 2: Gradle Build (Modern)</summary>
-
-```bash
-# Compile the project
-./gradlew build
-
-# Run the application
-./gradlew run
-
-# Create JAR file
-./gradlew jar
-
-# Clean build files
-./gradlew clean
-```
-
-**Benefits of Gradle:**
-- ✅ Faster incremental builds
-- ✅ Better dependency management
-- ✅ Modern build features
+**Benefits of Ant:**
+- ✅ Reliable and stable build process
 - ✅ Cross-platform compatibility
-- ✅ IDE integration
+- ✅ Integrated with NetBeans IDE
+- ✅ Simple and straightforward
+- ✅ No external dependencies
 </details>
 
 ### Running the Application
@@ -218,17 +211,12 @@ java -cp build/classes hillclimmer.HillClimmer
 </details>
 
 <details>
-<summary>🔧 Method 4: Using Maven/Gradle (Alternative)</summary>
-
-If you prefer using build tools:
+<summary>🔧 Method 4: Using Ant Build Tool</summary>
 
 ```bash
-# Using Maven
-mvn compile exec:java -Dexec.mainClass="hillclimmer.HillClimmer"
-
-# Using Gradle
-gradle build
-gradle run
+# Compile and run with Ant
+ant compile
+ant run
 ```
 </details>
 
@@ -339,33 +327,50 @@ java -version
 ```
 HillClimmer/
 ├── src/hillclimmer/
-│   ├── HillClimmer.java          # Main application
+│   ├── HillClimmer.java          # Main application with enhanced ID management
 │   ├── CustomerModule/
-│   │   ├── Customer.java         # Customer management
+│   │   ├── Customer.java         # Customer management with auto-generated IDs
 │   │   └── SafetyCheck.java      # Safety quiz system
 │   ├── VehicleModule/
 │   │   ├── Vehicle.java          # Abstract vehicle class
-│   │   ├── VehicleManager.java   # Vehicle inventory
-│   │   └── [Vehicle types...]    # Bike, buggy classes
+│   │   ├── VehicleManager.java   # Vehicle inventory with ID generation
+│   │   └── [Vehicle types...]    # Bike, buggy classes with unique IDs
 │   ├── RentalModule/
-│   │   ├── Rental.java           # Rental processing
-│   │   └── RentalManager.java    # Rental management
+│   │   ├── Rental.java           # Rental processing with consistent IDs
+│   │   └── RentalManager.java    # Rental management with ID synchronization
 │   ├── PaymentModule/
-│   │   ├── Payment.java          # Payment processing
+│   │   ├── Payment.java          # Payment processing with timestamp IDs
 │   │   └── TransactionManager.java # Transaction tracking
 │   ├── DurationModule/
 │   │   ├── DurationManager.java  # Timer system
-│   │   └── Reminder.java         # Reminder system
+│   │   └── Reminder.java         # Reminder system with auto-generated IDs
 │   └── DatabaseModule/
 │       ├── Manager.java          # Manager authentication
 │       ├── ManagerDAO.java       # Manager data access
-│       └── [DAO classes...]      # Data persistence
+│       ├── DataAccessObject.java # Enhanced base class with ID generation
+│       ├── CustomerDAO.java      # Customer DAO with auto ID generation
+│       ├── VehicleDAO.java       # Vehicle DAO with type-based ID generation
+│       ├── RentalDAO.java        # Rental DAO with sequential ID generation
+│       ├── PaymentDAO.java       # Payment DAO with timestamp-based IDs
+│       ├── ReminderDAO.java      # Reminder DAO with sequential IDs
+│       ├── SafetyCheckDAO.java   # Safety check DAO with SC-prefixed IDs
+│       ├── RentalPeriodDAO.java  # Rental period DAO with auto IDs
+│       └── InvoiceDAO.java       # Invoice DAO with sequential ID generation
 ├── data/
-│   ├── customers.csv             # Customer database
+│   ├── customers.csv             # Customer database with auto-generated IDs
 │   ├── managers.csv              # Manager database
-│   ├── vehicles.csv              # Vehicle inventory
-│   ├── rentals.csv               # Rental records
-│   └── payments.csv              # Payment history
+│   ├── vehicles.csv              # Vehicle inventory with unique IDs
+│   ├── rentals.csv               # Rental records with consistent IDs
+│   ├── payments.csv              # Payment history with timestamp IDs
+│   ├── reminders.csv             # Reminder records with auto IDs
+│   ├── safetychecks.csv          # Safety check records
+│   ├── rentalperiods.csv         # Rental period records
+│   └── invoices.csv              # Invoice records with auto IDs
+├── build/
+│   └── classes/                  # Compiled Java classes
+├── nbproject/                    # NetBeans project configuration
+├── build.xml                     # Ant build configuration
+├── manifest.mf                   # JAR manifest file
 └── test/
     ├── AuthenticationTest.java     # Authentication testing
     ├── ComprehensiveSystemTest.java # Full system testing
@@ -405,11 +410,14 @@ HillClimmer/
 - **6 Sample Customers** with complete profiles and email addresses
 - **5 Manager Accounts** with different authorization levels
 - **70+ Vehicles** across multiple categories
-- **CSV-Based Storage** for all data persistence
+- **CSV-Based Storage** for all data persistence with auto-generated IDs
 - **Real-time Updates** for inventory and bookings
 - **Flexible Login Options** (ID or Email for customers)
 - **Multi-Format Phone Support** with auto-normalization
 - **Comprehensive Test Suite** with 20+ test files
+- **Automatic ID Generation** for all entity types
+- **Data Integrity Protection** against ID conflicts
+- **Consistent Rental IDs** throughout the payment process
 
 ## 🐛 Troubleshooting
 
@@ -449,6 +457,16 @@ This project is developed for educational purposes as part of the OOP course ass
 
 ## 📝 Changelog
 
+### Version 2.1 (September 6, 2025)
+- ✅ **Advanced ID Generation System**: Implemented automatic ID generation for all DAO classes
+- ✅ **Fixed Rental ID Mismatch**: Resolved rental ID inconsistencies between creation and history views
+- ✅ **Enhanced Data Integrity**: All DAOs now check existing CSV data and generate unique IDs
+- ✅ **Comprehensive DAO Improvements**: Added generateNewId methods to CustomerDAO, InvoiceDAO, and all other DAO classes
+- ✅ **Build System Optimization**: Reverted to Ant build system for improved stability and reliability
+- ✅ **Consistent ID Formats**: Standardized ID generation (C001, R001, V001, P001, etc.)
+- ✅ **Conflict Prevention**: New entities won't overwrite existing data in CSV files
+- ✅ **Payment Integration**: Rental IDs remain consistent throughout the entire payment process
+
 ### Version 2.0 (September 5, 2025)
 - ✅ **Enhanced Login System**: Customers can now login using either ID or email address
 - ✅ **Advanced Phone Validation**: Support for multiple Malaysian phone formats with auto-normalization
@@ -466,4 +484,6 @@ This project is developed for educational purposes as part of the OOP course ass
 
 ---
 
-**🏔️ Ready to explore Malaysia's hill climbing adventures with HillClimmer! 🚀**
+**🏔️ Ready to explore Malaysia's hill climbing adventures with HillClimmer v2.1! 🚀**
+
+*Last updated: September 6, 2025*

@@ -38,6 +38,16 @@ public class RentalManager {
         }
     }
     
+    public void addRentalWithId(int rentalId, int customerId, int vehicleId, LocalDate startDate, LocalDate endDate, double totalCost) {
+        if (hasPermission("add")) {
+            Rental rental = new Rental(rentalId, customerId, vehicleId, startDate, endDate, totalCost);
+            rentalDAO.save(rental);
+            System.out.println("✅ Rental added successfully by " + getManagerName());
+        } else {
+            System.out.println("❌ Insufficient permissions to add rental.");
+        }
+    }
+    
     public List<Rental> getAllRentals() {
         if (hasPermission("view")) {
             return rentalDAO.getAll();

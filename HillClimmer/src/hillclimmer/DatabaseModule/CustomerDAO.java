@@ -52,7 +52,14 @@ public class CustomerDAO extends DataAccessObject<Customer> {
                 String phoneNo = parts[3];
                 String email = parts[4];
                 String licenseType = parts[5];
-                LocalDate licenseExpiryDate = parts[6].isEmpty() ? null : LocalDate.parse(parts[6]);
+                LocalDate licenseExpiryDate = null;
+                if (!parts[6].isEmpty()) {
+                    try {
+                        licenseExpiryDate = LocalDate.parse(parts[6]);
+                    } catch (Exception e) {
+                        System.err.println("Warning: Invalid license expiry date format for customer " + parts[0] + ": " + parts[6]);
+                    }
+                }
                 int age = Integer.parseInt(parts[7].trim());
                 String registrationDate = parts[8];
                 double outstandingBalance = Double.parseDouble(parts[9].trim());
@@ -149,6 +156,44 @@ public class CustomerDAO extends DataAccessObject<Customer> {
     @Override
     protected String getId(Customer customer) {
         return customer.getCustomerID();
+    }
+    
+    @Override
+    protected Customer generateNewId(Customer customer, java.util.List<Customer> existingCustomers) {
+        // Generate new customer ID based on existing customers
+        int maxId = existingCustomers.stream()
+                .mapToInt(c -> {
+                    try {
+                        return Integer.parseInt(c.getCustomerID().substring(1));
+                    } catch (NumberFormatException e) {
+                        return 0;
+                    }
+                })
+                .max()
+                .orElse(0);
+        
+        // Create new customer with generated ID
+        String newCustomerId = "C" + String.format("%03d", maxId + 1);
+        Customer newCustomer = new Customer(newCustomerId, customer.getName(), customer.getIcNumber(),
+                                          customer.getPhoneNo(), customer.getEmail(), customer.getLicenseType(),
+                                          customer.getLicenseExpiryDate(), customer.getAge(), "TempPass123!");
+        
+        // Copy other properties
+        newCustomer.setRegistrationDate(customer.getRegistrationDate());
+        newCustomer.setOutstandingBalance(customer.getOutstandingBalance());
+        newCustomer.setActive(customer.isActive());
+        newCustomer.setSafetyCheckPassed(customer.isSafetyCheckPassed());
+        newCustomer.setSafetyCheckID(customer.getSafetyCheckID());
+        newCustomer.setSafetyCheckDate(customer.getSafetyCheckDate());
+        
+        // Copy password information if available
+        if (customer.getHashedPassword() != null) {
+            newCustomer.setHashedPassword(customer.getHashedPassword());
+            newCustomer.setSalt(customer.getSalt());
+            newCustomer.clearPlainPassword();
+        }
+        
+        return newCustomer;
     }
 
     // Additional methods specific to CustomerDAO

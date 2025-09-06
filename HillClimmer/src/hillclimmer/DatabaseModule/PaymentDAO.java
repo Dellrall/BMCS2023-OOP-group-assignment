@@ -68,6 +68,17 @@ public class PaymentDAO extends DataAccessObject<Payment> {
     protected String getId(Payment payment) {
         return payment.getPaymentID();
     }
+    
+    @Override
+    protected Payment generateNewId(Payment payment, java.util.List<Payment> existingPayments) {
+        // Generate new payment ID using timestamp to ensure uniqueness
+        String newPaymentId = "P" + System.currentTimeMillis();
+        
+        // Create new payment with generated ID based on type
+        return Payment.createPayment(payment.getPaymentMethod(), newPaymentId, 
+                                   payment.getTotalAmount(), payment.getTimestamp(), 
+                                   payment.getCustomerID());
+    }
 
     // Additional methods
     public double getTotalEarnings() {

@@ -1,43 +1,3 @@
-MB001,Mountain Bike,Trek X-Caliber,50.0,Good,true
-MB002,Mountain Bike,Giant Talon,45.0,Excellent,true
-MB003,Mountain Bike,Specialized Rockhopper,55.0,Good,true
-MB004,Mountain Bike,Cannondale Trail,60.0,New,true
-MB005,Mountain Bike,Santa Cruz Tallboy,80.0,Excellent,true
-MB006,Mountain Bike,Yeti SB130,90.0,Good,false
-MB007,Mountain Bike,Pivot Mach 4,85.0,New,true
-MB008,Mountain Bike,Norco Fluid,65.0,Good,true
-MB009,Mountain Bike,Bianchi Methanol,70.0,Excellent,true
-MB010,Mountain Bike,Scott Genius,75.0,Good,true
-MB011,Mountain Bike,Trek Fuel EX,95.0,New,true
-MB012,Mountain Bike,Giant Trance,72.0,Good,false
-MB013,Mountain Bike,Specialized Epic,88.0,Excellent,true
-MB014,Mountain Bike,Cannondale Scalpel,82.0,Good,true
-MB015,Mountain Bike,Santa Cruz Hightower,78.0,New,true
-MB016,Mountain Bike,Yeti 575,68.0,Good,true
-MB017,Mountain Bike,Pivot Trail 429,76.0,Excellent,true
-MB018,Mountain Bike,Norco Sight,63.0,Good,false
-MB019,Mountain Bike,Bianchi Supernova,71.0,New,true
-MB020,Mountain Bike,Scott Spark,79.0,Excellent,true
-DB001,Dirt Bike,KTM SX,75.0,Excellent,true
-DB002,Dirt Bike,Honda CRF,70.0,Good,true
-DB003,Dirt Bike,Yamaha WR,72.0,New,true
-DB004,Dirt Bike,Kawasaki KX,78.0,Excellent,true
-DB005,Dirt Bike,Suzuki RM,68.0,Good,false
-DB006,Dirt Bike,KTM EXC,82.0,New,true
-DB007,Dirt Bike,Honda CRF-R,85.0,Excellent,true
-DB008,Dirt Bike,Yamaha YZ,76.0,Good,true
-DB009,Dirt Bike,Kawasaki KLX,65.0,New,true
-DB010,Dirt Bike,Suzuki DR,63.0,Good,false
-DB011,Dirt Bike,KTM SX-F,88.0,Excellent,true
-DB012,Dirt Bike,Honda CRF-X,73.0,New,true
-DB013,Dirt Bike,Yamaha TT-R,58.0,Good,true
-DB014,Dirt Bike,Kawasaki KDX,67.0,Excellent,true
-DB015,Dirt Bike,Suzuki RM-Z,81.0,Good,false
-DB016,Dirt Bike,KTM XC,79.0,New,true
-DB017,Dirt Bike,Honda XR,69.0,Excellent,true
-DB018,Dirt Bike,Yamaha WR-F,77.0,Good,true
-DB019,Dirt Bike,Kawasaki KLX-R,71.0,New,true
-DB020,Dirt Bike,Suzuki DR-Z,62.0,Good,false
 BG001,Buggy,Polaris RZR,100.0,Good,false
 BG002,Buggy,Yamaha YXZ,110.0,New,true
 BG003,Buggy,Kawasaki Teryx,105.0,Excellent,true
@@ -68,3 +28,43 @@ CR012,Crossover,Mitsubishi Montero,128.0,Good,false
 CR013,Crossover,Land Rover Discovery,145.0,New,true
 CR014,Crossover,Toyota Prado,132.0,Excellent,true
 CR015,Crossover,Ford Explorer,138.0,Good,true
+DB001,Dirt Bike,KTM SX,75.0,Excellent,true
+DB002,Dirt Bike,Honda CRF,70.0,Good,true
+DB003,Dirt Bike,Yamaha WR,72.0,New,true
+DB004,Dirt Bike,Kawasaki KX,78.0,Excellent,true
+DB005,Dirt Bike,Suzuki RM,68.0,Good,false
+DB006,Dirt Bike,KTM EXC,82.0,New,true
+DB007,Dirt Bike,Honda CRF-R,85.0,Excellent,true
+DB008,Dirt Bike,Yamaha YZ,76.0,Good,true
+DB009,Dirt Bike,Kawasaki KLX,65.0,New,true
+DB010,Dirt Bike,Suzuki DR,63.0,Good,false
+DB011,Dirt Bike,KTM SX-F,88.0,Excellent,true
+DB012,Dirt Bike,Honda CRF-X,73.0,New,true
+DB013,Dirt Bike,Yamaha TT-R,58.0,Good,true
+DB014,Dirt Bike,Kawasaki KDX,67.0,Excellent,true
+DB015,Dirt Bike,Suzuki RM-Z,81.0,Good,false
+DB016,Dirt Bike,KTM XC,79.0,New,true
+DB017,Dirt Bike,Honda XR,69.0,Excellent,true
+DB018,Dirt Bike,Yamaha WR-F,77.0,Good,true
+DB019,Dirt Bike,Kawasaki KLX-R,71.0,New,true
+DB020,Dirt Bike,Suzuki DR-Z,62.0,Good,false
+MB001,Mountain Bike,Trek X-Caliber,50.0,Good,true
+MB002,Mountain Bike,Giant Talon,45.0,Excellent,true
+MB003,Mountain Bike,Specialized Rockhopper,55.0,Good,true
+MB004,Mountain Bike,Cannondale Trail,60.0,New,true
+MB005,Mountain Bike,Santa Cruz Tallboy,80.0,Excellent,true
+MB006,Mountain Bike,Yeti SB130,90.0,Good,false
+MB007,Mountain Bike,Pivot Mach 4,85.0,New,true
+MB008,Mountain Bike,Norco Fluid,65.0,Good,true
+MB009,Mountain Bike,Bianchi Methanol,70.0,Excellent,true
+MB010,Mountain Bike,Scott Genius,75.0,Good,true
+MB011,Mountain Bike,Trek Fuel EX,95.0,New,true
+MB012,Mountain Bike,Giant Trance,72.0,Good,false
+MB013,Mountain Bike,Specialized Epic,88.0,Excellent,true
+MB014,Mountain Bike,Cannondale Scalpel,82.0,Good,true
+MB015,Mountain Bike,Santa Cruz Hightower,78.0,New,true
+MB016,Mountain Bike,Yeti 575,68.0,Good,true
+MB017,Mountain Bike,Pivot Trail 429,76.0,Excellent,true
+MB018,Mountain Bike,Norco Sight,63.0,Good,false
+MB019,Mountain Bike,Bianchi Supernova,71.0,New,true
+MB020,Mountain Bike,Scott Spark,79.0,Excellent,true

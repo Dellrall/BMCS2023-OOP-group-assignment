@@ -59,6 +59,42 @@ public class VehicleDAO extends DataAccessObject<Vehicle> {
     protected String getId(Vehicle vehicle) {
         return vehicle.getVehicleID();
     }
+    
+    @Override
+    protected Vehicle generateNewId(Vehicle vehicle, java.util.List<Vehicle> existingVehicles) {
+        // Generate new vehicle ID based on existing vehicles
+        int maxId = existingVehicles.stream()
+                .mapToInt(v -> {
+                    try {
+                        return Integer.parseInt(v.getVehicleID().substring(1));
+                    } catch (NumberFormatException e) {
+                        return 0;
+                    }
+                })
+                .max()
+                .orElse(0);
+        
+        String newVehicleId = "V" + String.format("%03d", maxId + 1);
+        
+        // Create new vehicle with generated ID based on type
+        switch (vehicle.getVehicleType()) {
+            case "Mountain Bike":
+                return new MountainBike(newVehicleId, vehicle.getVehicleModel(), vehicle.getModelPricing(), 
+                                      vehicle.getVehicleCon(), vehicle.isAvailable());
+            case "Dirt Bike":
+                return new DirtBike(newVehicleId, vehicle.getVehicleModel(), vehicle.getModelPricing(), 
+                                  vehicle.getVehicleCon(), vehicle.isAvailable());
+            case "Buggy":
+                return new Buggy(newVehicleId, vehicle.getVehicleModel(), vehicle.getModelPricing(), 
+                               vehicle.getVehicleCon(), vehicle.isAvailable());
+            case "Crossover":
+                return new Crossover(newVehicleId, vehicle.getVehicleModel(), vehicle.getModelPricing(), 
+                                   vehicle.getVehicleCon(), vehicle.isAvailable());
+            default:
+                return new Vehicle(newVehicleId, vehicle.getVehicleType(), vehicle.getVehicleModel(), 
+                                 vehicle.getModelPricing(), vehicle.getVehicleCon(), vehicle.isAvailable());
+        }
+    }
 
     // Additional methods specific to VehicleDAO
     public java.util.List<Vehicle> getAvailableVehicles() {

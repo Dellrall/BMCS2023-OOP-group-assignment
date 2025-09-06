@@ -20,6 +20,7 @@ public class VehicleManager {
     private int modifierRules;
     private List<Vehicle> vehicles;
     private VehicleDAO vehicleDAO;
+    @SuppressWarnings("unused")
     private Manager authenticatedManager;
 
     // Constructor with Manager object for authentication

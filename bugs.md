@@ -1,12 +1,12 @@
 # The "Bugs" bunny
-1) remove the long format for phone number and just request input with the format before
-2) limit answer within a-d please choose answer within a-d , and loop)
-3) loop reset password if not meet 6 min
-4) error change current to new with same pass
-5) change new pass but login still use old pass
-6) booked but show no outstanding balance
-7) diff rental id (view rental and after rent)
-8) make error handling try catch, if I don't follow format it will show me error, instead it should display please enter valid date (and restart if needed)
+1) remove the long format for phone number and just request input with the format before - done
+2) limit answer within a-d please choose answer within a-d , and loop) - done
+3) loop reset password if not meet 6 min - done
+4) error change current to new with same pass - done
+5) change new pass but login still use old pass - done
+6) booked but show no outstanding balance - done
+7) diff rental id (view rental and after rent)  - done
+8) make error handling try catch, if I don't follow format it will show me error, instead it should display please enter valid date (and restart if needed) - done
 9) system report show error after login customer rent , customer count reduce to 1 after that ( all code break after system report) 
 10) revenue is increased before payment, if admin add rental, it does not add to system report (no pending reminder)
 11) doesn't show more than 2 rental

@@ -31,15 +31,19 @@ public class RentalDAO extends DataAccessObject<Rental> {
     
     @Override
     protected Rental csvToObject(String csvLine) {
-        String[] parts = csvLine.split(",");
-        if (parts.length >= 6) {
-            int rentalId = Integer.parseInt(parts[0]);
-            int customerId = Integer.parseInt(parts[1]);
-            int vehicleId = Integer.parseInt(parts[2]);
-            LocalDate startDate = LocalDate.parse(parts[3]);
-            LocalDate endDate = LocalDate.parse(parts[4]);
-            double totalCost = Double.parseDouble(parts[5]);
-            return new Rental(rentalId, customerId, vehicleId, startDate, endDate, totalCost);
+        try {
+            String[] parts = csvLine.split(",");
+            if (parts.length >= 6) {
+                int rentalId = Integer.parseInt(parts[0]);
+                int customerId = Integer.parseInt(parts[1]);
+                int vehicleId = Integer.parseInt(parts[2]);
+                LocalDate startDate = LocalDate.parse(parts[3]);
+                LocalDate endDate = LocalDate.parse(parts[4]);
+                double totalCost = Double.parseDouble(parts[5]);
+                return new Rental(rentalId, customerId, vehicleId, startDate, endDate, totalCost);
+            }
+        } catch (Exception e) {
+            System.err.println("Warning: Skipping corrupted rental CSV line. Error: " + e.getMessage());
         }
         return null;
     }
@@ -67,5 +71,18 @@ public class RentalDAO extends DataAccessObject<Rental> {
         return loadAll().stream()
                 .filter(rental -> rental.getVehicleId() == vehicleId)
                 .collect(Collectors.toList());
+    }
+    
+    @Override
+    protected Rental generateNewId(Rental rental, List<Rental> existingRentals) {
+        // Generate new rental ID based on existing rentals
+        int maxId = existingRentals.stream()
+                .mapToInt(Rental::getRentalId)
+                .max()
+                .orElse(0);
+        
+        // Create new rental with generated ID
+        return new Rental(maxId + 1, rental.getCustomerId(), rental.getVehicleId(), 
+                         rental.getStartDate(), rental.getEndDate(), rental.getTotalCost());
     }
 }

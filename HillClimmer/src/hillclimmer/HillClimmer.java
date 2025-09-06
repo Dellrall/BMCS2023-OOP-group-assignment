@@ -1046,13 +1046,8 @@ public class HillClimmer {
 
             Vehicle selectedVehicle = availableVehicles.get(vehicleChoice);
 
-            System.out.print("Rental start date (DD/MM/YYYY): ");
-            String startDateStr = scanner.nextLine().trim();
-            LocalDate startDate = LocalDate.parse(startDateStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-
-            System.out.print("Rental end date (DD/MM/YYYY): ");
-            String endDateStr = scanner.nextLine().trim();
-            LocalDate endDate = LocalDate.parse(endDateStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            LocalDate startDate = readDate("Rental start date (DD/MM/YYYY): ", true);
+            LocalDate endDate = readDate("Rental end date (DD/MM/YYYY): ", false);
 
             if (startDate.isAfter(endDate) || startDate.isBefore(LocalDate.now())) {
                 System.out.println("❌ Invalid date range.");
@@ -1078,7 +1073,7 @@ public class HillClimmer {
 
             // Create rental
             int rentalId = rentalManager.getAllRentals().size() + 1;
-            rentalManager.addRental(Integer.parseInt(currentCustomer.getCustomerID().substring(1)),
+            rentalManager.addRentalWithId(rentalId, Integer.parseInt(currentCustomer.getCustomerID().substring(1)),
                 Integer.parseInt(selectedVehicle.getVehicleID().substring(2)), startDate, endDate, totalCost);
 
             // Create rental period with timer
@@ -1090,11 +1085,104 @@ public class HillClimmer {
 
             System.out.println("✅ Rental created successfully!");
             System.out.println("Rental ID: R" + rentalId);
-            System.out.println("Please make payment to confirm the rental.");
+            
+            // INTEGRATED PAYMENT FLOW - Ask user to confirm and proceed with payment
+            System.out.println("\n💳 PAYMENT REQUIRED");
+            System.out.println("=".repeat(50));
+            System.out.println("Your rental has been created but requires payment to be confirmed.");
+            System.out.println("Vehicle: " + selectedVehicle.getVehicleModel());
+            System.out.println("Duration: " + days + " days");
+            System.out.println("Total Amount: RM" + String.format("%.2f", totalCost));
+            System.out.println("=".repeat(50));
+            
+            System.out.print("Proceed with payment now? (Y/N): ");
+            String proceedPayment = scanner.nextLine().trim().toUpperCase();
+            
+            if ("Y".equals(proceedPayment)) {
+                processRentalPayment(totalCost);
+            } else {
+                // Add rental amount to outstanding balance when payment is deferred
+                currentCustomer.setOutstandingBalance(currentCustomer.getOutstandingBalance() + totalCost);
+                customerDAO.update(currentCustomer);
+                System.out.println("📄 Payment can be completed later from the main menu.");
+                System.out.println("💰 Outstanding Balance: RM" + String.format("%.2f", currentCustomer.getOutstandingBalance()));
+                System.out.println("Please note: Rental is not confirmed until payment is made.");
+            }
 
         } catch (Exception e) {
             System.out.println("❌ Error creating rental: " + e.getMessage());
             pauseForUserConfirmation();
+        }
+    }
+
+    private static void processRentalPayment(double amount) {
+        System.out.println("\n💳 PAYMENT METHOD SELECTION");
+        System.out.println("=".repeat(50));
+        System.out.println("Amount to pay: RM" + String.format("%.2f", amount));
+        System.out.println("=".repeat(50));
+        
+        System.out.println("Payment Methods:");
+        System.out.println("1. 💳 Credit/Debit Card");
+        System.out.println("2. 🏦 Online Banking"); 
+        System.out.println("3. 💵 Cash (Payment Slip)");
+        System.out.print("Select payment method (1-3): ");
+
+        try {
+            String input = scanner.nextLine().trim();
+            if (input.isEmpty()) {
+                System.out.println("❌ Please enter a valid selection.");
+                return;
+            }
+            int method = Integer.parseInt(input);
+
+            if (method < 1 || method > 3) {
+                System.out.println("❌ Invalid payment method.");
+                return;
+            }
+
+            // Create payment based on method
+            String paymentID = "P" + System.currentTimeMillis();
+            String timestamp = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            Payment payment = null;
+
+            switch (method) {
+                case 1: // Credit Card
+                    payment = new CreditCardPayment(paymentID, amount, timestamp, currentCustomer.getCustomerID());
+                    break;
+                case 2: // Online Banking
+                    payment = new OnlineBankingPayment(paymentID, amount, timestamp, currentCustomer.getCustomerID());
+                    break;
+                case 3: // Cash
+                    payment = new CashPayment(paymentID, amount, timestamp, currentCustomer.getCustomerID());
+                    break;
+            }
+
+            // Process the payment
+            payment.processPayment();
+
+            // Record transaction if payment was successful
+            if ("Paid".equals(payment.getPaymentStatus())) {
+                transactionManager.recordTransaction(payment);
+                currentCustomer.setOutstandingBalance(currentCustomer.getOutstandingBalance() - amount);
+                customerDAO.update(currentCustomer);
+                System.out.println("✅ Payment of RM" + String.format("%.2f", amount) + " processed successfully!");
+                System.out.println("🎉 Your rental is now confirmed!");
+            } else if ("Prebooked - Awaiting Cash Payment".equals(payment.getPaymentStatus())) {
+                // For cash payments, record as pending
+                transactionManager.recordTransaction(payment);
+                System.out.println("📄 PAYMENT SLIP GENERATED");
+                System.out.println("=".repeat(50));
+                System.out.println("Please complete payment at the counter when you arrive.");
+                System.out.println("Reference Number: " + payment.getReferenceNumber());
+                System.out.println("Amount Due: RM" + String.format("%.2f", amount));
+                System.out.println("=".repeat(50));
+                System.out.println("⚠️  Your rental is pre-booked but not confirmed until payment is made.");
+            } else {
+                System.out.println("❌ Payment was not completed. Please try again.");
+            }
+
+        } catch (Exception e) {
+            System.out.println("❌ Payment failed: " + e.getMessage());
         }
     }
 
@@ -1509,7 +1597,22 @@ public class HillClimmer {
             
             String confirm = readString("Are you sure you want to remove rental " + rentalId + "? (y/n): ");
             if (confirm.toLowerCase().startsWith("y")) {
+                // Get rental details before deletion to adjust outstanding balance
+                Rental rentalToRemove = rentalManager.getRentalById(rentalId);
+                if (rentalToRemove != null) {
+                    // Find the customer who made this rental
+                    Customer rentalCustomer = customerDAO.load("C" + rentalToRemove.getCustomerId());
+                    if (rentalCustomer != null) {
+                        // Remove rental cost from outstanding balance
+                        double currentBalance = rentalCustomer.getOutstandingBalance();
+                        double newBalance = Math.max(0, currentBalance - rentalToRemove.getTotalCost());
+                        rentalCustomer.setOutstandingBalance(newBalance);
+                        customerDAO.update(rentalCustomer);
+                        System.out.println("💰 Outstanding balance adjusted: RM" + String.format("%.2f", currentBalance) + " → RM" + String.format("%.2f", newBalance));
+                    }
+                }
                 rentalManager.deleteRental(rentalId);
+                System.out.println("✅ Rental " + rentalId + " removed successfully.");
             } else {
                 System.out.println("❌ Rental removal cancelled.");
             }

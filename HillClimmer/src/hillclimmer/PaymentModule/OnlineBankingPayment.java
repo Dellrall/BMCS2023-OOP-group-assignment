@@ -13,8 +13,11 @@ import java.util.Scanner;
  */
 public class OnlineBankingPayment extends Payment {
     private String bankName;
+    @SuppressWarnings("unused")
     private String accountNumber;
+    @SuppressWarnings("unused")
     private String username;
+    @SuppressWarnings("unused")
     private String password;
     private String otpCode;
 
@@ -47,7 +50,7 @@ public class OnlineBankingPayment extends Payment {
 
         // Collect banking details
         System.out.print("Enter your " + bankName + " username: ");
-        this.username = getUserInput();
+        this.username = normalizeUsername(getUserInput());
 
         System.out.print("Enter your password: ");
         this.password = getMaskedInput();
@@ -98,6 +101,15 @@ public class OnlineBankingPayment extends Payment {
             this.paymentStatus = "Failed";
             System.out.println("❌ Payment failed due to insufficient funds or technical error.");
         }
+    }
+
+    /**
+     * Normalizes username by trimming whitespace
+     * @param usernameInput Username with possible extra spaces
+     * @return Cleaned username
+     */
+    public String normalizeUsername(String usernameInput) {
+        return usernameInput.trim();
     }
 
     private String getBankName(int choice) {

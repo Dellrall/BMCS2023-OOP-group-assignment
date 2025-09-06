@@ -4,10 +4,6 @@
  */
 package hillclimmer.PaymentModule;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Scanner;
-
 /**
  * Payment class for managing payment transactions.
  *
