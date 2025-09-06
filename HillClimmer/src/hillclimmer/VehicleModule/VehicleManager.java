@@ -22,6 +22,7 @@ public class VehicleManager {
     private VehicleDAO vehicleDAO;
     @SuppressWarnings("unused")
     private Manager authenticatedManager;
+    private final Object vehicleLock = new Object();
 
     // Constructor with Manager object for authentication
     public VehicleManager(Manager manager) {
@@ -51,13 +52,15 @@ public class VehicleManager {
 
     // Add a new vehicle to the pool
     public void addVehicle(Vehicle newVehicle) {
-        if (hasPermission("add")) {
-            vehicles.add(newVehicle);
-            vehicleDAO.save(newVehicle); // Persist to storage
-            changeCount++;
-            System.out.println("Vehicle " + newVehicle.getVehicleID() + " added successfully.");
-        } else {
-            System.out.println("Insufficient permissions to add vehicle.");
+        synchronized (vehicleLock) {
+            if (hasPermission("add")) {
+                vehicles.add(newVehicle);
+                vehicleDAO.save(newVehicle); // Persist to storage
+                changeCount++;
+                System.out.println("Vehicle " + newVehicle.getVehicleID() + " added successfully.");
+            } else {
+                System.out.println("Insufficient permissions to add vehicle.");
+            }
         }
     }
 
@@ -84,21 +87,41 @@ public class VehicleManager {
         }
     }
 
+    // Update vehicle availability
+    public void setVehicleAvailability(String vehicleID, boolean available) {
+        synchronized (vehicleLock) {
+            if (hasPermission("update")) {
+                Vehicle v = vehicleDAO.load(vehicleID);
+                if (v != null) {
+                    v.setAvailable(available);
+                    vehicleDAO.update(v); // Persist the changes
+                    changeCount++;
+                    System.out.println("Availability updated for " + vehicleID + " to " + (available ? "Available" : "Unavailable"));
+                } else {
+                    System.out.println("Vehicle " + vehicleID + " not found.");
+                }
+            } else {
+                System.out.println("Insufficient permissions to update availability.");
+            }
+        }
+    }
+
     // Update vehicle pricing
     public void setVehiclePricing(String vehicleID, double newPrice) {
-        if (hasPermission("update")) {
-            Vehicle v = vehicleDAO.load(vehicleID);
-            if (v != null) {
-                // Since Vehicle doesn't have setModelPricing, use DAO to update condition as placeholder
-                // In real implementation, add setter to Vehicle or handle in DAO
-                System.out.println("Pricing update for " + vehicleID + " to " + newPrice + " (persisted via DAO).");
-                vehicleDAO.update(v); // Persist any changes
-                changeCount++;
+        synchronized (vehicleLock) {
+            if (hasPermission("update")) {
+                Vehicle v = vehicleDAO.load(vehicleID);
+                if (v != null) {
+                    v.setModelPricing(newPrice);
+                    vehicleDAO.update(v); // Persist the changes
+                    changeCount++;
+                    System.out.println("Pricing updated for " + vehicleID + " to RM" + String.format("%.2f", newPrice));
+                } else {
+                    System.out.println("Vehicle " + vehicleID + " not found.");
+                }
             } else {
-                System.out.println("Vehicle " + vehicleID + " not found.");
+                System.out.println("Insufficient permissions to update pricing.");
             }
-        } else {
-            System.out.println("Insufficient permissions to update pricing.");
         }
     }
 
@@ -161,7 +184,9 @@ public class VehicleManager {
 
     // Get all vehicles (for integration with other modules)
     public List<Vehicle> getAllVehicles() {
-        return new ArrayList<>(vehicles);
+        synchronized (vehicleLock) {
+            return new ArrayList<>(vehicles);
+        }
     }
 
     // Get manager details

@@ -1,11 +1,11 @@
 # 🏔️ HillClimmer Malaysia Vehicle Rental System
 
-**Version 2.1** | *Last Updated: September 6, 2025*
+**Version 2.2** | *Last Updated: September 6, 2025*
 
 ## 📋 Overview
 A comprehensive **cross-platform Java-based** vehicle rental system designed specifically for Malaysia's hill climbing market. Features secure authentication, role-based access control, and complete rental lifecycle management with Malaysian-specific validations. **Compatible with Windows, Linux, and macOS**.
 
-**✨ Recent Updates**: Enhanced ID generation system, fixed rental ID mismatch issues, comprehensive DAO improvements, and reverted to Ant build system for stability.
+**✨ Recent Updates**: Enhanced ID generation system, fixed rental ID mismatch issues, comprehensive DAO improvements, reverted to Ant build system for stability, and completed all major bug fixes for improved system reliability.
 
 ## ✨ Key Features
 
@@ -38,7 +38,13 @@ A comprehensive **cross-platform Java-based** vehicle rental system designed spe
 - **Age Calculation**: Automatic age from IC number
 - **Location Support**: Malaysian addresses and regions
 
-## 🆕 Recent Enhancements (v2.1)
+## 🆕 Recent Enhancements (v2.2)
+
+### 🔧 **Comprehensive Bug Fixes**
+- **14 Critical Issues Resolved**: Fixed all reported bugs including system crashes, data inconsistencies, and user experience problems
+- **Enhanced System Stability**: Resolved null pointer exceptions and application crashes
+- **Improved Data Integrity**: Fixed revenue tracking, rental ID mismatches, and duplicate ID prevention
+- **Better User Experience**: Added input validation, clear error messages, and intuitive navigation
 
 ### 🔑 **Enhanced Login System**
 - **Flexible Customer Login**: Login using Customer ID (C001) or Email address
@@ -65,6 +71,12 @@ A comprehensive **cross-platform Java-based** vehicle rental system designed spe
 - **Consistent ID Usage**: Rental IDs now match between creation and history views
 - **Payment Integration**: Rental IDs remain consistent throughout payment process
 - **Data Synchronization**: Fixed synchronization issues between rental creation and management
+
+### 🚗 **Enhanced Vehicle Management**
+- **Auto-Generated Vehicle IDs**: Type-specific prefixes (MB001, DB001, BG001, CR001)
+- **Condition Selection**: Structured input with a/b/c options for Good/Excellent/New
+- **Comprehensive Updates**: Price and availability updates with validation
+- **Duplicate Prevention**: No more duplicate vehicle ID creation
 
 ### 🧪 **Enhanced Testing Suite**
 - **Comprehensive Test Coverage**: New test files for recent enhancements
@@ -409,15 +421,17 @@ HillClimmer/
 
 - **6 Sample Customers** with complete profiles and email addresses
 - **5 Manager Accounts** with different authorization levels
-- **70+ Vehicles** across multiple categories
-- **CSV-Based Storage** for all data persistence with auto-generated IDs
-- **Real-time Updates** for inventory and bookings
+- **70+ Vehicles** across multiple categories with auto-generated type-specific IDs
+- **CSV-Based Storage** for all data persistence with conflict-free ID generation
+- **Real-time Updates** for inventory and bookings with comprehensive validation
 - **Flexible Login Options** (ID or Email for customers)
 - **Multi-Format Phone Support** with auto-normalization
-- **Comprehensive Test Suite** with 20+ test files
-- **Automatic ID Generation** for all entity types
-- **Data Integrity Protection** against ID conflicts
+- **Comprehensive Test Suite** with 20+ test files including bug fix validations
+- **Automatic ID Generation** for all entity types with type-specific prefixes
+- **Data Integrity Protection** against ID conflicts and system crashes
 - **Consistent Rental IDs** throughout the payment process
+- **Enhanced Vehicle Management** with condition selection and price/availability updates
+- **14 Critical Bug Fixes** implemented for improved system reliability
 
 ## 🐛 Troubleshooting
 
@@ -457,6 +471,22 @@ This project is developed for educational purposes as part of the OOP course ass
 
 ## 📝 Changelog
 
+### Version 2.2 (September 6, 2025) - Bug Fixes Release
+- ✅ **Bug #1**: Removed long format for phone number and simplified input format display
+- ✅ **Bug #2**: Limited answer options within a-d with proper loop validation
+- ✅ **Bug #3**: Fixed password reset loop to properly validate 6+ character minimum
+- ✅ **Bug #4**: Resolved error when changing current password to same new password
+- ✅ **Bug #5**: Fixed login issue where old password still worked after password change
+- ✅ **Bug #6**: Fixed outstanding balance display after booking confirmation
+- ✅ **Bug #7**: Resolved rental ID mismatch between creation and history views
+- ✅ **Bug #8**: Improved error handling with try-catch and user-friendly date validation messages
+- ✅ **Bug #9**: Fixed system report crash after customer login and rental (null pointer exception)
+- ✅ **Bug #10**: Fixed revenue tracking for admin-added rentals (missing reminders and system reports)
+- ✅ **Bug #11**: Fixed rental history pagination to show more than 2 rentals (added page navigation)
+- ✅ **Bug #12**: Added vehicle type validation during addition (prevents invalid selections)
+- ✅ **Bug #13**: Implemented condition selection (a,b,c) and auto-generated vehicle IDs (MB001, DB001, BG001, CR001)
+- ✅ **Bug #14**: Enhanced vehicle update functionality to include price and availability updates
+
 ### Version 2.1 (September 6, 2025)
 - ✅ **Advanced ID Generation System**: Implemented automatic ID generation for all DAO classes
 - ✅ **Fixed Rental ID Mismatch**: Resolved rental ID inconsistencies between creation and history views
@@ -484,6 +514,6 @@ This project is developed for educational purposes as part of the OOP course ass
 
 ---
 
-**🏔️ Ready to explore Malaysia's hill climbing adventures with HillClimmer v2.1! 🚀**
+**🏔️ Ready to explore Malaysia's hill climbing adventures with HillClimmer v2.2! 🚀**
 
 *Last updated: September 6, 2025*

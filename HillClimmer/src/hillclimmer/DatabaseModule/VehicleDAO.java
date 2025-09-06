@@ -62,11 +62,31 @@ public class VehicleDAO extends DataAccessObject<Vehicle> {
     
     @Override
     protected Vehicle generateNewId(Vehicle vehicle, java.util.List<Vehicle> existingVehicles) {
-        // Generate new vehicle ID based on existing vehicles
+        // Generate new vehicle ID based on existing vehicles with proper prefixes
+        String prefix;
+        switch (vehicle.getVehicleType()) {
+            case "Mountain Bike":
+                prefix = "MB";
+                break;
+            case "Dirt Bike":
+                prefix = "DB";
+                break;
+            case "Buggy":
+                prefix = "BG";
+                break;
+            case "Crossover":
+                prefix = "CR";
+                break;
+            default:
+                prefix = "V"; // Fallback for unknown types
+        }
+
+        // Find the highest ID number for this vehicle type
         int maxId = existingVehicles.stream()
+                .filter(v -> v.getVehicleID().startsWith(prefix))
                 .mapToInt(v -> {
                     try {
-                        return Integer.parseInt(v.getVehicleID().substring(1));
+                        return Integer.parseInt(v.getVehicleID().substring(2));
                     } catch (NumberFormatException e) {
                         return 0;
                     }
@@ -74,7 +94,7 @@ public class VehicleDAO extends DataAccessObject<Vehicle> {
                 .max()
                 .orElse(0);
         
-        String newVehicleId = "V" + String.format("%03d", maxId + 1);
+        String newVehicleId = prefix + String.format("%03d", maxId + 1);
         
         // Create new vehicle with generated ID based on type
         switch (vehicle.getVehicleType()) {

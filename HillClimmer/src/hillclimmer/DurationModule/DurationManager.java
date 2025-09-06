@@ -18,6 +18,8 @@ public class DurationManager {
     private List<RentalPeriod> rentalPeriods;
     private int nextReminderId;
     private int nextPeriodId;
+    private final Object reminderLock = new Object();
+    private final Object periodLock = new Object();
 
     public DurationManager() {
         this.reminders = new ArrayList<>();
@@ -28,8 +30,10 @@ public class DurationManager {
 
     // Reminder management methods
     public void addReminder(Reminder reminder) {
-        reminder.setReminderId(nextReminderId++);
-        reminders.add(reminder);
+        synchronized (reminderLock) {
+            reminder.setReminderId(nextReminderId++);
+            reminders.add(reminder);
+        }
     }
 
     public Reminder createReturnReminder(int rentalId, LocalDateTime returnDate) {
@@ -51,13 +55,17 @@ public class DurationManager {
     }
 
     public List<Reminder> getAllReminders() {
-        return new ArrayList<>(reminders);
+        synchronized (reminderLock) {
+            return new ArrayList<>(reminders);
+        }
     }
 
     public List<Reminder> getPendingReminders() {
-        return reminders.stream()
-                .filter(r -> "PENDING".equals(r.getStatus()))
-                .collect(Collectors.toList());
+        synchronized (reminderLock) {
+            return reminders.stream()
+                    .filter(r -> "PENDING".equals(r.getStatus()))
+                    .collect(Collectors.toList());
+        }
     }
 
     public List<Reminder> getOverdueReminders() {
@@ -94,8 +102,10 @@ public class DurationManager {
 
     // Rental period management methods
     public void addRentalPeriod(RentalPeriod period) {
-        period.setPeriodId(nextPeriodId++);
-        rentalPeriods.add(period);
+        synchronized (periodLock) {
+            period.setPeriodId(nextPeriodId++);
+            rentalPeriods.add(period);
+        }
     }
 
     public RentalPeriod createBasicRentalPeriod(int rentalId, LocalDate startDate, LocalDate endDate, double dailyRate) {
@@ -111,7 +121,9 @@ public class DurationManager {
     }
 
     public List<RentalPeriod> getAllRentalPeriods() {
-        return new ArrayList<>(rentalPeriods);
+        synchronized (periodLock) {
+            return new ArrayList<>(rentalPeriods);
+        }
     }
 
     public List<RentalPeriod> getActiveRentalPeriods() {
@@ -180,10 +192,12 @@ public class DurationManager {
     }
 
     public double getTotalRevenueFromActivePeriods() {
-        return rentalPeriods.stream()
-                .filter(RentalPeriod::isActive)
-                .mapToDouble(RentalPeriod::getTotalCost)
-                .sum();
+        synchronized (periodLock) {
+            return rentalPeriods.stream()
+                    .filter(RentalPeriod::isActive)
+                    .mapToDouble(RentalPeriod::getTotalCost)
+                    .sum();
+        }
     }
 
     public void generateReturnRemindersForActivePeriods() {

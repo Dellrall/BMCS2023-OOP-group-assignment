@@ -17,6 +17,7 @@ public class TransactionManager {
     private List<Payment> transactionList;
     private double totalEarnings;
     private PaymentDAO paymentDAO;
+    private final Object transactionLock = new Object();
 
     public TransactionManager(String transactionManagerID) {
         this.transactionManagerID = transactionManagerID;
@@ -37,18 +38,22 @@ public class TransactionManager {
     }
 
     public double getTotalEarnings() {
-        return totalEarnings;
+        synchronized (transactionLock) {
+            return totalEarnings;
+        }
     }
 
     // Record a successful transaction
     public void recordTransaction(Payment payment) {
-        if ("Paid".equals(payment.getPaymentStatus())) {
-            transactionList.add(payment);
-            paymentDAO.save(payment); // Persist
-            totalEarnings += payment.getTotalAmount();
-            System.out.println("Transaction recorded: " + payment.getPaymentID());
-        } else {
-            System.out.println("Cannot record unpaid transaction: " + payment.getPaymentID());
+        synchronized (transactionLock) {
+            if ("Paid".equals(payment.getPaymentStatus())) {
+                transactionList.add(payment);
+                paymentDAO.save(payment); // Persist
+                totalEarnings += payment.getTotalAmount();
+                System.out.println("Transaction recorded: " + payment.getPaymentID());
+            } else {
+                System.out.println("Cannot record unpaid transaction: " + payment.getPaymentID());
+            }
         }
     }
 

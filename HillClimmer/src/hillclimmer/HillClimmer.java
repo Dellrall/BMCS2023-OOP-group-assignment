@@ -619,6 +619,18 @@ public class HillClimmer {
     private static void displayVehicleStatistics() {
         try {
             System.out.println("\n=== VEHICLE INVENTORY STATISTICS ===");
+            
+            // Ensure vehicleManager is initialized
+            if (vehicleManager == null) {
+                try {
+                    vehicleManager = new VehicleManager("VM001", 2, "Ahmad Abdullah", 5);
+                    loadVehiclesFromCSV();
+                } catch (Exception e) {
+                    System.err.println("❌ Error initializing vehicle manager: " + e.getMessage());
+                    return;
+                }
+            }
+            
             List<Vehicle> allVehicles = vehicleManager.getAllVehicles();
 
             if (allVehicles == null) {
@@ -1011,6 +1023,17 @@ public class HillClimmer {
         }
 
         // Show available vehicles
+        // Ensure vehicleManager is initialized for customer operations
+        if (vehicleManager == null) {
+            try {
+                vehicleManager = new VehicleManager("VM001", 2, "Ahmad Abdullah", 5);
+                loadVehiclesFromCSV();
+            } catch (Exception e) {
+                System.err.println("❌ Error initializing vehicle manager: " + e.getMessage());
+                return;
+            }
+        }
+        
         List<Vehicle> availableVehicles = vehicleManager.getAllVehicles().stream()
             .filter(Vehicle::isAvailable)
             .toList();
@@ -1198,12 +1221,66 @@ public class HillClimmer {
             return;
         }
 
-        for (Rental rental : customerRentals) {
-            System.out.println("Rental ID: R" + rental.getRentalId());
-            System.out.println("Vehicle ID: V" + rental.getVehicleId());
-            System.out.println("Period: " + rental.getStartDate() + " to " + rental.getEndDate());
-            System.out.println("Total Cost: RM" + String.format("%.2f", rental.getTotalCost()));
-            System.out.println("---");
+        final int ITEMS_PER_PAGE = 3;
+        int totalRentals = customerRentals.size();
+        int totalPages = (int) Math.ceil((double) totalRentals / ITEMS_PER_PAGE);
+        int currentPage = 1;
+
+        while (true) {
+            System.out.println("\n📋 My Rental History (Page " + currentPage + " of " + totalPages + "):");
+            System.out.println("=".repeat(50));
+
+            // Calculate start and end indices for current page
+            int startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            int endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalRentals);
+
+            // Display rentals for current page
+            for (int i = startIndex; i < endIndex; i++) {
+                Rental rental = customerRentals.get(i);
+                System.out.println("Rental ID: R" + rental.getRentalId());
+                System.out.println("Vehicle ID: V" + rental.getVehicleId());
+                System.out.println("Period: " + rental.getStartDate() + " to " + rental.getEndDate());
+                System.out.println("Total Cost: RM" + String.format("%.2f", rental.getTotalCost()));
+                System.out.println("---");
+            }
+
+            System.out.println("=".repeat(50));
+            System.out.println("Showing rentals " + (startIndex + 1) + "-" + endIndex + " of " + totalRentals);
+
+            // Navigation options
+            System.out.println("\n📄 Navigation Options:");
+            if (currentPage > 1) {
+                System.out.println("  P - Previous page");
+            }
+            if (currentPage < totalPages) {
+                System.out.println("  N - Next page");
+            }
+            System.out.println("  [Page Number] - Go to specific page (1-" + totalPages + ")");
+            System.out.println("  0 - Return to main menu");
+
+            System.out.print("Enter choice: ");
+            String input = scanner.nextLine().trim().toUpperCase();
+
+            if (input.equals("0")) {
+                break;
+            } else if (input.equals("P") && currentPage > 1) {
+                currentPage--;
+            } else if (input.equals("N") && currentPage < totalPages) {
+                currentPage++;
+            } else {
+                try {
+                    int pageNum = Integer.parseInt(input);
+                    if (pageNum >= 1 && pageNum <= totalPages) {
+                        currentPage = pageNum;
+                    } else {
+                        System.out.println("❌ Invalid page number. Please enter 1-" + totalPages);
+                        pauseForUserConfirmation();
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("❌ Invalid input. Please enter P, N, a page number, or 0");
+                    pauseForUserConfirmation();
+                }
+            }
         }
     }
 
@@ -1441,6 +1518,18 @@ public class HillClimmer {
     }
     private static void viewAllVehicles() {
         System.out.println("\n=== ALL VEHICLES ===");
+        
+        // Ensure vehicleManager is initialized
+        if (vehicleManager == null) {
+            try {
+                vehicleManager = new VehicleManager("VM001", 2, "Ahmad Abdullah", 5);
+                loadVehiclesFromCSV();
+            } catch (Exception e) {
+                System.err.println("❌ Error initializing vehicle manager: " + e.getMessage());
+                return;
+            }
+        }
+        
         List<Vehicle> vehicles = vehicleManager.getAllVehicles();
 
         for (Vehicle v : vehicles) {
@@ -1461,10 +1550,22 @@ public class HillClimmer {
                 System.out.println("❌ Please enter a valid selection.");
                 return;
             }
-            int type = Integer.parseInt(input);
+            
+            int type;
+            try {
+                type = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("❌ Invalid input. Please enter a number between 1 and 4.");
+                return;
+            }
+            
+            if (type < 1 || type > 4) {
+                System.out.println("❌ Invalid vehicle type. Please select a number between 1 and 4.");
+                return;
+            }
 
-            System.out.print("Vehicle ID: ");
-            String vehicleId = scanner.nextLine().trim();
+            // Auto-generate vehicle ID based on type
+            String vehicleId = generateVehicleId(type);
 
             System.out.print("Model: ");
             String model = scanner.nextLine().trim();
@@ -1477,8 +1578,29 @@ public class HillClimmer {
             }
             double price = Double.parseDouble(priceInput);
 
-            System.out.print("Condition: ");
-            String condition = scanner.nextLine().trim();
+            // Condition selection with a, b, c options
+            System.out.println("Condition Options:");
+            System.out.println("a. Good");
+            System.out.println("b. Excellent");
+            System.out.println("c. New");
+            System.out.print("Select condition (a-c): ");
+            String conditionInput = scanner.nextLine().trim().toLowerCase();
+            
+            String condition;
+            switch (conditionInput) {
+                case "a":
+                    condition = "Good";
+                    break;
+                case "b":
+                    condition = "Excellent";
+                    break;
+                case "c":
+                    condition = "New";
+                    break;
+                default:
+                    System.out.println("❌ Invalid condition. Please select a, b, or c.");
+                    return;
+            }
 
             Vehicle newVehicle;
             switch (type) {
@@ -1507,6 +1629,45 @@ public class HillClimmer {
         }
     }
 
+    private static String generateVehicleId(int vehicleType) {
+        String prefix;
+        switch (vehicleType) {
+            case 1:
+                prefix = "MB"; // Mountain Bike
+                break;
+            case 2:
+                prefix = "DB"; // Dirt Bike
+                break;
+            case 3:
+                prefix = "BG"; // Buggy
+                break;
+            case 4:
+                prefix = "CR"; // Crossover
+                break;
+            default:
+                prefix = "V"; // Fallback
+        }
+
+        // Get all existing vehicles to find the highest ID for this type
+        List<Vehicle> allVehicles = vehicleManager.getAllVehicles();
+        int maxId = 0;
+
+        for (Vehicle v : allVehicles) {
+            if (v.getVehicleID().startsWith(prefix)) {
+                try {
+                    int idNum = Integer.parseInt(v.getVehicleID().substring(2));
+                    if (idNum > maxId) {
+                        maxId = idNum;
+                    }
+                } catch (NumberFormatException e) {
+                    // Skip invalid IDs
+                }
+            }
+        }
+
+        return prefix + String.format("%03d", maxId + 1);
+    }
+
     private static void removeVehicle() {
         System.out.print("Enter vehicle ID to remove: ");
         String vehicleId = scanner.nextLine().trim();
@@ -1517,10 +1678,122 @@ public class HillClimmer {
         System.out.print("Enter vehicle ID to update: ");
         String vehicleId = scanner.nextLine().trim();
 
-        System.out.print("New condition: ");
-        String newCondition = scanner.nextLine().trim();
+        // First check if vehicle exists
+        Vehicle vehicle = null;
+        for (Vehicle v : vehicleManager.getAllVehicles()) {
+            if (v.getVehicleID().equals(vehicleId)) {
+                vehicle = v;
+                break;
+            }
+        }
+
+        if (vehicle == null) {
+            System.out.println("❌ Vehicle " + vehicleId + " not found.");
+            return;
+        }
+
+        System.out.println("\nCurrent vehicle details:");
+        System.out.println("ID: " + vehicle.getVehicleID());
+        System.out.println("Model: " + vehicle.getVehicleModel());
+        System.out.println("Type: " + vehicle.getVehicleType());
+        System.out.println("Price: RM" + String.format("%.2f", vehicle.getModelPricing()));
+        System.out.println("Condition: " + vehicle.getVehicleCon());
+        System.out.println("Available: " + (vehicle.isAvailable() ? "Yes" : "No"));
+
+        System.out.println("\nWhat would you like to update?");
+        System.out.println("1. Condition");
+        System.out.println("2. Price");
+        System.out.println("3. Availability");
+        System.out.println("4. All of the above");
+        System.out.print("Select option (1-4): ");
+
+        String choice = scanner.nextLine().trim();
+
+        switch (choice) {
+            case "1":
+                updateVehicleCondition(vehicleId);
+                break;
+            case "2":
+                updateVehiclePrice(vehicleId);
+                break;
+            case "3":
+                updateVehicleAvailability(vehicleId);
+                break;
+            case "4":
+                updateVehicleCondition(vehicleId);
+                updateVehiclePrice(vehicleId);
+                updateVehicleAvailability(vehicleId);
+                break;
+            default:
+                System.out.println("❌ Invalid option.");
+        }
+    }
+
+    private static void updateVehicleCondition(String vehicleId) {
+        // Condition selection with a, b, c options
+        System.out.println("Condition Options:");
+        System.out.println("a. Good");
+        System.out.println("b. Excellent");
+        System.out.println("c. New");
+        System.out.print("Select new condition (a-c): ");
+        String conditionInput = scanner.nextLine().trim().toLowerCase();
+        
+        String newCondition;
+        switch (conditionInput) {
+            case "a":
+                newCondition = "Good";
+                break;
+            case "b":
+                newCondition = "Excellent";
+                break;
+            case "c":
+                newCondition = "New";
+                break;
+            default:
+                System.out.println("❌ Invalid condition. Please select a, b, or c.");
+                return;
+        }
 
         vehicleManager.setVehicleDetails(vehicleId, newCondition);
+    }
+
+    private static void updateVehiclePrice(String vehicleId) {
+        System.out.print("Enter new price (RM): ");
+        String priceInput = scanner.nextLine().trim();
+        
+        try {
+            double newPrice = Double.parseDouble(priceInput);
+            if (newPrice <= 0) {
+                System.out.println("❌ Price must be greater than 0.");
+                return;
+            }
+            vehicleManager.setVehiclePricing(vehicleId, newPrice);
+        } catch (NumberFormatException e) {
+            System.out.println("❌ Invalid price format.");
+        }
+    }
+
+    private static void updateVehicleAvailability(String vehicleId) {
+        System.out.println("Availability Options:");
+        System.out.println("a. Available");
+        System.out.println("b. Unavailable");
+        System.out.print("Select availability (a-b): ");
+        String availabilityInput = scanner.nextLine().trim().toLowerCase();
+        
+        boolean available;
+        switch (availabilityInput) {
+            case "a":
+                available = true;
+                break;
+            case "b":
+                available = false;
+                break;
+            default:
+                System.out.println("❌ Invalid option. Please select a or b.");
+                return;
+        }
+
+        vehicleManager.setVehicleAvailability(vehicleId, available);
     }
 
     private static void viewAllCustomers() {
@@ -1535,32 +1808,87 @@ public class HillClimmer {
 
     private static void showSystemReports() {
         System.out.println("\n=== SYSTEM REPORTS ===");
-        System.out.println("Total Vehicles: " + vehicleManager.getAllVehicles().size());
-        System.out.println("Total Customers: " + customerDAO.getAll().size());
-        System.out.println("Active Rentals: " + rentalManager.getAllRentals().size());
-        System.out.println("Pending Reminders: " + durationManager.getPendingReminders().size());
-        System.out.println("Total Revenue: RM" + durationManager.getTotalRevenueFromActivePeriods());
+        try {
+            System.out.println("Total Vehicles: " + (vehicleManager != null ? vehicleManager.getAllVehicles().size() : 0));
+            System.out.println("Total Customers: " + customerDAO.getAll().size());
+            System.out.println("Active Rentals: " + rentalManager.getAllRentals().size());
+            System.out.println("Pending Reminders: " + durationManager.getPendingReminders().size());
+            System.out.println("Total Revenue: RM" + durationManager.getTotalRevenueFromActivePeriods());
+        } catch (Exception e) {
+            System.err.println("❌ Error generating system report: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     // Rental Management Methods
     private static void viewAllRentals() {
         System.out.println("\n=== ALL RENTALS ===");
         List<Rental> rentals = rentalManager.getAllRentals();
-        
+
         if (rentals.isEmpty()) {
             System.out.println("📭 No rentals found.");
             return;
         }
-        
-        System.out.println("📋 Current Rentals:");
-        System.out.println("=".repeat(80));
-        for (Rental rental : rentals) {
-            System.out.printf("ID: %d | Customer: %d | Vehicle: %d | Period: %s to %s | Cost: RM%.2f%n",
-                rental.getRentalId(), rental.getCustomerId(), rental.getVehicleId(),
-                rental.getStartDate(), rental.getEndDate(), rental.getTotalCost());
+
+        final int ITEMS_PER_PAGE = 5;
+        int totalRentals = rentals.size();
+        int totalPages = (int) Math.ceil((double) totalRentals / ITEMS_PER_PAGE);
+        int currentPage = 1;
+
+        while (true) {
+            System.out.println("\n📋 Current Rentals (Page " + currentPage + " of " + totalPages + "):");
+            System.out.println("=".repeat(80));
+
+            // Calculate start and end indices for current page
+            int startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            int endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalRentals);
+
+            // Display rentals for current page
+            for (int i = startIndex; i < endIndex; i++) {
+                Rental rental = rentals.get(i);
+                System.out.printf("ID: %d | Customer: %d | Vehicle: %d | Period: %s to %s | Cost: RM%.2f%n",
+                    rental.getRentalId(), rental.getCustomerId(), rental.getVehicleId(),
+                    rental.getStartDate(), rental.getEndDate(), rental.getTotalCost());
+            }
+
+            System.out.println("=".repeat(80));
+            System.out.println("Showing rentals " + (startIndex + 1) + "-" + endIndex + " of " + totalRentals);
+
+            // Navigation options
+            System.out.println("\n📄 Navigation Options:");
+            if (currentPage > 1) {
+                System.out.println("  P - Previous page");
+            }
+            if (currentPage < totalPages) {
+                System.out.println("  N - Next page");
+            }
+            System.out.println("  [Page Number] - Go to specific page (1-" + totalPages + ")");
+            System.out.println("  0 - Return to manager menu");
+
+            System.out.print("Enter choice: ");
+            String input = scanner.nextLine().trim().toUpperCase();
+
+            if (input.equals("0")) {
+                break;
+            } else if (input.equals("P") && currentPage > 1) {
+                currentPage--;
+            } else if (input.equals("N") && currentPage < totalPages) {
+                currentPage++;
+            } else {
+                try {
+                    int pageNum = Integer.parseInt(input);
+                    if (pageNum >= 1 && pageNum <= totalPages) {
+                        currentPage = pageNum;
+                    } else {
+                        System.out.println("❌ Invalid page number. Please enter 1-" + totalPages);
+                        pauseForUserConfirmation();
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("❌ Invalid input. Please enter P, N, a page number, or 0");
+                    pauseForUserConfirmation();
+                }
+            }
         }
-        System.out.println("=".repeat(80));
-        System.out.println("Total Rentals: " + rentals.size());
     }
 
     private static void addNewRental() {
@@ -1579,7 +1907,21 @@ public class HillClimmer {
             
             String confirm = readString("Confirm rental creation? (y/n): ");
             if (confirm.toLowerCase().startsWith("y")) {
-                rentalManager.addRental(customerId, vehicleId, startDate, endDate, totalCost);
+                // Generate rental ID
+                int rentalId = rentalManager.getAllRentals().size() + 1;
+
+                // Add rental with specific ID
+                rentalManager.addRentalWithId(rentalId, customerId, vehicleId, startDate, endDate, totalCost);
+
+                // Create rental period for revenue tracking
+                durationManager.createBasicRentalPeriod(rentalId, startDate, endDate, dailyRate);
+
+                // Create return reminder
+                durationManager.createReturnReminder(rentalId, endDate.atStartOfDay());
+
+                System.out.println("✅ Rental created successfully!");
+                System.out.println("Rental ID: R" + rentalId);
+                System.out.println("📊 Rental period and reminder created for system reports");
             } else {
                 System.out.println("❌ Rental creation cancelled.");
             }

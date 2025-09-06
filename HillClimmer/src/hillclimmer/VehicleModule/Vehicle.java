@@ -44,6 +44,10 @@ public class Vehicle {
         return modelPricing;
     }
 
+    public void setModelPricing(double modelPricing) {
+        this.modelPricing = modelPricing;
+    }
+
     public String getVehicleCon() {
         return vehicleCon;
     }
