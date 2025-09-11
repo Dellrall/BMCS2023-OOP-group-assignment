@@ -1,15 +1,23 @@
 # The "Bugs" bunny
-1) remove the long format for phone number and just request input with the format before - done
-2) limit answer within a-d please choose answer within a-d , and loop) - done
-3) loop reset password if not meet 6 min - done
-4) error change current to new with same pass - done
-5) change new pass but login still use old pass - done
-6) booked but show no outstanding balance - done
-7) diff rental id (view rental and after rent)  - done
-8) make error handling try catch, if I don't follow format it will show me error, instead it should display please enter valid date (and restart if needed) - done
-9) system report show error after login customer rent , customer count reduce to 1 after that ( all code break after system report) done
-10) revenue is increased before payment, if admin add rental, it does not add to system report (no pending reminder) done
-11) doesn't show more than 2 rental done
-12) add new vehicle doesn't limit vehicle type when asked but only after - done 
-13) condition should be selection a,b,c for each condition or else I can type number as condition or small case or customer see a lot diff condition confuse, the id should be made auto according to vehicle type just like ur MB001 , I can recreate same id (I cant remove same id also) - done
-14) update should include price update and availble - done
+
+1) ~~new password cannot change for admin~~ ✅ **FIXED** - Admin password change now works with proper validation and loop-back functionality
+2) ~~don't specify format (60xxxx , xxxx, xxxx) just let user type phone number as usual 01157881296 or 0115788129 (accept both value of 3 num or 4 num)~~ ✅ **FIXED** - Phone number input simplified with examples, now accepts 10-11 digit numbers with flexible formatting
+3) Registration failed: Password must be at least 6 characters long (if does not met requirement it no loop)
+4) payment online (crash)
+5) payment method cant exit back to menu (0 cancel payment)
+6) credit card payment (the amount should auto key in)
+7) credit card (crash)
+8) view rental (page indicator should be at bottom together with total rental)
+9) after view payment history, remain in profile menu
+10) update password also loop back if requirement not met
+11) by logic revenue should display after payment confirmed (system report)
+12) I can create exact same account details and login choose the first one (limit email)
+13) add rental history (from assignment question) customer can view past rental date and vehicle (11/7/2025 - 11/7/2025 MB001 X RM10 1 DAY)
+14) availability update did not change (logical error)
+15) need 2 times update vehicle all of the above to take effect changes 
+16) update price did not change (logical error)
+17) report did not update when delete rental (pending,revenue)
+18) adding new rental to customer should be same as fixed vehicle price since u already specify vehicle id, if every vehicle id can manually fill daily rate, the vehicle id wont matter
+19) when admin delete rental, customer account outstanding no change (logical error)
+20) active rental no increase after book
+21) save booked date so it doesn't conflict with other customer

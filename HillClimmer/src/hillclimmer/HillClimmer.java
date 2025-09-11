@@ -344,7 +344,7 @@ public class HillClimmer {
             String phone = readString(prompt);
             
             if (!Customer.isValidMalaysianPhoneInput(phone)) {
-                System.out.println("❌ Invalid Malaysian phone number format. Please use +60XXXXXXXXX or 01XXXXXXXXX format.");
+                System.out.println("❌ Invalid phone number format. Please enter a valid Malaysian phone number (e.g., 0123456789).");
                 continue;
             }
             
@@ -377,7 +377,7 @@ public class HillClimmer {
     }
 
     /**
-     * Reads and validates password with minimum length
+     * Reads and validates password with minimum length and format requirements
      * @param prompt The prompt message
      * @param minLength Minimum password length
      * @return Valid password
@@ -392,7 +392,46 @@ public class HillClimmer {
                 continue;
             }
             
+            // Check for hex digits (0-9, a-f, A-F)
+            boolean hasHex = password.matches(".*[0-9a-fA-F].*");
+            if (!hasHex) {
+                System.out.println("❌ Password must contain at least one hexadecimal character (0-9, a-f, A-F).");
+                continue;
+            }
+            
+            // Check for symbols
+            boolean hasSymbol = password.matches(".*[!@#$%^&*()_+=\\-\\[\\]{}|;:,.<>?].*");
+            if (!hasSymbol) {
+                System.out.println("❌ Password must contain at least one symbol (!@#$%^&*() etc.).");
+                continue;
+            }
+            
             return password;
+        }
+    }
+
+    /**
+     * Reads and validates password with confirmation
+     * @param prompt The prompt message for initial password
+     * @param minLength Minimum password length
+     * @return Valid confirmed password
+     * @throws UserExitException if user enters "0" to exit
+     */
+    static String readPasswordWithConfirmation(String prompt, int minLength) throws UserExitException {
+        while (true) {
+            // Get the first password
+            String password = readPassword(prompt, minLength);
+            
+            // Get confirmation password
+            String confirmPassword = readPassword("Confirm Password: ");
+            
+            if (password.equals(confirmPassword)) {
+                System.out.println("✅ Password confirmed successfully!");
+                return password;
+            } else {
+                System.out.println("❌ Passwords do not match. Please try again.");
+                System.out.println();
+            }
         }
     }
 
@@ -814,7 +853,7 @@ public class HillClimmer {
     private static void customerRegistration() {
         // Clear screen for registration page
         transitionToScreen();
-        
+
         System.out.println("=========================================");
         System.out.println("   🏔️  HillClimmer VEHICLE RENTAL   🏔️");
         System.out.println("        Malaysia's Premier Hill");
@@ -825,13 +864,84 @@ public class HillClimmer {
         System.out.println("\n💡 Enter '0' at any input to return to main menu");
 
         try {
-            String name = readString("Full Name (as per IC): ");
-            String icNumber = readIC("IC Number (XXXXXX-XX-XXXX): ");
-            String phoneNo = readPhone("Phone Number (you can enter in formats: +60XXXXXXXXX, 0XXXXXXXXX, 0xx-xxx-xxxx, or 0xx xxx xxxx): ");
-            String email = readEmail("Email Address: ");
-            String licenseType = readLicenseType("License Type (B, B2, D, DA, E, E1, E2): ");
-            LocalDate licenseExpiry = readDate("License Expiry Date (DD/MM/YYYY): ", false);
-            String password = readPassword("Create Password (min 6 characters): ", 6);
+            // Initialize variables to store valid inputs
+            String name = null;
+            String icNumber = null;
+            String phoneNo = null;
+            String email = null;
+            String licenseType = null;
+            LocalDate licenseExpiry = null;
+            String password = null;
+
+            // Loop for name input
+            while (name == null) {
+                try {
+                    name = readString("Full Name (as per IC): ");
+                } catch (UserExitException e) {
+                    System.out.println("🔙 Returned to main menu.");
+                    return;
+                }
+            }
+
+            // Loop for IC input
+            while (icNumber == null) {
+                try {
+                    icNumber = readIC("IC Number (XXXXXX-XX-XXXX): ");
+                } catch (UserExitException e) {
+                    System.out.println("🔙 Returned to main menu.");
+                    return;
+                }
+            }
+
+            // Loop for phone input
+            while (phoneNo == null) {
+                try {
+                    phoneNo = readPhone("Phone Number (e.g., 0123456789 or +60123456789): ");
+                } catch (UserExitException e) {
+                    System.out.println("🔙 Returned to main menu.");
+                    return;
+                }
+            }
+
+            // Loop for email input
+            while (email == null) {
+                try {
+                    email = readEmail("Email Address: ");
+                } catch (UserExitException e) {
+                    System.out.println("🔙 Returned to main menu.");
+                    return;
+                }
+            }
+
+            // Loop for license type input
+            while (licenseType == null) {
+                try {
+                    licenseType = readLicenseType("License Type (B, B2, D, DA, E, E1, E2): ");
+                } catch (UserExitException e) {
+                    System.out.println("🔙 Returned to main menu.");
+                    return;
+                }
+            }
+
+            // Loop for license expiry input
+            while (licenseExpiry == null) {
+                try {
+                    licenseExpiry = readDate("License Expiry Date (DD/MM/YYYY): ", false);
+                } catch (UserExitException e) {
+                    System.out.println("🔙 Returned to main menu.");
+                    return;
+                }
+            }
+
+            // Loop for password input
+            while (password == null) {
+                try {
+                    password = readPasswordWithConfirmation("Create Password (min 6 characters): ", 6);
+                } catch (UserExitException e) {
+                    System.out.println("🔙 Returned to main menu.");
+                    return;
+                }
+            }
 
             // Generate customer ID using DAO's consistent ID generation
             String customerId = customerDAO.generateNextCustomerId();
@@ -857,8 +967,6 @@ public class HillClimmer {
             System.out.println("Please remember this ID for login.");
             System.out.println("\n" + newCustomer.toString());
 
-        } catch (UserExitException e) {
-            System.out.println("🔙 Returned to main menu.");
         } catch (Exception e) {
             System.out.println("❌ Registration failed: " + e.getMessage());
             System.out.println("Please try again.");
@@ -1305,11 +1413,14 @@ public class HillClimmer {
 
             switch (choice) {
                 case 1:
-                    System.out.print("New phone number: ");
-                    String newPhone = scanner.nextLine().trim();
-                    currentCustomer.setPhoneNo(newPhone);
-                    customerDAO.update(currentCustomer);
-                    System.out.println("✅ Phone number updated successfully!");
+                    try {
+                        String newPhone = readPhone("New phone number (e.g., 0123456789): ");
+                        currentCustomer.setPhoneNo(newPhone);
+                        customerDAO.update(currentCustomer);
+                        System.out.println("✅ Phone number updated successfully!");
+                    } catch (UserExitException e) {
+                        System.out.println("🔙 Phone number update cancelled.");
+                    }
                     break;
                 case 2:
                     System.out.print("New email: ");
@@ -1319,14 +1430,18 @@ public class HillClimmer {
                     System.out.println("✅ Email updated successfully!");
                     break;
                 case 3:
-                    String currentPass = readPassword("Current password: ");
-                    if (currentCustomer.authenticate(currentPass)) {
-                        String newPass = readPassword("New password: ");
-                        currentCustomer.updatePassword(newPass);
-                        customerDAO.update(currentCustomer);
-                        System.out.println("✅ Password changed successfully!");
-                    } else {
-                        System.out.println("❌ Current password is incorrect.");
+                    try {
+                        String currentPass = readPassword("Current password: ");
+                        if (currentCustomer.authenticate(currentPass)) {
+                            String newPass = readPasswordWithConfirmation("New password: ", 6);
+                            currentCustomer.updatePassword(newPass);
+                            customerDAO.update(currentCustomer);
+                            System.out.println("✅ Password changed successfully!");
+                        } else {
+                            System.out.println("❌ Current password is incorrect.");
+                        }
+                    } catch (UserExitException e) {
+                        System.out.println("🔙 Password change cancelled.");
                     }
                     break;
                 case 4:
@@ -1505,13 +1620,15 @@ public class HillClimmer {
         try {
             String currentPass = readPassword("Current password: ");
             if (currentManager.authenticatePassword(currentPass)) {
-                String newPass = readPassword("New password: ");
+                String newPass = readPasswordWithConfirmation("New password: ", 6);
                 currentManager.updatePassword(newPass);
                 managerDAO.update(currentManager);
                 System.out.println("✅ Manager password changed successfully!");
             } else {
                 System.out.println("❌ Current password is incorrect.");
             }
+        } catch (UserExitException e) {
+            System.out.println("🔙 Password change cancelled.");
         } catch (Exception e) {
             System.out.println("❌ Error changing password: " + e.getMessage());
         }

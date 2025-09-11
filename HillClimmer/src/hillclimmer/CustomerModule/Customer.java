@@ -39,10 +39,10 @@ public class Customer {
 
     // Malaysian IC pattern: YYMMDD-PB-###G (12 digits + hyphen + 1 digit)
     private static final Pattern IC_PATTERN = Pattern.compile("\\d{6}-\\d{2}-\\d{4}");
-    // Malaysian phone pattern: +60XXXXXXXXX or 0XXXXXXXXX
-    private static final Pattern PHONE_PATTERN = Pattern.compile("(?:\\+60|0)[1-9]\\d{7,8}");
-    // Malaysian phone input pattern: allows various formats for input
-    private static final Pattern PHONE_INPUT_PATTERN = Pattern.compile("(?:\\+60|0)[1-9]\\d{7,8}|0\\d{2}-\\d{3}-\\d{4}|0\\d{2} \\d{3} \\d{4}");
+    // Malaysian phone pattern: +60XXXXXXXXXX or 0XXXXXXXXX (10-11 digits total)
+    private static final Pattern PHONE_PATTERN = Pattern.compile("(?:\\+60|0)[1-9]\\d{8,9}");
+    // Malaysian phone input pattern: allows various formats for input (10-11 digits total)
+    private static final Pattern PHONE_INPUT_PATTERN = Pattern.compile("(?:\\+60|0)[1-9]\\d{8,9}|0\\d{2}-\\d{3}-\\d{4}|0\\d{2} \\d{3} \\d{4}|0\\d{3}-\\d{3}-\\d{4}|0\\d{3} \\d{3} \\d{4}");
 
     // Password validation patterns
     private static final Pattern HEX_PATTERN = Pattern.compile("[0-9a-fA-F]");
