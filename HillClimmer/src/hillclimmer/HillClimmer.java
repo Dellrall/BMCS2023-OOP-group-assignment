@@ -974,6 +974,8 @@ public class HillClimmer {
             System.out.println("Please remember this ID for login.");
             System.out.println("\n" + newCustomer.toString());
 
+            pauseForUserConfirmation();
+
         } catch (Exception e) {
             System.out.println("❌ Registration failed: " + e.getMessage());
             System.out.println("Please try again.");
@@ -1323,6 +1325,8 @@ public class HillClimmer {
             System.out.println("✅ Rental created successfully!");
             System.out.println("Rental ID: R" + rentalId);
             
+            pauseForUserConfirmation();
+            
             // INTEGRATED PAYMENT FLOW - Ask user to confirm and proceed with payment
             System.out.println("\n💳 PAYMENT REQUIRED");
             System.out.println("=".repeat(50));
@@ -1440,6 +1444,10 @@ public class HillClimmer {
                     rentalManager.updateRental(rental);
                 }
                 
+                // Add rental amount to outstanding balance (pending cash payment)
+                currentCustomer.setOutstandingBalance(currentCustomer.getOutstandingBalance() + amount);
+                customerDAO.update(currentCustomer);
+                
                 System.out.println("📄 PAYMENT SLIP GENERATED");
                 System.out.println("=".repeat(50));
                 System.out.println("Please complete payment at the counter when you arrive.");
@@ -1456,6 +1464,7 @@ public class HillClimmer {
         } catch (Exception e) {
             System.out.println("❌ Payment failed: " + e.getMessage());
             e.printStackTrace(); // Add this for debugging
+            pauseForUserConfirmation();
         }
     }
 
@@ -1585,6 +1594,7 @@ public class HillClimmer {
                         currentCustomer.setPhoneNo(newPhone);
                         customerDAO.update(currentCustomer);
                         System.out.println("✅ Phone number updated successfully!");
+                        pauseForUserConfirmation();
                     } catch (UserExitException e) {
                         System.out.println("🔙 Phone number update cancelled.");
                     }
@@ -1595,6 +1605,7 @@ public class HillClimmer {
                     currentCustomer.setEmail(newEmail);
                     customerDAO.update(currentCustomer);
                     System.out.println("✅ Email updated successfully!");
+                    pauseForUserConfirmation();
                     break;
                 case 3:
                     try {
@@ -1604,8 +1615,10 @@ public class HillClimmer {
                             currentCustomer.updatePassword(newPass);
                             customerDAO.update(currentCustomer);
                             System.out.println("✅ Password changed successfully!");
+                            pauseForUserConfirmation();
                         } else {
                             System.out.println("❌ Current password is incorrect.");
+                            pauseForUserConfirmation();
                         }
                     } catch (UserExitException e) {
                         System.out.println("🔙 Password change cancelled.");
@@ -1619,9 +1632,11 @@ public class HillClimmer {
                     return;
                 default:
                     System.out.println("❌ Invalid option.");
+                    pauseForUserConfirmation();
             }
         } catch (Exception e) {
             System.out.println("❌ Error updating profile: " + e.getMessage());
+            pauseForUserConfirmation();
         }
     }
 
@@ -1818,6 +1833,20 @@ public class HillClimmer {
             if ("Paid".equals(payment.getPaymentStatus())) {
                 transactionManager.recordTransaction(payment);
                 currentCustomer.setOutstandingBalance(currentCustomer.getOutstandingBalance() - amount);
+                
+                // If customer paid outstanding balance online, mark any pending rentals as paid
+                // (since they effectively switched from cash payment to online payment)
+                List<Rental> customerRentals = rentalManager.getAllRentals().stream()
+                    .filter(r -> r.getCustomerId() == Integer.parseInt(currentCustomer.getCustomerID().substring(1)))
+                    .toList();
+                
+                for (Rental rental : customerRentals) {
+                    if ("Pending".equals(rental.getPaymentStatus())) {
+                        rental.setPaymentStatus("Paid");
+                        rentalManager.updateRental(rental);
+                    }
+                }
+                
                 customerDAO.update(currentCustomer);
                 System.out.println("✅ Payment of RM" + String.format("%.2f", amount) + " processed successfully!");
                 System.out.println("Remaining balance: RM" + String.format("%.2f", currentCustomer.getOutstandingBalance()));
@@ -2034,6 +2063,8 @@ public class HillClimmer {
         System.out.print("Enter vehicle ID to remove: ");
         String vehicleId = scanner.nextLine().trim();
         vehicleManager.removeVehicle(vehicleId);
+        System.out.println("✅ Vehicle removed successfully!");
+        pauseForUserConfirmation();
     }
 
     private static void updateVehicleDetails() {
@@ -2088,6 +2119,7 @@ public class HillClimmer {
                 break;
             default:
                 System.out.println("❌ Invalid option.");
+                pauseForUserConfirmation();
         }
     }
 
@@ -2113,10 +2145,13 @@ public class HillClimmer {
                 break;
             default:
                 System.out.println("❌ Invalid condition. Please select a, b, or c.");
+                pauseForUserConfirmation();
                 return;
         }
 
         vehicleManager.setVehicleDetails(vehicleId, newCondition);
+        System.out.println("✅ Vehicle condition updated successfully!");
+        pauseForUserConfirmation();
     }
 
     private static void updateVehiclePrice(String vehicleId) {
@@ -2127,11 +2162,15 @@ public class HillClimmer {
             double newPrice = Double.parseDouble(priceInput);
             if (newPrice <= 0) {
                 System.out.println("❌ Price must be greater than 0.");
+                pauseForUserConfirmation();
                 return;
             }
             vehicleManager.setVehiclePricing(vehicleId, newPrice);
+            System.out.println("✅ Vehicle price updated successfully!");
+            pauseForUserConfirmation();
         } catch (NumberFormatException e) {
             System.out.println("❌ Invalid price format.");
+            pauseForUserConfirmation();
         }
     }
 
@@ -2152,10 +2191,13 @@ public class HillClimmer {
                 break;
             default:
                 System.out.println("❌ Invalid option. Please select a or b.");
+                pauseForUserConfirmation();
                 return;
         }
 
         vehicleManager.setVehicleAvailability(vehicleId, available);
+        System.out.println("✅ Vehicle availability updated successfully!");
+        pauseForUserConfirmation();
     }
 
     private static void viewAllCustomers() {
@@ -2314,12 +2356,19 @@ public class HillClimmer {
                     // Find the customer who made this rental
                     Customer rentalCustomer = customerDAO.load("C" + rentalToRemove.getCustomerId());
                     if (rentalCustomer != null) {
-                        // Remove rental cost from outstanding balance
-                        double currentBalance = rentalCustomer.getOutstandingBalance();
-                        double newBalance = Math.max(0, currentBalance - rentalToRemove.getTotalCost());
-                        rentalCustomer.setOutstandingBalance(newBalance);
-                        customerDAO.update(rentalCustomer);
-                        System.out.println("💰 Outstanding balance adjusted: RM" + String.format("%.2f", currentBalance) + " → RM" + String.format("%.2f", newBalance));
+                        // Only adjust outstanding balance for unpaid or pending rentals
+                        // Paid rentals don't affect outstanding balance
+                        String rentalStatus = rentalToRemove.getPaymentStatus();
+                        if ("Unpaid".equals(rentalStatus) || "Pending".equals(rentalStatus)) {
+                            // Remove rental cost from outstanding balance
+                            double currentBalance = rentalCustomer.getOutstandingBalance();
+                            double newBalance = Math.max(0, currentBalance - rentalToRemove.getTotalCost());
+                            rentalCustomer.setOutstandingBalance(newBalance);
+                            customerDAO.update(rentalCustomer);
+                            System.out.println("💰 Outstanding balance adjusted: RM" + String.format("%.2f", currentBalance) + " → RM" + String.format("%.2f", newBalance));
+                        } else if ("Paid".equals(rentalStatus)) {
+                            System.out.println("💰 Rental was already paid - outstanding balance unchanged.");
+                        }
                     }
                 }
                 rentalManager.deleteRental(rentalId);
