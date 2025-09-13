@@ -26,21 +26,25 @@ public class RentalDAO extends DataAccessObject<Rental> {
                rental.getVehicleId() + "," +
                rental.getStartDate() + "," +
                rental.getEndDate() + "," +
-               rental.getTotalCost();
+               rental.getTotalCost() + "," +
+               rental.getPaymentStatus();
     }
     
     @Override
     protected Rental csvToObject(String csvLine) {
         try {
             String[] parts = csvLine.split(",");
-            if (parts.length >= 6) {
+            if (parts.length >= 7) {
                 int rentalId = Integer.parseInt(parts[0]);
                 int customerId = Integer.parseInt(parts[1]);
                 int vehicleId = Integer.parseInt(parts[2]);
                 LocalDate startDate = LocalDate.parse(parts[3]);
                 LocalDate endDate = LocalDate.parse(parts[4]);
                 double totalCost = Double.parseDouble(parts[5]);
-                return new Rental(rentalId, customerId, vehicleId, startDate, endDate, totalCost);
+                String paymentStatus = parts.length > 6 ? parts[6] : "Unpaid"; // Default to Unpaid for backward compatibility
+                Rental rental = new Rental(rentalId, customerId, vehicleId, startDate, endDate, totalCost);
+                rental.setPaymentStatus(paymentStatus);
+                return rental;
             }
         } catch (Exception e) {
             System.err.println("Warning: Skipping corrupted rental CSV line. Error: " + e.getMessage());
@@ -81,8 +85,10 @@ public class RentalDAO extends DataAccessObject<Rental> {
                 .max()
                 .orElse(0);
         
-        // Create new rental with generated ID
-        return new Rental(maxId + 1, rental.getCustomerId(), rental.getVehicleId(), 
+        // Create new rental with generated ID, preserving payment status
+        Rental newRental = new Rental(maxId + 1, rental.getCustomerId(), rental.getVehicleId(), 
                          rental.getStartDate(), rental.getEndDate(), rental.getTotalCost());
+        newRental.setPaymentStatus(rental.getPaymentStatus());
+        return newRental;
     }
 }

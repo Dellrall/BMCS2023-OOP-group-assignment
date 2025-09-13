@@ -12,6 +12,7 @@ import java.util.Scanner;
  * @author las
  */
 public class OnlineBankingPayment extends Payment {
+    private static final Scanner scanner = new Scanner(System.in);
     private String bankName;
     @SuppressWarnings("unused")
     private String accountNumber;
@@ -35,6 +36,7 @@ public class OnlineBankingPayment extends Payment {
         System.out.println("\n=== ONLINE BANKING PAYMENT ===");
         System.out.println("Amount to pay: RM" + String.format("%.2f", totalAmount));
         System.out.println("Reference Number: " + referenceNumber);
+        System.out.println("💡 Enter '0' at any input to cancel payment");
 
         // Select bank
         System.out.println("Available Banks:");
@@ -43,63 +45,97 @@ public class OnlineBankingPayment extends Payment {
         System.out.println("3. Public Bank");
         System.out.println("4. Hong Leong Bank");
         System.out.println("5. RHB Bank");
-        System.out.print("Select your bank (1-5): ");
+        System.out.print("Select your bank (1-5) or 0 to cancel: ");
 
-        int bankChoice = Integer.parseInt(getUserInput());
-        this.bankName = getBankName(bankChoice);
-
-        // Collect banking details
-        System.out.print("Enter your " + bankName + " username: ");
-        this.username = normalizeUsername(getUserInput());
-
-        System.out.print("Enter your password: ");
-        this.password = getMaskedInput();
-
-        // Simulate login verification
-        System.out.println("\n🔄 Verifying credentials with " + bankName + "...");
         try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+            String bankInput = getUserInput();
+            if (bankInput.equals("0")) {
+                System.out.println("🔙 Payment cancelled.");
+                this.paymentStatus = "Cancelled";
+                return;
+            }
 
-        if (!verifyCredentials()) {
-            System.out.println("❌ Invalid username or password.");
-            this.paymentStatus = "Failed";
-            return;
-        }
+            int bankChoice = Integer.parseInt(bankInput);
+            if (bankChoice < 1 || bankChoice > 5) {
+                System.out.println("❌ Invalid bank selection.");
+                this.paymentStatus = "Failed";
+                return;
+            }
 
-        System.out.println("✅ Login successful!");
+            this.bankName = getBankName(bankChoice);
 
-        // Request OTP
-        System.out.println("📱 OTP sent to your registered mobile number.");
-        System.out.print("Enter 6-digit OTP: ");
-        this.otpCode = getUserInput();
+            // Collect banking details
+            System.out.print("Enter your " + bankName + " username (or 0 to cancel): ");
+            String usernameInput = getUserInput();
+            if (usernameInput.equals("0")) {
+                System.out.println("🔙 Payment cancelled.");
+                this.paymentStatus = "Cancelled";
+                return;
+            }
+            this.username = normalizeUsername(usernameInput);
 
-        if (!verifyOTP()) {
-            System.out.println("❌ Invalid OTP.");
-            this.paymentStatus = "Failed";
-            return;
-        }
+            System.out.print("Enter your password (or 0 to cancel): ");
+            String passwordInput = getMaskedInput();
+            if (passwordInput.equals("0")) {
+                System.out.println("🔙 Payment cancelled.");
+                this.paymentStatus = "Cancelled";
+                return;
+            }
+            this.password = passwordInput;
 
-        // Process payment
-        System.out.println("\n🔄 Processing payment through " + bankName + "...");
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+            // Simulate login verification
+            System.out.println("\n🔄 Verifying credentials with " + bankName + "...");
+            try {
+                Thread.sleep(1500);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
 
-        // Simulate success/failure (95% success rate)
-        if (Math.random() > 0.05) {
+            if (!verifyCredentials()) {
+                System.out.println("❌ Invalid username or password.");
+                this.paymentStatus = "Failed";
+                return;
+            }
+
+            System.out.println("✅ Login successful!");
+
+            // Request OTP
+            System.out.println("📱 OTP sent to your registered mobile number.");
+            System.out.print("Enter 6-digit OTP (or 0 to cancel): ");
+            String otpInput = getUserInput();
+            if (otpInput.equals("0")) {
+                System.out.println("🔙 Payment cancelled.");
+                this.paymentStatus = "Cancelled";
+                return;
+            }
+            this.otpCode = otpInput;
+
+            if (!verifyOTP()) {
+                System.out.println("❌ Invalid OTP.");
+                this.paymentStatus = "Failed";
+                return;
+            }
+
+            // Process payment
+            System.out.println("\n🔄 Processing payment through " + bankName + "...");
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
+            // Process payment (always successful for demo purposes)
             this.paymentStatus = "Paid";
             this.paymentSlip = generatePaymentSlip();
             System.out.println("✅ Payment successful!");
             System.out.println("Amount RM" + String.format("%.2f", totalAmount) + " debited from your " + bankName + " account");
             System.out.println("Reference: " + referenceNumber);
-        } else {
+        } catch (NumberFormatException e) {
+            System.out.println("❌ Invalid input. Please enter a valid number.");
             this.paymentStatus = "Failed";
-            System.out.println("❌ Payment failed due to insufficient funds or technical error.");
+        } catch (Exception e) {
+            System.out.println("❌ Payment processing error: " + e.getMessage());
+            this.paymentStatus = "Failed";
         }
     }
 
@@ -134,18 +170,14 @@ public class OnlineBankingPayment extends Payment {
     }
 
     private String getUserInput() {
-        try (Scanner scanner = new Scanner(System.in)) {
-            return scanner.nextLine().trim();
-        }
+        return scanner.nextLine().trim();
     }
 
     private String getMaskedInput() {
         // Simple password masking simulation
-        try (Scanner scanner = new Scanner(System.in)) {
-            String input = scanner.nextLine().trim();
-            System.out.println("*".repeat(input.length())); // Show asterisks
-            return input;
-        }
+        String input = scanner.nextLine().trim();
+        System.out.println("*".repeat(input.length())); // Show asterisks
+        return input;
     }
 
     private String generatePaymentSlip() {

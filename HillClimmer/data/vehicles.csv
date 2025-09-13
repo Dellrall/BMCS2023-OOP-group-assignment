@@ -28,6 +28,7 @@ CR012,Crossover,Mitsubishi Montero,128.0,Good,false
 CR013,Crossover,Land Rover Discovery,145.0,New,true
 CR014,Crossover,Toyota Prado,132.0,Excellent,true
 CR015,Crossover,Ford Explorer,138.0,Good,true
+CR016,Crossover,Kawasaki Noriagai,50.0,Good,true
 DB001,Dirt Bike,KTM SX,75.0,Excellent,true
 DB002,Dirt Bike,Honda CRF,70.0,Good,true
 DB003,Dirt Bike,Yamaha WR,72.0,New,true

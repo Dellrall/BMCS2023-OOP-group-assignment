@@ -419,18 +419,25 @@ public class HillClimmer {
      */
     static String readPasswordWithConfirmation(String prompt, int minLength) throws UserExitException {
         while (true) {
-            // Get the first password
-            String password = readPassword(prompt, minLength);
-            
-            // Get confirmation password
-            String confirmPassword = readPassword("Confirm Password: ");
-            
-            if (password.equals(confirmPassword)) {
-                System.out.println("✅ Password confirmed successfully!");
-                return password;
-            } else {
-                System.out.println("❌ Passwords do not match. Please try again.");
-                System.out.println();
+            try {
+                // Get the first password (with validation)
+                String password = readPassword(prompt, minLength);
+                
+                // Get confirmation password (with same validation)
+                System.out.println("Now confirm your password:");
+                String confirmPassword = readPassword("Confirm Password: ", minLength);
+                
+                if (password.equals(confirmPassword)) {
+                    System.out.println("✅ Password confirmed successfully!");
+                    return password;
+                } else {
+                    System.out.println("❌ Passwords do not match. Please enter both passwords again.");
+                    System.out.println();
+                    // Loop continues, will ask for both passwords again
+                }
+            } catch (UserExitException e) {
+                // Re-throw the exception to allow user to exit
+                throw e;
             }
         }
     }
@@ -1053,15 +1060,17 @@ public class HillClimmer {
             System.out.println("7. �️  Remove Rental");
             System.out.println("\n�👥 CUSTOMER MANAGEMENT:");
             System.out.println("8. 👥 View All Customers");
+            System.out.println("\n💰 PAYMENT MANAGEMENT:");
+            System.out.println("12. 💵 Process Cash Payments");
             System.out.println("\n� ACCOUNT MANAGEMENT:");
-            System.out.println("9. 🔑 Change Password");
+            System.out.println("13. 🔑 Change Password");
             System.out.println("\n�📈 SYSTEM REPORTS:");
-            System.out.println("10. 📈 System Reports");
-            System.out.println("11. 🚪 Logout");
+            System.out.println("14. 📈 System Reports");
+            System.out.println("15. 🚪 Logout");
             System.out.println("\n💡 Enter '0' at any input to return to this menu");
             
             try {
-                int choice = readInt("Please select an option (1-11): ", 1, 11);
+                int choice = readInt("Please select an option (1-15): ", 1, 15);
 
             switch (choice) {
                 case 1:
@@ -1088,13 +1097,16 @@ public class HillClimmer {
                 case 8:
                     viewAllCustomers();
                     break;
-                case 9:
+                case 12:
+                    processCashPayments();
+                    break;
+                case 13:
                     changeManagerPassword();
                     break;
-                case 10:
+                case 14:
                     showSystemReports();
                     break;
-                case 11:
+                case 15:
                     System.out.println("👋 Manager logout successful.");
                     System.out.println("👤 Goodbye, " + (currentManager != null ? currentManager.getName() : "Manager") + "!");
                     System.out.println("🏢 Thank you for managing HillClimmer operations.");
@@ -1104,12 +1116,49 @@ public class HillClimmer {
                     isManagerMode = false;
                     return;
                 default:
-                    System.out.println("❌ Invalid option. Please select 1-10.");
+                    System.out.println("❌ Invalid option. Please select 1-15.");
             }
             } catch (UserExitException e) {
                 System.out.println("🔙 Returned to manager menu.");
                 continue;
             }
+        }
+    }
+
+    // Helper method to check if a vehicle type is allowed for a license type
+    private static boolean isVehicleAllowedForLicense(String vehicleType, String licenseType) {
+        if (licenseType == null) return false;
+
+        switch (licenseType.toUpperCase()) {
+            case "B":
+                // License B can drive Dirt Bikes and Mountain Bikes only
+                return "Dirt Bike".equals(vehicleType) || "Mountain Bike".equals(vehicleType);
+            case "B2":
+                // License B2 can drive Dirt Bikes, Mountain Bikes, and possibly more
+                return "Dirt Bike".equals(vehicleType) || "Mountain Bike".equals(vehicleType) ||
+                       "Buggy".equals(vehicleType);
+            case "D":
+                // License D can drive all vehicle types
+                return true;
+            default:
+                // Unknown license types can only drive bikes for safety
+                return "Dirt Bike".equals(vehicleType) || "Mountain Bike".equals(vehicleType);
+        }
+    }
+
+    // Helper method to get allowed vehicle types as a string
+    private static String getAllowedVehicleTypes(String licenseType) {
+        if (licenseType == null) return "None";
+
+        switch (licenseType.toUpperCase()) {
+            case "B":
+                return "Dirt Bikes, Mountain Bikes";
+            case "B2":
+                return "Dirt Bikes, Mountain Bikes, Buggies";
+            case "D":
+                return "All vehicle types";
+            default:
+                return "Dirt Bikes, Mountain Bikes (contact admin for other types)";
         }
     }
 
@@ -1142,41 +1191,91 @@ public class HillClimmer {
             }
         }
         
+        // Filter vehicles based on customer's license type
         List<Vehicle> availableVehicles = vehicleManager.getAllVehicles().stream()
             .filter(Vehicle::isAvailable)
+            .filter(v -> isVehicleAllowedForLicense(v.getVehicleType(), currentCustomer.getLicenseType()))
             .toList();
 
         if (availableVehicles.isEmpty()) {
-            System.out.println("❌ No vehicles are currently available for rental.");
+            System.out.println("❌ No vehicles are currently available for rental with your license type (" + currentCustomer.getLicenseType() + ").");
+            System.out.println("License " + currentCustomer.getLicenseType() + " can drive: " + getAllowedVehicleTypes(currentCustomer.getLicenseType()));
             pauseForUserConfirmation();
             return;
         }
 
-        System.out.println("Available vehicles:");
-        for (int i = 0; i < availableVehicles.size(); i++) {
-            Vehicle v = availableVehicles.get(i);
-            System.out.println((i + 1) + ". " + v.getVehicleID() + " - " + v.getVehicleModel() +
-                " (RM" + v.getModelPricing() + "/day)");
+        // Implement pagination with 10 vehicles per page
+        final int VEHICLES_PER_PAGE = 10;
+        int totalVehicles = availableVehicles.size();
+        int totalPages = (int) Math.ceil((double) totalVehicles / VEHICLES_PER_PAGE);
+        int currentPage = 1;
+        Vehicle selectedVehicle = null; // Declare outside loop
+
+        while (true) {
+            System.out.println("\n🚗 Available Vehicles (Page " + currentPage + " of " + totalPages + "):");
+            System.out.println("License Type: " + currentCustomer.getLicenseType() + " | Allowed: " + getAllowedVehicleTypes(currentCustomer.getLicenseType()));
+            System.out.println("=".repeat(80));
+
+            // Calculate start and end indices for current page
+            int startIndex = (currentPage - 1) * VEHICLES_PER_PAGE;
+            int endIndex = Math.min(startIndex + VEHICLES_PER_PAGE, totalVehicles);
+
+            // Display vehicles for current page
+            for (int i = startIndex; i < endIndex; i++) {
+                Vehicle v = availableVehicles.get(i);
+                System.out.printf("%-3d. %-8s - %-20s (RM%.2f/day) [%s]%n",
+                    (i + 1), v.getVehicleID(), v.getVehicleModel(),
+                    v.getModelPricing(), v.getVehicleType());
+            }
+
+            System.out.println("=".repeat(80));
+            System.out.println("Showing vehicles " + (startIndex + 1) + "-" + endIndex + " of " + totalVehicles);
+
+            // Navigation options
+            System.out.println("\n📄 Navigation Options:");
+            if (currentPage > 1) {
+                System.out.println("  P - Previous page");
+            }
+            if (currentPage < totalPages) {
+                System.out.println("  N - Next page");
+            }
+            System.out.println("  [Number] - Select vehicle by number (1-" + totalVehicles + ")");
+            System.out.println("  0 - Return to customer menu");
+
+            System.out.print("Enter choice: ");
+            String input = scanner.nextLine().trim().toUpperCase();
+
+            if (input.equals("0")) {
+                return; // Return to customer menu
+            } else if (input.equals("P") && currentPage > 1) {
+                currentPage--;
+            } else if (input.equals("N") && currentPage < totalPages) {
+                currentPage++;
+            } else {
+                try {
+                    int vehicleChoice = Integer.parseInt(input);
+                    if (vehicleChoice >= 1 && vehicleChoice <= totalVehicles) {
+                        // Valid selection - break out of pagination loop
+                        selectedVehicle = availableVehicles.get(vehicleChoice - 1);
+                        break; // Exit pagination loop
+                    } else {
+                        System.out.println("❌ Invalid vehicle number. Please enter 1-" + totalVehicles);
+                        pauseForUserConfirmation();
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("❌ Invalid input. Please enter P, N, a vehicle number, or 0");
+                    pauseForUserConfirmation();
+                }
+            }
+        } // End of pagination while loop
+
+        // At this point, selectedVehicle should be set
+        if (selectedVehicle == null) {
+            return; // User cancelled
         }
 
-        System.out.print("Select vehicle (1-" + availableVehicles.size() + "): ");
         try {
-            String input = scanner.nextLine().trim();
-            if (input.isEmpty()) {
-                System.out.println("❌ Please enter a valid selection.");
-                pauseForUserConfirmation();
-                return;
-            }
-            int vehicleChoice = Integer.parseInt(input) - 1;
-
-            if (vehicleChoice < 0 || vehicleChoice >= availableVehicles.size()) {
-                System.out.println("❌ Invalid vehicle selection.");
-                pauseForUserConfirmation();
-                return;
-            }
-
-            Vehicle selectedVehicle = availableVehicles.get(vehicleChoice);
-
+            // Continue with the rest of the rental process using selectedVehicle
             LocalDate startDate = readDate("Rental start date (DD/MM/YYYY): ", true);
             LocalDate endDate = readDate("Rental end date (DD/MM/YYYY): ", false);
 
@@ -1206,6 +1305,13 @@ public class HillClimmer {
             int rentalId = rentalManager.getAllRentals().size() + 1;
             rentalManager.addRentalWithId(rentalId, Integer.parseInt(currentCustomer.getCustomerID().substring(1)),
                 Integer.parseInt(selectedVehicle.getVehicleID().substring(2)), startDate, endDate, totalCost);
+            
+            // Get the created rental and set initial payment status
+            Rental newRental = rentalManager.getRentalById(rentalId);
+            if (newRental != null) {
+                newRental.setPaymentStatus("Unpaid");
+                rentalManager.updateRental(newRental);
+            }
 
             // Create rental period with timer
             durationManager.createBasicRentalPeriod(rentalId, startDate, endDate,
@@ -1230,7 +1336,7 @@ public class HillClimmer {
             String proceedPayment = scanner.nextLine().trim().toUpperCase();
             
             if ("Y".equals(proceedPayment)) {
-                processRentalPayment(totalCost);
+                processRentalPayment(totalCost, rentalId);
             } else {
                 // Add rental amount to outstanding balance when payment is deferred
                 currentCustomer.setOutstandingBalance(currentCustomer.getOutstandingBalance() + totalCost);
@@ -1246,28 +1352,43 @@ public class HillClimmer {
         }
     }
 
-    private static void processRentalPayment(double amount) {
+    private static void processRentalPayment(double amount, int rentalId) {
         System.out.println("\n💳 PAYMENT METHOD SELECTION");
         System.out.println("=".repeat(50));
         System.out.println("Amount to pay: RM" + String.format("%.2f", amount));
         System.out.println("=".repeat(50));
-        
+
         System.out.println("Payment Methods:");
         System.out.println("1. 💳 Credit/Debit Card");
-        System.out.println("2. 🏦 Online Banking"); 
+        System.out.println("2. 🏦 Online Banking");
         System.out.println("3. 💵 Cash (Payment Slip)");
-        System.out.print("Select payment method (1-3): ");
+        System.out.println("0. 🔙 Return to previous menu");
+        System.out.print("Select payment method (0-3): ");
 
         try {
             String input = scanner.nextLine().trim();
+
+            // Check for exit
+            if (input.equals("0")) {
+                System.out.println("🔙 Returned to previous menu.");
+                return;
+            }
+
             if (input.isEmpty()) {
                 System.out.println("❌ Please enter a valid selection.");
                 return;
             }
-            int method = Integer.parseInt(input);
 
-            if (method < 1 || method > 3) {
-                System.out.println("❌ Invalid payment method.");
+            int method;
+            try {
+                method = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("❌ Invalid input. Please enter a number between 0-3.");
+                return;
+            }
+
+            if (method < 0 || method > 3) {
+                System.out.println("❌ Invalid payment method. Please select 0-3.");
                 return;
             }
 
@@ -1294,13 +1415,31 @@ public class HillClimmer {
             // Record transaction if payment was successful
             if ("Paid".equals(payment.getPaymentStatus())) {
                 transactionManager.recordTransaction(payment);
-                currentCustomer.setOutstandingBalance(currentCustomer.getOutstandingBalance() - amount);
-                customerDAO.update(currentCustomer);
+                
+                // NOTE: Rental payments do NOT affect outstanding balance
+                // Outstanding balance is only for separate debt payments, not rental costs
+                
+                // Update rental payment status to Paid
+                Rental rental = rentalManager.getRentalById(rentalId);
+                if (rental != null) {
+                    rental.setPaymentStatus("Paid");
+                    rentalManager.updateRental(rental);
+                }
+                
                 System.out.println("✅ Payment of RM" + String.format("%.2f", amount) + " processed successfully!");
                 System.out.println("🎉 Your rental is now confirmed!");
+                pauseForUserConfirmation();
             } else if ("Prebooked - Awaiting Cash Payment".equals(payment.getPaymentStatus())) {
                 // For cash payments, record as pending
                 transactionManager.recordTransaction(payment);
+                
+                // Update rental payment status to Pending (cash payment)
+                Rental rental = rentalManager.getRentalById(rentalId);
+                if (rental != null) {
+                    rental.setPaymentStatus("Pending");
+                    rentalManager.updateRental(rental);
+                }
+                
                 System.out.println("📄 PAYMENT SLIP GENERATED");
                 System.out.println("=".repeat(50));
                 System.out.println("Please complete payment at the counter when you arrive.");
@@ -1308,12 +1447,15 @@ public class HillClimmer {
                 System.out.println("Amount Due: RM" + String.format("%.2f", amount));
                 System.out.println("=".repeat(50));
                 System.out.println("⚠️  Your rental is pre-booked but not confirmed until payment is made.");
+                pauseForUserConfirmation();
             } else {
                 System.out.println("❌ Payment was not completed. Please try again.");
+                pauseForUserConfirmation();
             }
 
         } catch (Exception e) {
             System.out.println("❌ Payment failed: " + e.getMessage());
+            e.printStackTrace(); // Add this for debugging
         }
     }
 
@@ -1326,6 +1468,7 @@ public class HillClimmer {
 
         if (customerRentals.isEmpty()) {
             System.out.println("You have no rental history.");
+            pauseForUserConfirmation();
             return;
         }
 
@@ -1349,6 +1492,28 @@ public class HillClimmer {
                 System.out.println("Vehicle ID: V" + rental.getVehicleId());
                 System.out.println("Period: " + rental.getStartDate() + " to " + rental.getEndDate());
                 System.out.println("Total Cost: RM" + String.format("%.2f", rental.getTotalCost()));
+                
+                // Display payment status with appropriate emoji
+                String statusEmoji = "";
+                String statusColor = "";
+                switch (rental.getPaymentStatus().toLowerCase()) {
+                    case "paid":
+                        statusEmoji = "✅";
+                        statusColor = "PAID";
+                        break;
+                    case "pending":
+                        statusEmoji = "⏳";
+                        statusColor = "PENDING";
+                        break;
+                    case "unpaid":
+                        statusEmoji = "❌";
+                        statusColor = "UNPAID";
+                        break;
+                    default:
+                        statusEmoji = "❓";
+                        statusColor = rental.getPaymentStatus().toUpperCase();
+                }
+                System.out.println("Payment Status: " + statusEmoji + " " + statusColor);
                 System.out.println("---");
             }
 
@@ -1370,6 +1535,7 @@ public class HillClimmer {
             String input = scanner.nextLine().trim().toUpperCase();
 
             if (input.equals("0")) {
+                pauseForUserConfirmation();
                 break;
             } else if (input.equals("P") && currentPage > 1) {
                 currentPage--;
@@ -1407,6 +1573,7 @@ public class HillClimmer {
             String input = scanner.nextLine().trim();
             if (input.isEmpty()) {
                 System.out.println("❌ Please enter a valid option.");
+                pauseForUserConfirmation();
                 return;
             }
             int choice = Integer.parseInt(input);
@@ -1448,6 +1615,7 @@ public class HillClimmer {
                     viewPaymentHistory();
                     break;
                 case 5:
+                    pauseForUserConfirmation();
                     return;
                 default:
                     System.out.println("❌ Invalid option.");
@@ -1467,6 +1635,7 @@ public class HillClimmer {
 
         if (customerPayments.isEmpty()) {
             System.out.println("No payment history found.");
+            pauseForUserConfirmation();
             return;
         }
 
@@ -1501,6 +1670,7 @@ public class HillClimmer {
             System.out.println("Safety Check ID: " + currentCustomer.getSafetyCheckID());
             System.out.println("Completed: " + currentCustomer.getSafetyCheckDate());
             System.out.println("You can proceed with vehicle bookings.");
+            pauseForUserConfirmation();
             return;
         }
 
@@ -1519,50 +1689,108 @@ public class HillClimmer {
 
             System.out.println("\n🎉 Safety check results saved to your profile!");
             System.out.println("You can now book vehicles without retaking the assessment.");
+            pauseForUserConfirmation();
         } else {
             System.out.println("\n❌ Safety check failed. You must pass the assessment before booking vehicles.");
             System.out.println("You can retake the safety check anytime from the main menu.");
+            pauseForUserConfirmation();
         }
     }
 
     private static void makePayment() {
         System.out.println("\n=== PAYMENT SYSTEM ===");
-        System.out.println("Outstanding Balance: RM" + String.format("%.2f", currentCustomer.getOutstandingBalance()));
+        double outstandingBalance = currentCustomer.getOutstandingBalance();
+        System.out.println("Outstanding Balance: RM" + String.format("%.2f", outstandingBalance));
 
-        if (currentCustomer.getOutstandingBalance() == 0) {
+        if (outstandingBalance == 0) {
             System.out.println("✅ No outstanding payments.");
+            pauseForUserConfirmation();
             return;
         }
 
-        System.out.println("Payment Methods:");
-        System.out.println("1. 💳 Credit/Debit Card");
-        System.out.println("2. 🏦 Online Banking");
-        System.out.println("3. 💵 Cash (Payment Slip)");
-        System.out.print("Select payment method (1-3): ");
+        System.out.println("\nPayment Options:");
+        System.out.println("1. � Pay Full Amount (RM" + String.format("%.2f", outstandingBalance) + ")");
+        System.out.println("2. 💵 Pay Custom Amount");
+        System.out.println("0. � Return to previous menu");
+        System.out.print("Select payment option (0-2): ");
 
         try {
+            String optionInput = scanner.nextLine().trim();
+
+            // Check for exit
+            if (optionInput.equals("0")) {
+                System.out.println("🔙 Returned to previous menu.");
+                return;
+            }
+
+            if (optionInput.isEmpty()) {
+                System.out.println("❌ Please enter a valid selection.");
+                pauseForUserConfirmation();
+                return;
+            }
+
+            int option;
+            try {
+                option = Integer.parseInt(optionInput);
+            } catch (NumberFormatException e) {
+                System.out.println("❌ Invalid input. Please enter 0-2.");
+                return;
+            }
+
+            if (option < 0 || option > 2) {
+                System.out.println("❌ Invalid option. Please select 0-2.");
+                return;
+            }
+
+            double amount;
+            if (option == 1) {
+                // Pay full amount automatically
+                amount = outstandingBalance;
+                System.out.println("✅ Paying full outstanding balance: RM" + String.format("%.2f", amount));
+            } else {
+                // Pay custom amount
+                System.out.print("Enter payment amount (RM): ");
+                String amountInput = scanner.nextLine().trim();
+                if (amountInput.isEmpty()) {
+                    System.out.println("❌ Please enter a valid amount.");
+                    pauseForUserConfirmation();
+                    return;
+                }
+
+                try {
+                    amount = Double.parseDouble(amountInput);
+                } catch (NumberFormatException e) {
+                    System.out.println("❌ Invalid amount format.");
+                    return;
+                }
+
+                if (amount <= 0) {
+                    System.out.println("❌ Payment amount must be greater than 0.");
+                    return;
+                }
+
+                if (amount > outstandingBalance) {
+                    System.out.println("❌ Payment amount cannot exceed outstanding balance of RM" + String.format("%.2f", outstandingBalance));
+                    return;
+                }
+            }
+
+            System.out.println("\nPayment Methods:");
+            System.out.println("1. 💳 Credit/Debit Card");
+            System.out.println("2. 🏦 Online Banking");
+            System.out.println("3. 💵 Cash (Payment Slip)");
+            System.out.print("Select payment method (1-3): ");
+
             String input = scanner.nextLine().trim();
             if (input.isEmpty()) {
                 System.out.println("❌ Please enter a valid selection.");
+                pauseForUserConfirmation();
                 return;
             }
             int method = Integer.parseInt(input);
 
             if (method < 1 || method > 3) {
                 System.out.println("❌ Invalid payment method.");
-                return;
-            }
-
-            System.out.print("Enter payment amount (RM): ");
-            String amountInput = scanner.nextLine().trim();
-            if (amountInput.isEmpty()) {
-                System.out.println("❌ Please enter a valid amount.");
-                return;
-            }
-            double amount = Double.parseDouble(amountInput);
-
-            if (amount <= 0 || amount > currentCustomer.getOutstandingBalance()) {
-                System.out.println("❌ Invalid payment amount.");
                 return;
             }
 
@@ -1593,13 +1821,21 @@ public class HillClimmer {
                 customerDAO.update(currentCustomer);
                 System.out.println("✅ Payment of RM" + String.format("%.2f", amount) + " processed successfully!");
                 System.out.println("Remaining balance: RM" + String.format("%.2f", currentCustomer.getOutstandingBalance()));
+                pauseForUserConfirmation();
             } else if ("Prebooked - Awaiting Cash Payment".equals(payment.getPaymentStatus())) {
                 // For cash payments, record as pending
                 transactionManager.recordTransaction(payment);
-                System.out.println("📄 Payment slip generated. Please complete payment at the counter.");
-                System.out.println("Reference: " + payment.getReferenceNumber());
+                System.out.println("📄 PAYMENT SLIP GENERATED");
+                System.out.println("=".repeat(50));
+                System.out.println("Please complete payment at the counter when you arrive.");
+                System.out.println("Reference Number: " + payment.getReferenceNumber());
+                System.out.println("Amount Due: RM" + String.format("%.2f", amount));
+                System.out.println("=".repeat(50));
+                System.out.println("⚠️  Your payment is pre-booked but not confirmed until payment is made.");
+                pauseForUserConfirmation();
             } else {
-                System.out.println("❌ Payment was not completed.");
+                System.out.println("❌ Payment was not completed. Please try again.");
+                pauseForUserConfirmation();
             }
 
         } catch (Exception e) {
@@ -1624,13 +1860,17 @@ public class HillClimmer {
                 currentManager.updatePassword(newPass);
                 managerDAO.update(currentManager);
                 System.out.println("✅ Manager password changed successfully!");
+                pauseForUserConfirmation();
             } else {
                 System.out.println("❌ Current password is incorrect.");
+                pauseForUserConfirmation();
             }
         } catch (UserExitException e) {
             System.out.println("🔙 Password change cancelled.");
+            pauseForUserConfirmation();
         } catch (Exception e) {
             System.out.println("❌ Error changing password: " + e.getMessage());
+            pauseForUserConfirmation();
         }
     }
     private static void viewAllVehicles() {
@@ -1654,6 +1894,7 @@ public class HillClimmer {
                 " | Price: RM" + v.getModelPricing() + " | Condition: " + v.getVehicleCon() +
                 " | Available: " + (v.isAvailable() ? "Yes" : "No"));
         }
+        pauseForUserConfirmation();
     }
 
     private static void addNewVehicle() {
@@ -1665,6 +1906,7 @@ public class HillClimmer {
             String input = scanner.nextLine().trim();
             if (input.isEmpty()) {
                 System.out.println("❌ Please enter a valid selection.");
+                pauseForUserConfirmation();
                 return;
             }
             
@@ -1691,6 +1933,7 @@ public class HillClimmer {
             String priceInput = scanner.nextLine().trim();
             if (priceInput.isEmpty()) {
                 System.out.println("❌ Please enter a valid price.");
+                pauseForUserConfirmation();
                 return;
             }
             double price = Double.parseDouble(priceInput);
@@ -1740,9 +1983,11 @@ public class HillClimmer {
 
             vehicleManager.addVehicle(newVehicle);
             System.out.println("✅ Vehicle added successfully!");
+            pauseForUserConfirmation();
 
         } catch (Exception e) {
             System.out.println("❌ Error adding vehicle: " + e.getMessage());
+            pauseForUserConfirmation();
         }
     }
 
@@ -1921,6 +2166,7 @@ public class HillClimmer {
             System.out.println("ID: " + c.getCustomerID() + " | Name: " + c.getName() +
                 " | Phone: " + c.getPhoneNo() + " | Balance: RM" + String.format("%.2f", c.getOutstandingBalance()));
         }
+        pauseForUserConfirmation();
     }
 
     private static void showSystemReports() {
@@ -1935,6 +2181,7 @@ public class HillClimmer {
             System.err.println("❌ Error generating system report: " + e.getMessage());
             e.printStackTrace();
         }
+        pauseForUserConfirmation();
     }
 
     // Rental Management Methods
@@ -1944,6 +2191,7 @@ public class HillClimmer {
 
         if (rentals.isEmpty()) {
             System.out.println("📭 No rentals found.");
+            pauseForUserConfirmation();
             return;
         }
 
@@ -1986,6 +2234,7 @@ public class HillClimmer {
             String input = scanner.nextLine().trim().toUpperCase();
 
             if (input.equals("0")) {
+                pauseForUserConfirmation();
                 break;
             } else if (input.equals("P") && currentPage > 1) {
                 currentPage--;
@@ -2039,11 +2288,14 @@ public class HillClimmer {
                 System.out.println("✅ Rental created successfully!");
                 System.out.println("Rental ID: R" + rentalId);
                 System.out.println("📊 Rental period and reminder created for system reports");
+                pauseForUserConfirmation();
             } else {
                 System.out.println("❌ Rental creation cancelled.");
+                pauseForUserConfirmation();
             }
         } catch (UserExitException e) {
             System.out.println("🔙 Rental creation cancelled. Returned to manager menu.");
+            pauseForUserConfirmation();
         }
     }
 
@@ -2072,11 +2324,108 @@ public class HillClimmer {
                 }
                 rentalManager.deleteRental(rentalId);
                 System.out.println("✅ Rental " + rentalId + " removed successfully.");
+                pauseForUserConfirmation();
             } else {
                 System.out.println("❌ Rental removal cancelled.");
+                pauseForUserConfirmation();
             }
         } catch (UserExitException e) {
             System.out.println("🔙 Rental removal cancelled. Returned to manager menu.");
+            pauseForUserConfirmation();
+        }
+    }
+
+    private static void processCashPayments() {
+        System.out.println("\n=== PROCESS CASH PAYMENTS ===");
+        System.out.println("💵 Manage pending cash payments and update rental status");
+        System.out.println("\n💡 Enter '0' at any input to return to manager menu");
+
+        try {
+            // Get all rentals with pending payment status
+            List<Rental> allRentals = rentalManager.getAllRentals();
+            List<Rental> pendingRentals = new ArrayList<>();
+
+            for (Rental rental : allRentals) {
+                if ("Pending".equals(rental.getPaymentStatus())) {
+                    pendingRentals.add(rental);
+                }
+            }
+
+            if (pendingRentals.isEmpty()) {
+                System.out.println("✅ No pending cash payments found.");
+                System.out.println("All rentals are either paid or unpaid.");
+                pauseForUserConfirmation();
+                return;
+            }
+
+            System.out.println("\n⏳ PENDING CASH PAYMENTS:");
+            System.out.println("=".repeat(90));
+            System.out.printf("%-5s %-10s %-8s %-12s %-12s %-10s %-15s%n",
+                "ID", "Customer", "Vehicle", "Start Date", "End Date", "Cost", "Status");
+            System.out.println("=".repeat(90));
+
+            for (Rental rental : pendingRentals) {
+                System.out.printf("%-5d %-10d %-8d %-12s %-12s RM%-8.2f %-15s%n",
+                    rental.getRentalId(), rental.getCustomerId(), rental.getVehicleId(),
+                    rental.getStartDate(), rental.getEndDate(), rental.getTotalCost(),
+                    rental.getPaymentStatus());
+            }
+            System.out.println("=".repeat(90));
+
+            int rentalId = readInt("Enter Rental ID to mark as paid: ", 1, Integer.MAX_VALUE);
+
+            // Find the selected rental
+            Rental selectedRental = null;
+            for (Rental rental : pendingRentals) {
+                if (rental.getRentalId() == rentalId) {
+                    selectedRental = rental;
+                    break;
+                }
+            }
+
+            if (selectedRental == null) {
+                System.out.println("❌ Rental ID " + rentalId + " not found in pending payments.");
+                pauseForUserConfirmation();
+                return;
+            }
+
+            // Confirm payment processing
+            System.out.println("\n💰 PAYMENT DETAILS:");
+            System.out.println("Rental ID: " + selectedRental.getRentalId());
+            System.out.println("Customer ID: " + selectedRental.getCustomerId());
+            System.out.println("Amount: RM" + String.format("%.2f", selectedRental.getTotalCost()));
+
+            String confirm = readString("Confirm cash payment received? (y/n): ");
+            if (confirm.toLowerCase().startsWith("y")) {
+                // Update rental status to "Paid"
+                selectedRental.setPaymentStatus("Paid");
+                rentalManager.updateRental(selectedRental);
+
+                // Update customer's outstanding balance
+                Customer customer = customerDAO.load("C" + selectedRental.getCustomerId());
+                if (customer != null) {
+                    double currentBalance = customer.getOutstandingBalance();
+                    double newBalance = Math.max(0, currentBalance - selectedRental.getTotalCost());
+                    customer.setOutstandingBalance(newBalance);
+                    customerDAO.update(customer);
+
+                    System.out.println("✅ Cash payment processed successfully!");
+                    System.out.println("💰 Customer balance updated: RM" + String.format("%.2f", currentBalance) +
+                        " → RM" + String.format("%.2f", newBalance));
+                    System.out.println("📊 Rental status changed to: Paid");
+                    pauseForUserConfirmation();
+                } else {
+                    System.out.println("⚠️  Warning: Customer not found, but rental status updated.");
+                    pauseForUserConfirmation();
+                }
+            } else {
+                System.out.println("❌ Payment processing cancelled.");
+                pauseForUserConfirmation();
+            }
+
+        } catch (UserExitException e) {
+            System.out.println("🔙 Returned to manager menu.");
+            pauseForUserConfirmation();
         }
     }
 

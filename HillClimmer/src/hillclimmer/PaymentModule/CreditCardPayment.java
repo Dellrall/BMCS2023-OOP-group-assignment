@@ -12,6 +12,7 @@ import java.util.Scanner;
  * @author las
  */
 public class CreditCardPayment extends Payment {
+    private static final Scanner scanner = new Scanner(System.in);
     private String cardNumber;
     private String cardHolderName;
     private String expiryDate;
@@ -32,52 +33,75 @@ public class CreditCardPayment extends Payment {
         System.out.println("\n=== CREDIT CARD PAYMENT ===");
         System.out.println("Amount to pay: RM" + String.format("%.2f", totalAmount));
         System.out.println("Reference Number: " + referenceNumber);
-
-        // Collect card details with flexible input
-        System.out.print("Enter card number (16 digits, spaces/dashes allowed): ");
-        String cardInput = getUserInput();
-        this.cardNumber = normalizeCardNumber(cardInput);
-
-        System.out.print("Enter card holder name: ");
-        this.cardHolderName = getUserInput();
-
-        System.out.print("Enter expiry date (MM/YY or MM-YY or MM YY): ");
-        String expiryInput = getUserInput();
-        this.expiryDate = normalizeExpiryDate(expiryInput);
-
-        System.out.print("Enter CVV (3 digits): ");
-        this.cvv = getUserInput();
-
-        // Validate card details
-        if (!isValidCardDetails()) {
-            System.out.println("❌ Invalid card details. Payment failed.");
-            this.paymentStatus = "Failed";
-            return;
-        }
-
-        // Determine card type
-        this.cardType = determineCardType(cardNumber);
-
-        // Simulate payment processing
-        System.out.println("\n🔄 Processing credit card payment...");
-        System.out.println("Contacting " + cardType + " payment gateway...");
+        System.out.println("💡 Enter '0' at any input to cancel payment");
 
         try {
-            Thread.sleep(2000); // Simulate processing time
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+            // Collect card details with flexible input
+            System.out.print("Enter card number (16 digits, spaces/dashes allowed) or 0 to cancel: ");
+            String cardInput = getUserInput();
+            if (cardInput.equals("0")) {
+                System.out.println("🔙 Payment cancelled.");
+                this.paymentStatus = "Cancelled";
+                return;
+            }
+            this.cardNumber = normalizeCardNumber(cardInput);
 
-        // Simulate success/failure (90% success rate)
-        if (Math.random() > 0.1) {
+            System.out.print("Enter card holder name or 0 to cancel: ");
+            String nameInput = getUserInput();
+            if (nameInput.equals("0")) {
+                System.out.println("🔙 Payment cancelled.");
+                this.paymentStatus = "Cancelled";
+                return;
+            }
+            this.cardHolderName = nameInput;
+
+            System.out.print("Enter expiry date (MM/YY or MM-YY or MM YY) or 0 to cancel: ");
+            String expiryInput = getUserInput();
+            if (expiryInput.equals("0")) {
+                System.out.println("🔙 Payment cancelled.");
+                this.paymentStatus = "Cancelled";
+                return;
+            }
+            this.expiryDate = normalizeExpiryDate(expiryInput);
+
+            System.out.print("Enter CVV (3 digits) or 0 to cancel: ");
+            String cvvInput = getUserInput();
+            if (cvvInput.equals("0")) {
+                System.out.println("🔙 Payment cancelled.");
+                this.paymentStatus = "Cancelled";
+                return;
+            }
+            this.cvv = cvvInput;
+
+            // Validate card details
+            if (!isValidCardDetails()) {
+                System.out.println("❌ Invalid card details. Payment failed.");
+                this.paymentStatus = "Failed";
+                return;
+            }
+
+            // Determine card type
+            this.cardType = determineCardType(cardNumber);
+
+            // Simulate payment processing
+            System.out.println("\n🔄 Processing credit card payment...");
+            System.out.println("Contacting " + cardType + " payment gateway...");
+
+            try {
+                Thread.sleep(2000); // Simulate processing time
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
+            // Process payment (always successful for demo purposes)
             this.paymentStatus = "Paid";
             this.paymentSlip = generatePaymentSlip();
             System.out.println("✅ Payment successful!");
             System.out.println("Card ending in " + cardNumber.substring(cardNumber.length() - 4) + " charged RM" + String.format("%.2f", totalAmount));
             System.out.println("Reference: " + referenceNumber);
-        } else {
+        } catch (Exception e) {
+            System.out.println("❌ Payment processing error: " + e.getMessage());
             this.paymentStatus = "Failed";
-            System.out.println("❌ Payment declined by card issuer.");
         }
     }
 
@@ -153,9 +177,7 @@ public class CreditCardPayment extends Payment {
     }
 
     private String getUserInput() {
-        try (Scanner scanner = new Scanner(System.in)) {
-            return scanner.nextLine().trim();
-        }
+        return scanner.nextLine().trim();
     }
 
     private String generatePaymentSlip() {

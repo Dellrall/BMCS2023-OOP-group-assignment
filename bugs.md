@@ -2,11 +2,11 @@
 
 1) ~~new password cannot change for admin~~ ✅ **FIXED** - Admin password change now works with proper validation and loop-back functionality
 2) ~~don't specify format (60xxxx , xxxx, xxxx) just let user type phone number as usual 01157881296 or 0115788129 (accept both value of 3 num or 4 num)~~ ✅ **FIXED** - Phone number input simplified with examples, now accepts 10-11 digit numbers with flexible formatting
-3) Registration failed: Password must be at least 6 characters long (if does not met requirement it no loop)
-4) payment online (crash)
-5) payment method cant exit back to menu (0 cancel payment)
-6) credit card payment (the amount should auto key in)
-7) credit card (crash)
+3) ~~Registration failed: Password must be at least 6 characters long (if does not met requirement it no loop)~~ ✅ **FIXED** - Password confirmation now properly loops back to first password input when validation fails or passwords don't match
+4) payment online (crash) - done
+5) payment method cant exit back to menu (0 cancel payment) - done
+6) credit card payment (the amount should auto key in) - done
+7) credit card (crash) - done
 8) view rental (page indicator should be at bottom together with total rental)
 9) after view payment history, remain in profile menu
 10) update password also loop back if requirement not met
