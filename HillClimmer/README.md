@@ -1,11 +1,11 @@
 # 🏔️ HillClimmer Malaysia Vehicle Rental System
 
-**Version 2.2** | *Last Updated: September 6, 2025*
+**Version 2.3** | *Last Updated: September 15, 2025*
 
 ## 📋 Overview
 A comprehensive **cross-platform Java-based** vehicle rental system designed specifically for Malaysia's hill climbing market. Features secure authentication, role-based access control, and complete rental lifecycle management with Malaysian-specific validations. **Compatible with Windows, Linux, and macOS**.
 
-**✨ Recent Updates**: Enhanced ID generation system, fixed rental ID mismatch issues, comprehensive DAO improvements, reverted to Ant build system for stability, and completed all major bug fixes for improved system reliability.
+**✨ Recent Updates**: Enhanced credit card validation with reinput loops, admin bulk rental deletion, improved menu organization, rental date conflict prevention, and comprehensive bug fixes for enhanced user experience and system reliability.
 
 ---
 
@@ -18,6 +18,16 @@ A comprehensive **cross-platform Java-based** vehicle rental system designed spe
 ---
 
 ## 📋 Changelog
+
+### Version 2.3 (September 15, 2025) - Advanced Features Release
+- ✅ **Credit Card Validation**: Added comprehensive input validation with reinput loops for card number (16 digits), card holder name (letters/spaces only), expiry date (MM/YY format with validity checks), and CVV (3 digits)
+- ✅ **Admin Bulk Operations**: Implemented loop for admin rental deletion allowing multiple deletions in one session
+- ✅ **Menu Organization**: Reorganized manager menu into 5 logical subsections to reduce crowding and improve navigation
+- ✅ **Rental Conflict Prevention**: Added date overlap validation to prevent double-booking same vehicle on same dates
+- ✅ **Enhanced Rental Display**: Improved admin view rentals to group by vehicle and show different dates clearly
+- ✅ **Admin Rental Management**: Fixed rental ID generation and prevented overwriting when adding rentals
+- ✅ **Payment Status Fixes**: Corrected cash payment balance updates and payment status handling
+- ✅ **System Reports**: Fixed active rental counting, pending reminders, and revenue tracking for admin operations
 
 ### Version 2.2 (September 6, 2025) - Bug Fixes Release
 - ✅ **Bug #1**: Removed long format for phone number and simplified input format display
@@ -79,10 +89,11 @@ A comprehensive **cross-platform Java-based** vehicle rental system designed spe
 - **Real-time Inventory**: Track availability and maintenance
 - **Manager Controls**: Add, remove, update vehicles (permission-based)
 
-### 📅 **Rental Lifecycle Management**
-- **Smart Booking**: Automated cost calculation and availability checking
-- **Duration Tracking**: Timer system with automated reminders
-- **Payment Integration**: Multiple payment methods with receipts
+### � **Advanced Payment Processing**
+- **Multiple Payment Methods**: Cash, Credit Card, Online Banking with receipts
+- **Credit Card Validation**: Comprehensive input validation with reinput loops
+- **Secure Processing**: Simulated payment gateway with validation
+- **Payment History**: Complete transaction tracking with status updates
 
 ### 🇲🇾 **Malaysia-Specific Features**
 - **IC Validation**: Malaysian IC format (XXXXXX-XX-XXXX) with date validation
@@ -91,7 +102,26 @@ A comprehensive **cross-platform Java-based** vehicle rental system designed spe
 - **Age Calculation**: Automatic age from IC number
 - **Location Support**: Malaysian addresses and regions
 
-## 🆕 Recent Enhancements (v2.2)
+## 🆕 Recent Enhancements (v2.3)
+
+### 💳 **Advanced Credit Card Validation**
+- **Input Validation Loops**: Users must enter valid credit card details or cancel payment
+- **Card Number**: Exactly 16 digits required with spaces/dashes allowed
+- **Card Holder Name**: Letters and spaces only, no numbers or special characters
+- **Expiry Date**: MM/YY format with month (01-12) and future date validation
+- **CVV**: Exactly 3 digits required
+- **User-Friendly Errors**: Clear error messages guide users to correct invalid input
+
+### 👨‍💼 **Enhanced Admin Workflow**
+- **Bulk Rental Deletion**: Admins can delete multiple rentals in one session without returning to menu
+- **Organized Menu Structure**: Manager menu divided into 5 logical sections for better navigation
+- **Improved Rental Display**: Group rentals by vehicle with clear date differentiation
+- **Conflict Prevention**: Automatic validation prevents double-booking same vehicle on same dates
+
+### 🔧 **System Reliability Improvements**
+- **Payment Status Accuracy**: Fixed cash payment balance updates and status handling
+- **Data Integrity**: Corrected rental ID generation and admin-added rental visibility
+- **Report Accuracy**: System reports now properly count active rentals, pending reminders, and revenue
 
 ### 🔧 **Comprehensive Bug Fixes**
 - **14 Critical Issues Resolved**: Fixed all reported bugs including system crashes, data inconsistencies, and user experience problems

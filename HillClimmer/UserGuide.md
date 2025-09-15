@@ -1,5 +1,7 @@
 # � HillClimmer Malaysia - Complete User Guide
 
+**Version 2.3** | *Last Updated: September 15, 2025*
+
 ## 📋 Table of Contents
 - [🔐 User Accounts & Credentials](#-user-accounts--credentials)
 - [👥 Customer Portal Guide](#-customer-portal-guide)
@@ -11,7 +13,26 @@
 
 ---
 
-## � User Accounts & Credentials
+## 📋 Version 2.3 Updates (September 15, 2025)
+
+### 🆕 New Features
+- **Enhanced Credit Card Validation**: Comprehensive input validation with reinput loops for all card fields
+- **Admin Bulk Operations**: Bulk rental deletion allowing multiple deletions in one session
+- **Improved Menu Organization**: Manager menu reorganized into 5 logical sections
+- **Rental Conflict Prevention**: Automatic date overlap validation for vehicle bookings
+
+### 🔧 Improvements
+- **Credit Card Validation**: 16-digit card number, letters-only card holder name, MM/YY expiry format, 3-digit CVV
+- **User Experience**: Clear error messages and reinput loops prevent payment failures
+- **Admin Efficiency**: Streamlined workflows for rental management and payment processing
+- **Data Integrity**: Enhanced validation prevents booking conflicts and data inconsistencies
+
+### 📖 Documentation Updates
+- Updated payment method instructions with validation rules
+- Added troubleshooting for credit card validation errors
+- Enhanced manager portal guide with new menu organization
+
+---
 
 ### 👥 Customer Accounts
 
@@ -884,7 +905,7 @@ What should you do at a green traffic light?
 </details>
 
 <details>
-<summary>2. Credit Card Payment</summary>
+<summary>2. Credit Card Payment (Enhanced v2.3)</summary>
 
 **Accepted Cards:**
 - Visa (all types)
@@ -896,19 +917,38 @@ What should you do at a green traffic light?
 - Encrypted card data
 - Fraud protection
 - Instant confirmation
+- **NEW**: Comprehensive input validation with reinput loops
+
+**Required Card Details:**
+- **Card Number**: Exactly 16 digits (spaces and dashes allowed)
+- **Card Holder Name**: Letters and spaces only (no numbers/special characters)
+- **Expiry Date**: MM/YY format with valid month (01-12) and future date
+- **CVV**: Exactly 3 digits
+
+**Validation Rules (v2.3):**
+- ❌ **Card Number**: Must be exactly 16 digits
+- ❌ **Card Holder Name**: Letters and spaces only
+- ❌ **Expiry Date**: Valid MM/YY format, month 01-12, not expired
+- ❌ **CVV**: Exactly 3 digits
 
 **Process:**
 1. Select credit card payment
-2. Enter card details securely
-3. Verify payment information
-4. Receive instant confirmation
-5. Digital receipt provided
+2. Enter card number (16 digits) - system validates immediately
+3. Enter card holder name - letters/spaces only validation
+4. Enter expiry date (MM/YY) - format and validity checks
+5. Enter CVV (3 digits) - length validation
+6. **NEW**: If any field is invalid, re-enter correct information
+7. Enter '0' at any prompt to cancel payment
+8. Successful validation proceeds to payment processing
+9. Receive instant confirmation
+10. Digital receipt provided
 
 **Benefits:**
 - Instant booking confirmation
 - Secure transactions
 - Payment protection
 - Convenient online process
+- **NEW**: User-friendly validation prevents payment errors
 
 </details>
 
