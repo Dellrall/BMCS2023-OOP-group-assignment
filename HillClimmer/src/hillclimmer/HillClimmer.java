@@ -1138,14 +1138,16 @@ public class HillClimmer {
             System.out.println("🏢 Ready to manage HillClimmer operations?");
             System.out.println("\n📋 MANAGEMENT SECTIONS:");
             System.out.println("1. 🚗 Fleet & Vehicles");
-            System.out.println("2. � Bookings & Rentals");
-            System.out.println("3. 👥 Customer Service");
-            System.out.println("4. 💰 Financial Operations");
-            System.out.println("5. 🚪 Logout");
+            System.out.println("2. 📅 Bookings & Rentals");
+            System.out.println("3. 👥 View All Customers");
+            System.out.println("4. ➕ Add New Customer");
+            System.out.println("5. �️  Remove Customer");
+            System.out.println("6. �💰 Financial Operations");
+            System.out.println("7. 🚪 Logout");
             System.out.println("\n💡 Enter '0' at any input to return to main menu");
             
             try {
-                int choice = readInt("Please select a section (1-5): ", 1, 5);
+                int choice = readInt("Please select an option (1-7): ", 1, 7);
 
                 switch (choice) {
                     case 1:
@@ -1155,12 +1157,18 @@ public class HillClimmer {
                         showRentalManagementMenu();
                         break;
                     case 3:
-                        showCustomerManagementMenu();
+                        viewAllCustomers();
                         break;
                     case 4:
-                        showFinancialOperationsMenu();
+                        addCustomer();
                         break;
                     case 5:
+                        removeCustomer();
+                        break;
+                    case 6:
+                        showFinancialOperationsMenu();
+                        break;
+                    case 7:
                         System.out.println("👋 Manager logout successful.");
                         System.out.println("👤 Goodbye, " + (currentManager != null ? currentManager.getName() : "Manager") + "!");
                         System.out.println("🏢 Thank you for managing HillClimmer operations.");
