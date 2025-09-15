@@ -493,6 +493,56 @@ public class HillClimmer {
         }
     }
 
+    /**
+     * Checks if a vehicle is available for the requested rental dates
+     * @param vehicleId The vehicle ID to check
+     * @param startDate The requested start date
+     * @param endDate The requested end date
+     * @return true if available, false if there's a date conflict
+     */
+    private static boolean isVehicleAvailableForDates(int vehicleId, LocalDate startDate, LocalDate endDate) {
+        List<Rental> allRentals = rentalManager.getAllRentals();
+
+        for (Rental rental : allRentals) {
+            if (rental.getVehicleId() == vehicleId) {
+                LocalDate existingStart = rental.getStartDate();
+                LocalDate existingEnd = rental.getEndDate();
+
+                // Check for date overlap: new rental overlaps with existing rental if
+                // newStart <= existingEnd AND newEnd >= existingStart
+                if (!startDate.isAfter(existingEnd) && !endDate.isBefore(existingStart)) {
+                    return false; // Conflict found
+                }
+            }
+        }
+        return true; // No conflicts
+    }
+
+    /**
+     * Gets conflicting rental dates for a vehicle
+     * @param vehicleId The vehicle ID to check
+     * @param startDate The requested start date
+     * @param endDate The requested end date
+     * @return List of conflicting date ranges as strings
+     */
+    private static List<String> getConflictingDates(int vehicleId, LocalDate startDate, LocalDate endDate) {
+        List<String> conflicts = new ArrayList<>();
+        List<Rental> allRentals = rentalManager.getAllRentals();
+
+        for (Rental rental : allRentals) {
+            if (rental.getVehicleId() == vehicleId) {
+                LocalDate existingStart = rental.getStartDate();
+                LocalDate existingEnd = rental.getEndDate();
+
+                // Check for date overlap
+                if (!startDate.isAfter(existingEnd) && !endDate.isBefore(existingStart)) {
+                    conflicts.add(existingStart + " to " + existingEnd);
+                }
+            }
+        }
+        return conflicts;
+    }
+
     public static void main(String[] args) {
         // Initialize garbage collection monitoring
         Runtime runtime = Runtime.getRuntime();
@@ -1482,6 +1532,20 @@ public class HillClimmer {
 
             if (startDate.isAfter(endDate) || startDate.isBefore(LocalDate.now())) {
                 System.out.println("❌ Invalid date range.");
+                pauseForUserConfirmation();
+                return;
+            }
+
+            // Check for vehicle availability conflicts
+            int vehicleId = Integer.parseInt(selectedVehicle.getVehicleID().substring(2));
+            if (!isVehicleAvailableForDates(vehicleId, startDate, endDate)) {
+                System.out.println("❌ VEHICLE UNAVAILABLE FOR SELECTED DATES");
+                System.out.println("This vehicle has already been rented for the following dates:");
+                List<String> conflicts = getConflictingDates(vehicleId, startDate, endDate);
+                for (String conflict : conflicts) {
+                    System.out.println("• " + conflict);
+                }
+                System.out.println("Please select different dates or choose another vehicle.");
                 pauseForUserConfirmation();
                 return;
             }
@@ -2653,6 +2717,19 @@ public class HillClimmer {
             LocalDate startDate = readDate("Start Date (DD/MM/YYYY): ", true);
             LocalDate endDate = readDate("End Date (DD/MM/YYYY): ", false);
             double dailyRate = readDouble("Daily Rate (RM): ", 0, Double.MAX_VALUE);
+            
+            // Check for vehicle availability conflicts
+            if (!isVehicleAvailableForDates(vehicleId, startDate, endDate)) {
+                System.out.println("❌ VEHICLE UNAVAILABLE FOR SELECTED DATES");
+                System.out.println("This vehicle has already been rented for the following dates:");
+                List<String> conflicts = getConflictingDates(vehicleId, startDate, endDate);
+                for (String conflict : conflicts) {
+                    System.out.println("• " + conflict);
+                }
+                System.out.println("Please select different dates or choose another vehicle.");
+                pauseForUserConfirmation();
+                return;
+            }
             
             double totalCost = rentalManager.calculateTotalCost(startDate, endDate, dailyRate);
             System.out.printf("Calculated Total Cost: RM%.2f%n", totalCost);
