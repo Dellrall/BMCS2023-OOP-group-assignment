@@ -1503,7 +1503,12 @@ public class HillClimmer {
             }
 
             // Create rental
-            int rentalId = rentalManager.getAllRentals().size() + 1;
+            List<Rental> allRentals = rentalManager.getAllRentals();
+            int maxId = allRentals.stream()
+                .mapToInt(Rental::getRentalId)
+                .max()
+                .orElse(0);
+            int rentalId = maxId + 1;
             rentalManager.addRentalWithId(rentalId, Integer.parseInt(currentCustomer.getCustomerID().substring(1)),
                 Integer.parseInt(selectedVehicle.getVehicleID().substring(2)), startDate, endDate, totalCost);
             
@@ -2636,8 +2641,13 @@ public class HillClimmer {
             
             String confirm = readString("Confirm rental creation? (y/n): ");
             if (confirm.toLowerCase().startsWith("y")) {
-                // Generate rental ID
-                int rentalId = rentalManager.getAllRentals().size() + 1;
+                // Generate rental ID - find max existing ID and add 1
+                List<Rental> allRentals = rentalManager.getAllRentals();
+                int maxId = allRentals.stream()
+                    .mapToInt(Rental::getRentalId)
+                    .max()
+                    .orElse(0);
+                int rentalId = maxId + 1;
 
                 // Add rental with specific ID
                 rentalManager.addRentalWithId(rentalId, customerId, vehicleId, startDate, endDate, totalCost);
