@@ -2563,6 +2563,15 @@ public class HillClimmer {
             return;
         }
 
+        // Sort rentals by vehicle ID, then by start date to show different dates for same vehicle
+        rentals.sort((r1, r2) -> {
+            int vehicleCompare = Integer.compare(r1.getVehicleId(), r2.getVehicleId());
+            if (vehicleCompare != 0) {
+                return vehicleCompare;
+            }
+            return r1.getStartDate().compareTo(r2.getStartDate());
+        });
+
         final int ITEMS_PER_PAGE = 5;
         int totalRentals = rentals.size();
         int totalPages = (int) Math.ceil((double) totalRentals / ITEMS_PER_PAGE);
@@ -2577,11 +2586,20 @@ public class HillClimmer {
             int endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalRentals);
 
             // Display rentals for current page
+            int previousVehicleId = -1;
             for (int i = startIndex; i < endIndex; i++) {
                 Rental rental = rentals.get(i);
+                
+                // Add visual separator when vehicle changes
+                if (rental.getVehicleId() != previousVehicleId && previousVehicleId != -1) {
+                    System.out.println("─".repeat(80));
+                }
+                
                 System.out.printf("ID: %d | Customer: %d | Vehicle: %d | Period: %s to %s | Cost: RM%.2f%n",
                     rental.getRentalId(), rental.getCustomerId(), rental.getVehicleId(),
                     rental.getStartDate(), rental.getEndDate(), rental.getTotalCost());
+                
+                previousVehicleId = rental.getVehicleId();
             }
 
             System.out.println("=".repeat(80));
