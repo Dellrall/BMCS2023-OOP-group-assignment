@@ -1863,6 +1863,54 @@ public class HillClimmer {
                 return;
             }
 
+            // Special handling for Credit Card - offer choice between old and new interface
+            boolean useNewInterface = false;
+            if (method == 1) {
+                System.out.println("\n🔄 Payment Processing Options:");
+                System.out.println("1. Use traditional payment processing");
+                System.out.println("2. Use new PaymentProcessor interface (BETA)");
+                System.out.print("Select processing method (1-2): ");
+
+                String interfaceChoice = scanner.nextLine().trim();
+                if (interfaceChoice.equals("2")) {
+                    useNewInterface = true;
+                    System.out.println("🎯 Using new PaymentProcessor interface!");
+                } else {
+                    System.out.println("📋 Using traditional payment processing.");
+                }
+            }
+
+            // Process payment based on choice
+            if (useNewInterface && method == 1) {
+                // Use new PaymentProcessor interface
+                PaymentResult result = processPaymentWithInterface(amount, method);
+                if (result.isSuccessful()) {
+                    // Update customer balance for successful payment
+                    currentCustomer.setOutstandingBalance(currentCustomer.getOutstandingBalance() - amount);
+                    customerDAO.update(currentCustomer);
+
+                    // Mark any pending rentals as paid
+                    List<Rental> customerRentals = rentalManager.getAllRentals().stream()
+                        .filter(r -> r.getCustomerId() == Integer.parseInt(currentCustomer.getCustomerID().substring(1)))
+                        .toList();
+
+                    for (Rental rental : customerRentals) {
+                        if ("Pending".equals(rental.getPaymentStatus())) {
+                            rental.setPaymentStatus("Paid");
+                            rentalManager.updateRental(rental);
+                        }
+                    }
+
+                    System.out.println("💰 Outstanding balance updated successfully!");
+                    pauseForUserConfirmation();
+                } else {
+                    System.out.println("❌ Payment was not completed.");
+                    pauseForUserConfirmation();
+                }
+                return; // Exit early for interface processing
+            }
+
+            // Original payment processing logic (unchanged)
             // Create payment based on method
             String paymentID = "P" + System.currentTimeMillis();
             String timestamp = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
@@ -1923,6 +1971,42 @@ public class HillClimmer {
 
         } catch (Exception e) {
             System.out.println("❌ Payment failed: " + e.getMessage());
+        }
+    }
+
+    /**
+     * NEW: Process payment using PaymentProcessor interface (Credit Card only for now)
+     * This method demonstrates the new PaymentProcessor interface approach
+     */
+    private static PaymentResult processPaymentWithInterface(double amount, int paymentType) {
+        PaymentProcessor processor;
+
+        switch (paymentType) {
+            case 1: // Credit Card - using new interface
+                processor = new CreditCardPaymentProcessor();
+                break;
+            default:
+                // Fallback to old method for other payment types
+                throw new IllegalArgumentException("Payment type " + paymentType + " not yet implemented with interface");
+        }
+
+        System.out.println("💰 Processing payment of RM" + String.format("%.2f", amount) + " via " + processor.getPaymentMethodName());
+        System.out.println("🔄 Using new PaymentProcessor interface...");
+
+        PaymentResult result = processor.processPayment(amount);
+
+        if (result.isSuccessful()) {
+            System.out.println("✅ Payment successful via interface!");
+            System.out.println("Transaction ID: " + result.getTransactionId());
+
+            // Record transaction
+            // Note: This would need to be adapted to work with the new PaymentResult
+            // For now, we'll just return the result
+
+            return result;
+        } else {
+            System.out.println("❌ Payment failed: " + result.getErrorMessage());
+            return result;
         }
     }
 
