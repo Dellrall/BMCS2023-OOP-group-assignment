@@ -1093,20 +1093,21 @@ public class HillClimmer {
             System.out.println("\n📅 RENTAL MANAGEMENT:");
             System.out.println("5. 📋 View All Rentals");
             System.out.println("6. ➕ Add New Rental");
-            System.out.println("7. �️  Remove Rental");
-            System.out.println("\n�👥 CUSTOMER MANAGEMENT:");
-            System.out.println("8. 👥 View All Customers");
+            System.out.println("7. 🔍 Search Rental by Reference Number");
+            System.out.println("8. 🗑️  Remove Rental");
+            System.out.println("\n👥 CUSTOMER MANAGEMENT:");
+            System.out.println("9. 👥 View All Customers");
             System.out.println("\n💰 PAYMENT MANAGEMENT:");
-            System.out.println("12. 💵 Process Cash Payments");
-            System.out.println("\n� ACCOUNT MANAGEMENT:");
-            System.out.println("13. 🔑 Change Password");
-            System.out.println("\n�📈 SYSTEM REPORTS:");
-            System.out.println("14. 📈 System Reports");
-            System.out.println("15. 🚪 Logout");
+            System.out.println("13. 💵 Process Cash Payments");
+            System.out.println("\n🔐 ACCOUNT MANAGEMENT:");
+            System.out.println("14. 🔑 Change Password");
+            System.out.println("\n📈 SYSTEM REPORTS:");
+            System.out.println("15. 📈 System Reports");
+            System.out.println("16. 🚪 Logout");
             System.out.println("\n💡 Enter '0' at any input to return to this menu");
             
             try {
-                int choice = readInt("Please select an option (1-15): ", 1, 15);
+                int choice = readInt("Please select an option (1-16): ", 1, 16);
 
             switch (choice) {
                 case 1:
@@ -1128,21 +1129,24 @@ public class HillClimmer {
                     addNewRental();
                     break;
                 case 7:
-                    removeRental();
+                    searchRentalByReference();
                     break;
                 case 8:
+                    removeRental();
+                    break;
+                case 9:
                     viewAllCustomers();
                     break;
-                case 12:
+                case 13:
                     processCashPayments();
                     break;
-                case 13:
+                case 14:
                     changeManagerPassword();
                     break;
-                case 14:
+                case 15:
                     showSystemReports();
                     break;
-                case 15:
+                case 16:
                     System.out.println("👋 Manager logout successful.");
                     System.out.println("👤 Goodbye, " + (currentManager != null ? currentManager.getName() : "Manager") + "!");
                     System.out.println("🏢 Thank you for managing HillClimmer operations.");
@@ -2518,6 +2522,70 @@ public class HillClimmer {
             }
         } catch (UserExitException e) {
             System.out.println("🔙 Rental removal cancelled. Returned to manager menu.");
+            pauseForUserConfirmation();
+        }
+    }
+
+    private static void searchRentalByReference() {
+        System.out.println("\n=== SEARCH RENTAL BY REFERENCE NUMBER ===");
+        System.out.println("🔍 Find payment details and related rentals using payment reference number");
+        System.out.println("\n💡 Enter '0' at any input to cancel and return to manager menu");
+
+        try {
+            String referenceNumber = readString("Enter payment reference number: ");
+
+            if (referenceNumber.trim().isEmpty()) {
+                System.out.println("❌ Reference number cannot be empty.");
+                pauseForUserConfirmation();
+                return;
+            }
+
+            // Create PaymentDAO instance to search for payment
+            PaymentDAO paymentDAO = new PaymentDAO();
+
+            // Find the payment by reference number
+            Payment payment = paymentDAO.getByReferenceNumber(referenceNumber.trim());
+
+            if (payment == null) {
+                System.out.println("❌ No payment found with reference number: " + referenceNumber);
+                pauseForUserConfirmation();
+                return;
+            }
+
+            // Display payment details
+            System.out.println("\n=== PAYMENT DETAILS ===");
+            System.out.println("Payment ID: " + payment.getPaymentID());
+            System.out.println("Reference Number: " + payment.getReferenceNumber());
+            System.out.println("Amount: RM" + String.format("%.2f", payment.getTotalAmount()));
+            System.out.println("Method: " + payment.getPaymentMethod());
+            System.out.println("Status: " + payment.getPaymentStatus());
+            System.out.println("Date: " + payment.getTimestamp());
+            System.out.println("Customer ID: " + payment.getCustomerID());
+
+            // Find related rentals for this customer
+            List<Rental> relatedRentals = rentalManager.findRentalsByPaymentReference(referenceNumber.trim(), paymentDAO);
+
+            if (relatedRentals.isEmpty()) {
+                System.out.println("\n📭 No rentals found for customer " + payment.getCustomerID());
+            } else {
+                System.out.println("\n=== RELATED RENTALS ===");
+                System.out.println("The following rentals belong to the customer who made this payment:");
+                System.out.println("Note: This payment may have affected pending/unpaid rentals for this customer.");
+                System.out.println("=".repeat(80));
+
+                for (Rental rental : relatedRentals) {
+                    System.out.printf("Rental ID: %d | Vehicle ID: %d | Period: %s to %s | Cost: RM%.2f | Status: %s%n",
+                        rental.getRentalId(), rental.getVehicleId(),
+                        rental.getStartDate(), rental.getEndDate(),
+                        rental.getTotalCost(), rental.getPaymentStatus());
+                }
+                System.out.println("=".repeat(80));
+            }
+
+            pauseForUserConfirmation();
+
+        } catch (UserExitException e) {
+            System.out.println("🔙 Search cancelled. Returned to manager menu.");
             pauseForUserConfirmation();
         }
     }

@@ -6,6 +6,8 @@ package hillclimmer.RentalModule;
 
 import hillclimmer.DatabaseModule.RentalDAO;
 import hillclimmer.DatabaseModule.Manager;
+import hillclimmer.DatabaseModule.PaymentDAO;
+import hillclimmer.PaymentModule.Payment;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -121,5 +123,41 @@ public class RentalManager {
     // Check if manager is authenticated
     public boolean isAuthenticated() {
         return authenticatedManager != null;
+    }
+
+    /**
+     * Find rentals that might be related to a payment by reference number
+     * Since payments affect outstanding balances, this returns rentals for the customer
+     * that made the payment and were in pending/unpaid status
+     * @param referenceNumber The payment reference number
+     * @param paymentDAO PaymentDAO instance to find the payment
+     * @return List of potentially related rentals
+     */
+    public List<Rental> findRentalsByPaymentReference(String referenceNumber, PaymentDAO paymentDAO) {
+        if (!hasPermission("view")) {
+            System.out.println("❌ Insufficient permissions to search rentals.");
+            return new java.util.ArrayList<>();
+        }
+
+        // Find the payment by reference number
+        Payment payment = paymentDAO.getByReferenceNumber(referenceNumber);
+        if (payment == null) {
+            return new java.util.ArrayList<>();
+        }
+
+        // Extract customer ID from payment (format is "C001", "C002", etc.)
+        String customerIdStr = payment.getCustomerID();
+        if (!customerIdStr.startsWith("C")) {
+            return new java.util.ArrayList<>();
+        }
+
+        try {
+            int customerId = Integer.parseInt(customerIdStr.substring(1));
+            // Return all rentals for this customer (both paid and unpaid)
+            // The manager can then see which ones might have been affected
+            return getRentalsByCustomer(customerId);
+        } catch (NumberFormatException e) {
+            return new java.util.ArrayList<>();
+        }
     }
 }
