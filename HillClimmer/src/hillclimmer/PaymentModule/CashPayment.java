@@ -5,6 +5,8 @@ package hillclimmer.PaymentModule;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * CashPayment class for processing cash payments
@@ -64,7 +66,9 @@ public class CashPayment extends Payment {
         this.paymentStatus = "Paid";
         this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
         updatePaymentSlip();
+        saveReceiptToFile();
         System.out.println("✅ Cash payment received by " + cashierName);
+        System.out.println("🧾 Receipt saved to receipts folder");
     }
 
     public boolean isExpired() {
@@ -115,5 +119,22 @@ public class CashPayment extends Payment {
                           "Status: PAID\n\n" +
                           "Thank you for your payment!\n" +
                           "Your booking is now confirmed.";
+    }
+
+    /**
+     * Save the payment receipt to a text file in the receipts folder
+     */
+    private void saveReceiptToFile() {
+        String fileName = "receipts/CASH_" + referenceNumber + "_" +
+                         LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".txt";
+
+        try (FileWriter writer = new FileWriter(fileName)) {
+            writer.write(paymentSlip);
+            writer.write("\n\n--- RECEIPT GENERATED ---\n");
+            writer.write("File: " + fileName + "\n");
+            writer.write("Generated: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")) + "\n");
+        } catch (IOException e) {
+            System.err.println("⚠️  Warning: Could not save receipt to file: " + e.getMessage());
+        }
     }
 }

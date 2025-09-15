@@ -21,6 +21,7 @@ import hillclimmer.RentalModule.*;
 import hillclimmer.DurationModule.*;
 import hillclimmer.DatabaseModule.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.io.Console;
@@ -2562,6 +2563,14 @@ public class HillClimmer {
             System.out.println("Date: " + payment.getTimestamp());
             System.out.println("Customer ID: " + payment.getCustomerID());
 
+            // Special handling for cash payments
+            if ("Cash".equals(payment.getPaymentMethod()) && "Paid".equals(payment.getPaymentStatus())) {
+                System.out.println("\n💵 CASH PAYMENT RECEIPT:");
+                System.out.println("This payment was processed at the counter.");
+                System.out.println("A receipt file should be available in the receipts/ folder.");
+                System.out.println("Receipt Reference: " + payment.getReferenceNumber());
+            }
+
             // Find related rentals for this customer
             List<Rental> relatedRentals = rentalManager.findRentalsByPaymentReference(referenceNumber.trim(), paymentDAO);
 
@@ -2652,6 +2661,19 @@ public class HillClimmer {
 
             String confirm = readString("Confirm cash payment received? (y/n): ");
             if (confirm.toLowerCase().startsWith("y")) {
+                // Create a CashPayment object to handle the payment processing
+                String paymentID = "CASH" + System.currentTimeMillis();
+                CashPayment cashPayment = new CashPayment(paymentID, selectedRental.getTotalCost(),
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")),
+                    "C" + selectedRental.getCustomerId());
+
+                // Mark the payment as paid (this will save the receipt)
+                cashPayment.markAsPaid(currentManager != null ? currentManager.getName() : "Manager");
+
+                // Save the payment to database
+                PaymentDAO paymentDAO = new PaymentDAO();
+                paymentDAO.save(cashPayment);
+
                 // Update rental status to "Paid"
                 selectedRental.setPaymentStatus("Paid");
                 rentalManager.updateRental(selectedRental);
@@ -2668,6 +2690,7 @@ public class HillClimmer {
                     System.out.println("💰 Customer balance updated: RM" + String.format("%.2f", currentBalance) +
                         " → RM" + String.format("%.2f", newBalance));
                     System.out.println("📊 Rental status changed to: Paid");
+                    System.out.println("🧾 Receipt saved with reference: " + cashPayment.getReferenceNumber());
                     pauseForUserConfirmation();
                 } else {
                     System.out.println("⚠️  Warning: Customer not found, but rental status updated.");
