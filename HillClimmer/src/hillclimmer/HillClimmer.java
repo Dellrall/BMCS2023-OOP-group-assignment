@@ -843,7 +843,7 @@ public class HillClimmer {
                 rentalManager = new RentalManager(currentManager);
             
                 System.out.println("✅ Manager login successful!");
-                System.out.println("� Welcome back, " + currentManager.getName() + "!");
+                System.out.println("👋 Welcome back, " + currentManager.getName() + "!");
                 System.out.println("🔐 Authorization Level: " + currentManager.getAuthorizationLevel());
                 System.out.println("📊 Access to both Vehicle and Rental Management");
                 System.out.println("🏢 Ready to manage HillClimmer operations?");
@@ -1086,10 +1086,10 @@ public class HillClimmer {
             System.out.println("👋 Welcome back, " + (currentManager != null ? currentManager.getName() : "Manager") + "!");
             System.out.println("🔐 Authorization Level: " + (currentManager != null ? currentManager.getAuthorizationLevel() : "N/A"));
             System.out.println("🏢 Ready to manage HillClimmer operations?");
-            System.out.println("\n� MANAGEMENT SECTIONS:");
-            System.out.println("1. � Vehicle Management");
-            System.out.println("2. � Rental Management");
-            System.out.println("3. � Customer Management");
+            System.out.println("\n📋 MANAGEMENT SECTIONS:");
+            System.out.println("1. 🚗 Vehicle Management");
+            System.out.println("2. 📋 Rental Management");
+            System.out.println("3. 👥 Customer Management");
             System.out.println("4. 💰 Payment Management");
             System.out.println("5. 🔐 Account Management");
             System.out.println("6. 📈 System Reports");
@@ -1943,9 +1943,9 @@ public class HillClimmer {
         }
 
         System.out.println("\nPayment Options:");
-        System.out.println("1. � Pay Full Amount (RM" + String.format("%.2f", outstandingBalance) + ")");
+        System.out.println("1. 💰 Pay Full Amount (RM" + String.format("%.2f", outstandingBalance) + ")");
         System.out.println("2. 💵 Pay Custom Amount");
-        System.out.println("0. � Return to previous menu");
+        System.out.println("0. ↩️ Return to previous menu");
         System.out.print("Select payment option (0-2): ");
 
         try {
