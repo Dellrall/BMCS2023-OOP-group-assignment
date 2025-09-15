@@ -68,6 +68,18 @@ public class DurationManager {
         }
     }
 
+    public void markReminderCompleted(int associatedId, String reminderType) {
+        synchronized (reminderLock) {
+            for (Reminder reminder : reminders) {
+                if (reminder.getAssociatedId() == associatedId && 
+                    reminderType.equals(reminder.getReminderType())) {
+                    reminder.setStatus("COMPLETED");
+                    break;
+                }
+            }
+        }
+    }
+
     public List<Reminder> getOverdueReminders() {
         return reminders.stream()
                 .filter(Reminder::isOverdue)

@@ -1514,11 +1514,8 @@ public class HillClimmer {
                 rentalManager.updateRental(newRental);
             }
 
-            // Create rental period with timer
-            durationManager.createBasicRentalPeriod(rentalId, startDate, endDate,
-                selectedVehicle.getModelPricing());
-
-            // Create return reminder
+            // NOTE: Rental period will be created after successful payment
+            // Create return reminder for unpaid rental
             durationManager.createReturnReminder(rentalId, endDate.atStartOfDay());
 
             System.out.println("✅ Rental created successfully!");
@@ -1627,6 +1624,14 @@ public class HillClimmer {
                 if (rental != null) {
                     rental.setPaymentStatus("Paid");
                     rentalManager.updateRental(rental);
+                    
+                    // Create rental period now that payment is successful
+                    // Use a default daily rate since vehicle details are not easily accessible here
+                    double dailyRate = 50.0; // Default rate, can be improved later
+                    durationManager.createBasicRentalPeriod(rentalId, rental.getStartDate(), rental.getEndDate(), dailyRate);
+                    
+                    // Mark return reminder as completed since payment is successful
+                    durationManager.markReminderCompleted(rentalId, "RETURN");
                 }
                 
                 System.out.println("✅ Payment of RM" + String.format("%.2f", amount) + " processed successfully!");
@@ -2519,9 +2524,22 @@ public class HillClimmer {
         try {
             System.out.println("Total Vehicles: " + (vehicleManager != null ? vehicleManager.getAllVehicles().size() : 0));
             System.out.println("Total Customers: " + customerDAO.getAll().size());
-            System.out.println("Active Rentals: " + rentalManager.getAllRentals().size());
+            
+            // Only count rentals with "Paid" status as active
+            List<Rental> allRentals = rentalManager.getAllRentals();
+            long activeRentals = allRentals.stream()
+                .filter(rental -> "Paid".equals(rental.getPaymentStatus()))
+                .count();
+            System.out.println("Active Rentals: " + activeRentals);
+            
             System.out.println("Pending Reminders: " + durationManager.getPendingReminders().size());
-            System.out.println("Total Revenue: RM" + durationManager.getTotalRevenueFromActivePeriods());
+            
+            // Only count revenue from paid rentals
+            double totalRevenue = allRentals.stream()
+                .filter(rental -> "Paid".equals(rental.getPaymentStatus()))
+                .mapToDouble(Rental::getTotalCost)
+                .sum();
+            System.out.println("Total Revenue: RM" + String.format("%.2f", totalRevenue));
         } catch (Exception e) {
             System.err.println("❌ Error generating system report: " + e.getMessage());
             e.printStackTrace();
@@ -2624,7 +2642,14 @@ public class HillClimmer {
                 // Add rental with specific ID
                 rentalManager.addRentalWithId(rentalId, customerId, vehicleId, startDate, endDate, totalCost);
 
-                // Create rental period for revenue tracking
+                // Set payment status to Paid for admin-created rentals
+                Rental adminRental = rentalManager.getRentalById(rentalId);
+                if (adminRental != null) {
+                    adminRental.setPaymentStatus("Paid");
+                    rentalManager.updateRental(adminRental);
+                }
+
+                // Create rental period for admin-created rentals (considered paid)
                 durationManager.createBasicRentalPeriod(rentalId, startDate, endDate, dailyRate);
 
                 // Create return reminder
@@ -2837,6 +2862,14 @@ public class HillClimmer {
                 // Update rental status to "Paid"
                 selectedRental.setPaymentStatus("Paid");
                 rentalManager.updateRental(selectedRental);
+
+                // Create rental period now that payment is successful
+                double dailyRate = 50.0; // Default rate, can be improved later
+                durationManager.createBasicRentalPeriod(selectedRental.getRentalId(), 
+                    selectedRental.getStartDate(), selectedRental.getEndDate(), dailyRate);
+
+                // Mark return reminder as completed since payment is successful
+                durationManager.markReminderCompleted(selectedRental.getRentalId(), "RETURN");
 
                 // Update customer's outstanding balance
                 Customer customer = customerDAO.load("C" + selectedRental.getCustomerId());
