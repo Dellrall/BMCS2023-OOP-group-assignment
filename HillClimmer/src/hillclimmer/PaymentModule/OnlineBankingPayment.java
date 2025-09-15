@@ -21,6 +21,7 @@ public class OnlineBankingPayment extends Payment {
     @SuppressWarnings("unused")
     private String password;
     private String otpCode;
+    private String generatedOTP;
 
     public OnlineBankingPayment(String paymentID, double totalAmount, String timestamp, String customerID) {
         super(paymentID, totalAmount, "Online Banking", "Pending", timestamp, customerID);
@@ -29,6 +30,7 @@ public class OnlineBankingPayment extends Payment {
         this.username = "";
         this.password = "";
         this.otpCode = "";
+        this.generatedOTP = "";
     }
 
     @Override
@@ -99,8 +101,10 @@ public class OnlineBankingPayment extends Payment {
 
             System.out.println("✅ Login successful!");
 
-            // Request OTP
+            // Generate and send OTP
+            this.generatedOTP = generateOTP();
             System.out.println("📱 OTP sent to your registered mobile number.");
+            System.out.println("🔢 Generated OTP: " + generatedOTP + " (For demo purposes - in real system this would be sent via SMS)");
             System.out.print("Enter 6-digit OTP (or 0 to cancel): ");
             String otpInput = getUserInput();
             if (otpInput.equals("0")) {
@@ -111,7 +115,7 @@ public class OnlineBankingPayment extends Payment {
             this.otpCode = otpInput;
 
             if (!verifyOTP()) {
-                System.out.println("❌ Invalid OTP.");
+                System.out.println("❌ Invalid OTP. Payment cancelled.");
                 this.paymentStatus = "Failed";
                 return;
             }
@@ -165,8 +169,13 @@ public class OnlineBankingPayment extends Payment {
     }
 
     private boolean verifyOTP() {
-        // Simulate OTP verification (95% success rate)
-        return otpCode.length() == 6 && Math.random() > 0.05;
+        // Verify OTP against generated code
+        return otpCode.equals(generatedOTP);
+    }
+
+    private String generateOTP() {
+        // Generate a 6-digit OTP
+        return String.format("%06d", (int)(Math.random() * 1000000));
     }
 
     private String getUserInput() {
