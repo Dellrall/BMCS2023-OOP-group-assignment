@@ -1137,21 +1137,19 @@ public class HillClimmer {
             System.out.println("🔐 Authorization Level: " + (currentManager != null ? currentManager.getAuthorizationLevel() : "N/A"));
             System.out.println("🏢 Ready to manage HillClimmer operations?");
             System.out.println("\n📋 MANAGEMENT SECTIONS:");
-            System.out.println("1. 🚗 Vehicle Management");
-            System.out.println("2. 📋 Rental Management");
-            System.out.println("3. 👥 Customer Management");
-            System.out.println("4. 💰 Payment Management");
-            System.out.println("5. 🔐 Account Management");
-            System.out.println("6. 📈 System Reports");
-            System.out.println("7. 🚪 Logout");
+            System.out.println("1. 🚗 Fleet & Vehicles");
+            System.out.println("2. � Bookings & Rentals");
+            System.out.println("3. 👥 Customer Service");
+            System.out.println("4. 💰 Financial Operations");
+            System.out.println("5. 🚪 Logout");
             System.out.println("\n💡 Enter '0' at any input to return to main menu");
             
             try {
-                int choice = readInt("Please select a section (1-7): ", 1, 7);
+                int choice = readInt("Please select a section (1-5): ", 1, 5);
 
                 switch (choice) {
                     case 1:
-                        showVehicleManagementMenu();
+                        showFleetManagementMenu();
                         break;
                     case 2:
                         showRentalManagementMenu();
@@ -1160,15 +1158,9 @@ public class HillClimmer {
                         showCustomerManagementMenu();
                         break;
                     case 4:
-                        showPaymentManagementMenu();
+                        showFinancialOperationsMenu();
                         break;
                     case 5:
-                        showAccountManagementMenu();
-                        break;
-                    case 6:
-                        showSystemReports();
-                        break;
-                    case 7:
                         System.out.println("👋 Manager logout successful.");
                         System.out.println("👤 Goodbye, " + (currentManager != null ? currentManager.getName() : "Manager") + "!");
                         System.out.println("🏢 Thank you for managing HillClimmer operations.");
@@ -1183,6 +1175,55 @@ public class HillClimmer {
             } catch (UserExitException e) {
                 System.out.println("🔙 Returned to manager menu.");
                 continue;
+            }
+        }
+    }
+
+    // ===== FLEET MANAGEMENT SUBMENU =====
+    private static void showFleetManagementMenu() {
+        while (true) {
+            transitionToScreen();
+
+            System.out.println("=========================================");
+            System.out.println("   🏔️  HillClimmer VEHICLE RENTAL   🏔️");
+            System.out.println("        Malaysia's Premier Hill");
+            System.out.println("        Climbing Vehicle Service");
+            System.out.println("=========================================");
+            System.out.println("\n=== 🚗 FLEET MANAGEMENT ===");
+            System.out.println("Manager: " + (currentManager != null ? currentManager.getName() : "Manager"));
+            System.out.println("\n📋 FLEET OPERATIONS:");
+            System.out.println("1. 📊 View All Vehicles");
+            System.out.println("2. ➕ Add New Vehicle");
+            System.out.println("3. 🗑️  Remove Vehicle");
+            System.out.println("4. ✏️  Update Vehicle Details");
+            System.out.println("5. 📈 Fleet Reports");
+            System.out.println("0. 🔙 Back to Main Menu");
+            System.out.println("\n💡 Enter '0' to return to main menu");
+
+            try {
+                int choice = readInt("Select fleet operation (0-5): ", 0, 5);
+
+                switch (choice) {
+                    case 0:
+                        return; // Back to main menu
+                    case 1:
+                        viewAllVehicles();
+                        break;
+                    case 2:
+                        addNewVehicle();
+                        break;
+                    case 3:
+                        removeVehicle();
+                        break;
+                    case 4:
+                        updateVehicleDetails();
+                        break;
+                    case 5:
+                        showSystemReports();
+                        break;
+                }
+            } catch (UserExitException e) {
+                return; // Back to main menu
             }
         }
     }
@@ -1302,6 +1343,43 @@ public class HillClimmer {
                         return; // Back to main menu
                     case 1:
                         viewAllCustomers();
+                        break;
+                }
+            } catch (UserExitException e) {
+                return; // Back to main menu
+            }
+        }
+    }
+
+    // ===== FINANCIAL OPERATIONS SUBMENU =====
+    private static void showFinancialOperationsMenu() {
+        while (true) {
+            transitionToScreen();
+
+            System.out.println("=========================================");
+            System.out.println("   🏔️  HillClimmer VEHICLE RENTAL   🏔️");
+            System.out.println("        Malaysia's Premier Hill");
+            System.out.println("        Climbing Vehicle Service");
+            System.out.println("=========================================");
+            System.out.println("\n=== 💰 FINANCIAL OPERATIONS ===");
+            System.out.println("Manager: " + (currentManager != null ? currentManager.getName() : "Manager"));
+            System.out.println("\n📋 FINANCIAL OPERATIONS:");
+            System.out.println("1. 💵 Process Cash Payments");
+            System.out.println("2. 🔑 Account Management");
+            System.out.println("0. 🔙 Back to Main Menu");
+            System.out.println("\n💡 Enter '0' to return to main menu");
+
+            try {
+                int choice = readInt("Select financial operation (0-2): ", 0, 2);
+
+                switch (choice) {
+                    case 0:
+                        return; // Back to main menu
+                    case 1:
+                        processCashPayments();
+                        break;
+                    case 2:
+                        showAccountManagementMenu();
                         break;
                 }
             } catch (UserExitException e) {
