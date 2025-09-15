@@ -914,6 +914,16 @@ public class HillClimmer {
             while (email == null) {
                 try {
                     email = readEmail("Email Address: ");
+                    
+                    // Check if email already exists
+                    Customer existingCustomer = customerDAO.findByEmail(email);
+                    if (existingCustomer != null) {
+                        System.out.println("❌ This email address is already registered.");
+                        System.out.println("💡 Please use a different email address or login with your existing account.");
+                        email = null; // Reset email to continue the loop
+                        continue;
+                    }
+                    
                 } catch (UserExitException e) {
                     System.out.println("🔙 Returned to main menu.");
                     return;
@@ -1600,12 +1610,32 @@ public class HillClimmer {
                     }
                     break;
                 case 2:
-                    System.out.print("New email: ");
-                    String newEmail = scanner.nextLine().trim();
-                    currentCustomer.setEmail(newEmail);
-                    customerDAO.update(currentCustomer);
-                    System.out.println("✅ Email updated successfully!");
-                    pauseForUserConfirmation();
+                    try {
+                        String newEmail = readEmail("New email: ");
+                        
+                        // Check if the new email is different from current email
+                        if (newEmail.equals(currentCustomer.getEmail())) {
+                            System.out.println("ℹ️ The new email is the same as your current email.");
+                            pauseForUserConfirmation();
+                            break;
+                        }
+                        
+                        // Check if email already exists for another customer
+                        Customer existingCustomer = customerDAO.findByEmail(newEmail);
+                        if (existingCustomer != null && !existingCustomer.getCustomerID().equals(currentCustomer.getCustomerID())) {
+                            System.out.println("❌ This email address is already registered to another account.");
+                            System.out.println("💡 Please use a different email address.");
+                            pauseForUserConfirmation();
+                            break;
+                        }
+                        
+                        currentCustomer.setEmail(newEmail);
+                        customerDAO.update(currentCustomer);
+                        System.out.println("✅ Email updated successfully!");
+                        pauseForUserConfirmation();
+                    } catch (UserExitException e) {
+                        System.out.println("🔙 Email update cancelled.");
+                    }
                     break;
                 case 3:
                     try {
