@@ -2682,7 +2682,8 @@ public class HillClimmer {
                 Rental rentalToRemove = rentalManager.getRentalById(rentalId);
                 if (rentalToRemove != null) {
                     // Find the customer who made this rental
-                    Customer rentalCustomer = customerDAO.load("C" + rentalToRemove.getCustomerId());
+                    String customerId = "C" + String.format("%03d", rentalToRemove.getCustomerId());
+                    Customer rentalCustomer = customerDAO.load(customerId);
                     if (rentalCustomer != null) {
                         // Only adjust outstanding balance for unpaid or pending rentals
                         // Paid rentals don't affect outstanding balance
@@ -2848,9 +2849,10 @@ public class HillClimmer {
             if (confirm.toLowerCase().startsWith("y")) {
                 // Create a CashPayment object to handle the payment processing
                 String paymentID = "CASH" + System.currentTimeMillis();
+                String customerId = "C" + String.format("%03d", selectedRental.getCustomerId());
                 CashPayment cashPayment = new CashPayment(paymentID, selectedRental.getTotalCost(),
                     LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")),
-                    "C" + selectedRental.getCustomerId());
+                    customerId);
 
                 // Mark the payment as paid (this will save the receipt)
                 cashPayment.markAsPaid(currentManager != null ? currentManager.getName() : "Manager");
@@ -2872,12 +2874,20 @@ public class HillClimmer {
                 durationManager.markReminderCompleted(selectedRental.getRentalId(), "RETURN");
 
                 // Update customer's outstanding balance
-                Customer customer = customerDAO.load("C" + selectedRental.getCustomerId());
+                Customer customer = customerDAO.load(customerId);
+                System.out.println("DEBUG: Looking for customer ID: " + customerId);
                 if (customer != null) {
+                    System.out.println("DEBUG: Found customer: " + customer.getName());
                     double currentBalance = customer.getOutstandingBalance();
                     double newBalance = Math.max(0, currentBalance - selectedRental.getTotalCost());
                     customer.setOutstandingBalance(newBalance);
                     customerDAO.update(customer);
+
+                    // Refresh currentCustomer if they're logged in (to update displayed balance)
+                    if (currentCustomer != null && currentCustomer.getCustomerID().equals(customerId)) {
+                        currentCustomer = customerDAO.load(customerId);
+                        System.out.println("DEBUG: Refreshed currentCustomer balance to: RM" + String.format("%.2f", currentCustomer.getOutstandingBalance()));
+                    }
 
                     System.out.println("✅ Cash payment processed successfully!");
                     System.out.println("💰 Customer balance updated: RM" + String.format("%.2f", currentBalance) +
@@ -2886,7 +2896,7 @@ public class HillClimmer {
                     System.out.println("🧾 Receipt saved with reference: " + cashPayment.getReferenceNumber());
                     pauseForUserConfirmation();
                 } else {
-                    System.out.println("⚠️  Warning: Customer not found, but rental status updated.");
+                    System.out.println("⚠️  Warning: Customer not found with ID: " + customerId + ", but rental status updated.");
                     pauseForUserConfirmation();
                 }
             } else {
