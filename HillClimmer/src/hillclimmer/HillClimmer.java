@@ -884,6 +884,18 @@ public class HillClimmer {
             while (name == null) {
                 try {
                     name = readString("Full Name (as per IC): ");
+                    
+                    // Check if name already exists
+                    List<Customer> allCustomers = customerDAO.getAll();
+                    for (Customer existingCustomer : allCustomers) {
+                        if (existingCustomer.getName().equalsIgnoreCase(name)) {
+                            System.out.println("❌ This name is already registered.");
+                            System.out.println("💡 Please use a different name or login with your existing account.");
+                            name = null; // Reset name to continue the loop
+                            break;
+                        }
+                    }
+                    
                 } catch (UserExitException e) {
                     System.out.println("🔙 Returned to main menu.");
                     return;
@@ -894,6 +906,18 @@ public class HillClimmer {
             while (icNumber == null) {
                 try {
                     icNumber = readIC("IC Number (XXXXXX-XX-XXXX): ");
+                    
+                    // Check if IC number already exists
+                    List<Customer> allCustomers = customerDAO.getAll();
+                    for (Customer existingCustomer : allCustomers) {
+                        if (existingCustomer.getIcNumber().equals(icNumber)) {
+                            System.out.println("❌ This IC number is already registered.");
+                            System.out.println("💡 Please use a different IC number or login with your existing account.");
+                            icNumber = null; // Reset IC number to continue the loop
+                            break;
+                        }
+                    }
+                    
                 } catch (UserExitException e) {
                     System.out.println("🔙 Returned to main menu.");
                     return;
