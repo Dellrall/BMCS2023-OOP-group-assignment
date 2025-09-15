@@ -1332,17 +1332,25 @@ public class HillClimmer {
             System.out.println("Manager: " + (currentManager != null ? currentManager.getName() : "Manager"));
             System.out.println("\n📋 CUSTOMER OPERATIONS:");
             System.out.println("1. 👥 View All Customers");
+            System.out.println("2. ➕ Add New Customer");
+            System.out.println("3. 🗑️  Remove Customer");
             System.out.println("0. 🔙 Back to Main Menu");
             System.out.println("\n💡 Enter '0' to return to main menu");
 
             try {
-                int choice = readInt("Select customer operation (0-1): ", 0, 1);
+                int choice = readInt("Select customer operation (0-3): ", 0, 3);
 
                 switch (choice) {
                     case 0:
                         return; // Back to main menu
                     case 1:
                         viewAllCustomers();
+                        break;
+                    case 2:
+                        addCustomer();
+                        break;
+                    case 3:
+                        removeCustomer();
                         break;
                 }
             } catch (UserExitException e) {
@@ -2663,6 +2671,226 @@ public class HillClimmer {
             System.out.println("ID: " + c.getCustomerID() + " | Name: " + c.getName() +
                 " | Phone: " + c.getPhoneNo() + " | Balance: RM" + String.format("%.2f", c.getOutstandingBalance()));
         }
+        pauseForUserConfirmation();
+    }
+
+    private static void addCustomer() {
+        // Check if current manager is a vehicle manager (VM-prefixed ID)
+        if (currentManager == null || !currentManager.getManagerID().startsWith("VM")) {
+            System.out.println("❌ Access Denied: Only Vehicle Managers can add customers.");
+            pauseForUserConfirmation();
+            return;
+        }
+
+        System.out.println("\n=== ADD NEW CUSTOMER ===");
+        System.out.println("Manager: " + currentManager.getName() + " (Vehicle Manager)");
+
+        try {
+            // Get customer details
+            System.out.println("\n📝 Enter customer information:");
+
+            // Name
+            System.out.print("Full Name: ");
+            String name = scanner.nextLine().trim();
+            if (name.isEmpty()) {
+                System.out.println("❌ Name cannot be empty.");
+                pauseForUserConfirmation();
+                return;
+            }
+
+            // IC Number
+            String icNumber;
+            while (true) {
+                System.out.print("IC Number (XXXXXX-XX-XXXX): ");
+                icNumber = scanner.nextLine().trim();
+                if (icNumber.equals("0")) {
+                    System.out.println("🔙 Operation cancelled.");
+                    return;
+                }
+                if (Customer.isValidIC(icNumber)) {
+                    break;
+                } else {
+                    System.out.println("❌ Invalid IC format. Please use XXXXXX-XX-XXXX format.");
+                }
+            }
+
+            // Phone Number
+            String phoneNumber;
+            while (true) {
+                System.out.print("Phone Number (+60XXXXXXXXX or 0XXXXXXXXX): ");
+                phoneNumber = scanner.nextLine().trim();
+                if (phoneNumber.equals("0")) {
+                    System.out.println("🔙 Operation cancelled.");
+                    return;
+                }
+                if (Customer.isValidMalaysianPhoneInput(phoneNumber)) {
+                    // Normalize phone number
+                    phoneNumber = Customer.normalizeMalaysianPhone(phoneNumber);
+                    break;
+                } else {
+                    System.out.println("❌ Invalid phone number format.");
+                }
+            }
+
+            // Email
+            String email;
+            while (true) {
+                System.out.print("Email Address: ");
+                email = scanner.nextLine().trim();
+                if (email.equals("0")) {
+                    System.out.println("🔙 Operation cancelled.");
+                    return;
+                }
+                if (email.contains("@") && email.contains(".") && email.length() >= 5) {
+                    break;
+                } else {
+                    System.out.println("❌ Invalid email format.");
+                }
+            }
+
+            // License Type
+            String licenseType;
+            while (true) {
+                System.out.print("License Type (B, B2, D, DA, E, E1, E2): ");
+                licenseType = scanner.nextLine().trim().toUpperCase();
+                if (licenseType.equals("0")) {
+                    System.out.println("🔙 Operation cancelled.");
+                    return;
+                }
+                if (Arrays.asList("B", "B2", "D", "DA", "E", "E1", "E2").contains(licenseType)) {
+                    break;
+                } else {
+                    System.out.println("❌ Invalid license type. Please choose from: B, B2, D, DA, E, E1, E2");
+                }
+            }
+
+            // Create password
+            String password;
+            while (true) {
+                System.out.print("Initial Password (min 6 chars, must include hex and symbols): ");
+                password = scanner.nextLine().trim();
+                if (password.equals("0")) {
+                    System.out.println("🔙 Operation cancelled.");
+                    return;
+                }
+                if (password.length() >= 6) {
+                    break;
+                } else {
+                    System.out.println("❌ Password must be at least 6 characters long.");
+                }
+            }
+
+            // Check if email already exists
+            if (customerDAO.findByEmail(email) != null) {
+                System.out.println("❌ A customer with this email already exists.");
+                pauseForUserConfirmation();
+                return;
+            }
+
+            // Calculate age from IC and set license expiry (simplified for manager creation)
+            LocalDate licenseExpiry = LocalDate.now().plusYears(3); // Default 3 years from now
+            Customer tempCustomer = new Customer("C000", name, icNumber, phoneNumber, email,
+                licenseType, licenseExpiry, 0, password);
+            int age = tempCustomer.getAgeFromIC();
+
+            if (age < 18) {
+                System.out.println("❌ Customer must be at least 18 years old.");
+                pauseForUserConfirmation();
+                return;
+            }
+
+            // Create customer with proper ID generation
+            Customer newCustomer = new Customer("C000", name, icNumber, phoneNumber, email,
+                licenseType, licenseExpiry, age, password);
+
+            // Save to database
+            customerDAO.save(newCustomer);
+            System.out.println("✅ Customer added successfully!");
+            System.out.println("Customer ID: " + newCustomer.getCustomerID());
+            System.out.println("Name: " + newCustomer.getName());
+            System.out.println("Email: " + newCustomer.getEmail());
+
+        } catch (Exception e) {
+            System.out.println("❌ Error adding customer: " + e.getMessage());
+        }
+
+        pauseForUserConfirmation();
+    }
+
+    private static void removeCustomer() {
+        // Check if current manager is a vehicle manager (VM-prefixed ID)
+        if (currentManager == null || !currentManager.getManagerID().startsWith("VM")) {
+            System.out.println("❌ Access Denied: Only Vehicle Managers can remove customers.");
+            pauseForUserConfirmation();
+            return;
+        }
+
+        System.out.println("\n=== REMOVE CUSTOMER ===");
+        System.out.println("Manager: " + currentManager.getName() + " (Vehicle Manager)");
+        System.out.println("⚠️  WARNING: This action cannot be undone!");
+
+        try {
+            // Get customer ID to remove
+            System.out.print("Enter Customer ID to remove (e.g., C001) or 0 to cancel: ");
+            String customerIdInput = scanner.nextLine().trim();
+
+            if (customerIdInput.equals("0")) {
+                System.out.println("🔙 Operation cancelled.");
+                return;
+            }
+
+            // Validate customer ID format
+            if (!customerIdInput.matches("C\\d{3}")) {
+                System.out.println("❌ Invalid customer ID format. Please use CXXX format (e.g., C001).");
+                pauseForUserConfirmation();
+                return;
+            }
+
+            // Find customer
+            Customer customerToRemove = customerDAO.load(customerIdInput);
+            if (customerToRemove == null) {
+                System.out.println("❌ Customer not found.");
+                pauseForUserConfirmation();
+                return;
+            }
+
+            // Show customer details for confirmation
+            System.out.println("\n👤 Customer Details:");
+            System.out.println("ID: " + customerToRemove.getCustomerID());
+            System.out.println("Name: " + customerToRemove.getName());
+            System.out.println("Email: " + customerToRemove.getEmail());
+            System.out.println("Outstanding Balance: RM" + String.format("%.2f", customerToRemove.getOutstandingBalance()));
+
+            // Check for active rentals
+            List<Rental> customerRentals = rentalManager.getRentalsByCustomer(
+                Integer.parseInt(customerToRemove.getCustomerID().substring(1)));
+            long activeRentals = customerRentals.stream()
+                .filter(rental -> "Paid".equals(rental.getPaymentStatus()))
+                .count();
+
+            if (activeRentals > 0) {
+                System.out.println("⚠️  WARNING: Customer has " + activeRentals + " active rental(s)!");
+                System.out.println("Removing this customer will affect existing rentals.");
+            }
+
+            // Confirmation
+            System.out.print("\nAre you sure you want to remove this customer? (yes/no): ");
+            String confirmation = scanner.nextLine().trim().toLowerCase();
+
+            if (!confirmation.equals("yes") && !confirmation.equals("y")) {
+                System.out.println("🔙 Operation cancelled.");
+                return;
+            }
+
+            // Remove customer
+            customerDAO.delete(customerToRemove.getCustomerID());
+            System.out.println("✅ Customer removed successfully!");
+            System.out.println("Removed: " + customerToRemove.getName() + " (" + customerToRemove.getCustomerID() + ")");
+
+        } catch (Exception e) {
+            System.out.println("❌ Error removing customer: " + e.getMessage());
+        }
+
         pauseForUserConfirmation();
     }
 
