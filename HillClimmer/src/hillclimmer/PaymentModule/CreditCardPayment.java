@@ -36,44 +36,98 @@ public class CreditCardPayment extends Payment {
         System.out.println("💡 Enter '0' at any input to cancel payment");
 
         try {
-            // Collect card details with flexible input
-            System.out.print("Enter card number (16 digits, spaces/dashes allowed) or 0 to cancel: ");
-            String cardInput = getUserInput();
-            if (cardInput.equals("0")) {
-                System.out.println("🔙 Payment cancelled.");
-                this.paymentStatus = "Cancelled";
-                return;
+            // Collect card details with validation loops
+            // Card Number Validation Loop
+            while (true) {
+                System.out.print("Enter card number (16 digits, spaces/dashes allowed) or 0 to cancel: ");
+                String cardInput = getUserInput();
+                if (cardInput.equals("0")) {
+                    System.out.println("🔙 Payment cancelled.");
+                    this.paymentStatus = "Cancelled";
+                    return;
+                }
+                this.cardNumber = normalizeCardNumber(cardInput);
+                
+                if (this.cardNumber.length() != 16 || !this.cardNumber.matches("\\d+")) {
+                    System.out.println("❌ Invalid card number. Must be exactly 16 digits. Please try again.");
+                    continue;
+                }
+                break;
             }
-            this.cardNumber = normalizeCardNumber(cardInput);
 
-            System.out.print("Enter card holder name or 0 to cancel: ");
-            String nameInput = getUserInput();
-            if (nameInput.equals("0")) {
-                System.out.println("🔙 Payment cancelled.");
-                this.paymentStatus = "Cancelled";
-                return;
+            // Card Holder Name Validation Loop
+            while (true) {
+                System.out.print("Enter card holder name or 0 to cancel: ");
+                String nameInput = getUserInput();
+                if (nameInput.equals("0")) {
+                    System.out.println("🔙 Payment cancelled.");
+                    this.paymentStatus = "Cancelled";
+                    return;
+                }
+                
+                if (nameInput.trim().isEmpty() || !nameInput.matches("[a-zA-Z\\s]+")) {
+                    System.out.println("❌ Invalid card holder name. Must contain only letters and spaces. Please try again.");
+                    continue;
+                }
+                this.cardHolderName = nameInput;
+                break;
             }
-            this.cardHolderName = nameInput;
 
-            System.out.print("Enter expiry date (MM/YY or MM-YY or MM YY) or 0 to cancel: ");
-            String expiryInput = getUserInput();
-            if (expiryInput.equals("0")) {
-                System.out.println("🔙 Payment cancelled.");
-                this.paymentStatus = "Cancelled";
-                return;
+            // Expiry Date Validation Loop
+            while (true) {
+                System.out.print("Enter expiry date (MM/YY or MM-YY or MM YY) or 0 to cancel: ");
+                String expiryInput = getUserInput();
+                if (expiryInput.equals("0")) {
+                    System.out.println("🔙 Payment cancelled.");
+                    this.paymentStatus = "Cancelled";
+                    return;
+                }
+                this.expiryDate = normalizeExpiryDate(expiryInput);
+                
+                if (!this.expiryDate.matches("\\d{2}/\\d{2}")) {
+                    System.out.println("❌ Invalid expiry date format. Must be MM/YY. Please try again.");
+                    continue;
+                }
+                
+                // Check if month and year are valid
+                String[] parts = this.expiryDate.split("/");
+                int month = Integer.parseInt(parts[0]);
+                int year = Integer.parseInt(parts[1]) + 2000;
+                
+                if (month < 1 || month > 12) {
+                    System.out.println("❌ Invalid month. Must be between 01-12. Please try again.");
+                    continue;
+                }
+                
+                // Check if card is not expired
+                java.time.LocalDate expiry = java.time.LocalDate.of(year, month, 1);
+                if (expiry.isBefore(java.time.LocalDate.now())) {
+                    System.out.println("❌ Card has expired. Please try again.");
+                    continue;
+                }
+                
+                break;
             }
-            this.expiryDate = normalizeExpiryDate(expiryInput);
 
-            System.out.print("Enter CVV (3 digits) or 0 to cancel: ");
-            String cvvInput = getUserInput();
-            if (cvvInput.equals("0")) {
-                System.out.println("🔙 Payment cancelled.");
-                this.paymentStatus = "Cancelled";
-                return;
+            // CVV Validation Loop
+            while (true) {
+                System.out.print("Enter CVV (3 digits) or 0 to cancel: ");
+                String cvvInput = getUserInput();
+                if (cvvInput.equals("0")) {
+                    System.out.println("🔙 Payment cancelled.");
+                    this.paymentStatus = "Cancelled";
+                    return;
+                }
+                
+                if (cvvInput.length() != 3 || !cvvInput.matches("\\d+")) {
+                    System.out.println("❌ Invalid CVV. Must be exactly 3 digits. Please try again.");
+                    continue;
+                }
+                this.cvv = cvvInput;
+                break;
             }
-            this.cvv = cvvInput;
 
-            // Validate card details
+            // Validate card details (basic safety check)
             if (!isValidCardDetails()) {
                 System.out.println("❌ Invalid card details. Payment failed.");
                 this.paymentStatus = "Failed";
@@ -132,11 +186,11 @@ public class CreditCardPayment extends Payment {
     }
 
     private boolean isValidCardDetails() {
-        // Basic validation
+        // Basic validation (most validation is now done during input)
         if (cardNumber.length() != 16 || !cardNumber.matches("\\d+")) {
             return false;
         }
-        if (cardHolderName.isEmpty()) {
+        if (cardHolderName.isEmpty() || !cardHolderName.matches("[a-zA-Z\\s]+")) {
             return false;
         }
         if (!expiryDate.matches("\\d{2}/\\d{2}")) {
@@ -146,7 +200,7 @@ public class CreditCardPayment extends Payment {
             return false;
         }
 
-        // Check expiry date
+        // Check expiry date (already validated during input, but keeping as safety check)
         String[] parts = expiryDate.split("/");
         int month = Integer.parseInt(parts[0]);
         int year = Integer.parseInt(parts[1]) + 2000;
