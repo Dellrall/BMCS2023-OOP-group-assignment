@@ -2856,44 +2856,60 @@ public class HillClimmer {
         System.out.println("\n=== REMOVE RENTAL ===");
         System.out.println("\n💡 Enter '0' at any input to cancel and return to manager menu");
         
-        try {
-            int rentalId = readInt("Rental ID to remove: ", 1, Integer.MAX_VALUE);
-            
-            String confirm = readString("Are you sure you want to remove rental " + rentalId + "? (y/n): ");
-            if (confirm.toLowerCase().startsWith("y")) {
-                // Get rental details before deletion to adjust outstanding balance
-                Rental rentalToRemove = rentalManager.getRentalById(rentalId);
-                if (rentalToRemove != null) {
-                    // Find the customer who made this rental
-                    String customerId = "C" + String.format("%03d", rentalToRemove.getCustomerId());
-                    Customer rentalCustomer = customerDAO.load(customerId);
-                    if (rentalCustomer != null) {
-                        // Only adjust outstanding balance for unpaid or pending rentals
-                        // Paid rentals don't affect outstanding balance
-                        String rentalStatus = rentalToRemove.getPaymentStatus();
-                        if ("Unpaid".equals(rentalStatus) || "Pending".equals(rentalStatus)) {
-                            // Remove rental cost from outstanding balance
-                            double currentBalance = rentalCustomer.getOutstandingBalance();
-                            double newBalance = Math.max(0, currentBalance - rentalToRemove.getTotalCost());
-                            rentalCustomer.setOutstandingBalance(newBalance);
-                            customerDAO.update(rentalCustomer);
-                            System.out.println("💰 Outstanding balance adjusted: RM" + String.format("%.2f", currentBalance) + " → RM" + String.format("%.2f", newBalance));
-                        } else if ("Paid".equals(rentalStatus)) {
-                            System.out.println("💰 Rental was already paid - outstanding balance unchanged.");
+        boolean continueDeleting = true;
+        
+        while (continueDeleting) {
+            try {
+                int rentalId = readInt("Rental ID to remove: ", 1, Integer.MAX_VALUE);
+                
+                String confirm = readString("Are you sure you want to remove rental " + rentalId + "? (y/n): ");
+                if (confirm.toLowerCase().startsWith("y")) {
+                    // Get rental details before deletion to adjust outstanding balance
+                    Rental rentalToRemove = rentalManager.getRentalById(rentalId);
+                    if (rentalToRemove != null) {
+                        // Find the customer who made this rental
+                        String customerId = "C" + String.format("%03d", rentalToRemove.getCustomerId());
+                        Customer rentalCustomer = customerDAO.load(customerId);
+                        if (rentalCustomer != null) {
+                            // Only adjust outstanding balance for unpaid or pending rentals
+                            // Paid rentals don't affect outstanding balance
+                            String rentalStatus = rentalToRemove.getPaymentStatus();
+                            if ("Unpaid".equals(rentalStatus) || "Pending".equals(rentalStatus)) {
+                                // Remove rental cost from outstanding balance
+                                double currentBalance = rentalCustomer.getOutstandingBalance();
+                                double newBalance = Math.max(0, currentBalance - rentalToRemove.getTotalCost());
+                                rentalCustomer.setOutstandingBalance(newBalance);
+                                customerDAO.update(rentalCustomer);
+                                System.out.println("💰 Outstanding balance adjusted: RM" + String.format("%.2f", currentBalance) + " → RM" + String.format("%.2f", newBalance));
+                            } else if ("Paid".equals(rentalStatus)) {
+                                System.out.println("💰 Rental was already paid - outstanding balance unchanged.");
+                            }
                         }
                     }
+                    rentalManager.deleteRental(rentalId);
+                    System.out.println("✅ Rental " + rentalId + " removed successfully.");
+                    
+                    // Ask if user wants to delete another rental
+                    String deleteAnother = readString("Do you want to delete another rental? (y/n): ");
+                    if (!deleteAnother.toLowerCase().startsWith("y")) {
+                        continueDeleting = false;
+                    }
+                } else {
+                    System.out.println("❌ Rental removal cancelled.");
+                    
+                    // Ask if user wants to try deleting another rental
+                    String deleteAnother = readString("Do you want to delete another rental? (y/n): ");
+                    if (!deleteAnother.toLowerCase().startsWith("y")) {
+                        continueDeleting = false;
+                    }
                 }
-                rentalManager.deleteRental(rentalId);
-                System.out.println("✅ Rental " + rentalId + " removed successfully.");
-                pauseForUserConfirmation();
-            } else {
-                System.out.println("❌ Rental removal cancelled.");
-                pauseForUserConfirmation();
+            } catch (UserExitException e) {
+                System.out.println("🔙 Rental removal cancelled. Returned to manager menu.");
+                continueDeleting = false;
             }
-        } catch (UserExitException e) {
-            System.out.println("🔙 Rental removal cancelled. Returned to manager menu.");
-            pauseForUserConfirmation();
         }
+        
+        pauseForUserConfirmation();
     }
 
     private static void searchRentalByReference() {
