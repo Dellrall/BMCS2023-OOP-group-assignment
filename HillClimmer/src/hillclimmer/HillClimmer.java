@@ -2652,6 +2652,9 @@ public class HillClimmer {
                             rentalManager.updateRental(rental);
                         }
                     }
+                    
+                    // Update rental statuses after marking rentals as paid
+                    rentalManager.updateRentalStatuses();
 
                     System.out.println("💰 Outstanding balance updated successfully!");
                     pauseForUserConfirmation();
