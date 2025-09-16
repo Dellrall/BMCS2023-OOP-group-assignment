@@ -160,4 +160,39 @@ public class RentalManager {
             return new java.util.ArrayList<>();
         }
     }
+
+    /**
+     * Updates rental statuses based on current date:
+     * - Upcoming: startDate > today (pre-booking)
+     * - Active: startDate <= today and endDate >= today (ongoing)
+     * - End: endDate < today (completed)
+     */
+    public void updateRentalStatuses() {
+        List<Rental> allRentals = rentalDAO.getAll();
+        LocalDate today = LocalDate.now();
+        boolean hasUpdates = false;
+
+        for (Rental rental : allRentals) {
+            String currentStatus = rental.getStatus();
+            String newStatus = currentStatus;
+
+            if (rental.getStartDate().isAfter(today)) {
+                newStatus = "Upcoming";
+            } else if (rental.getEndDate().isBefore(today)) {
+                newStatus = "End";
+            } else {
+                newStatus = "Active";
+            }
+
+            if (!currentStatus.equals(newStatus)) {
+                rental.setStatus(newStatus);
+                rentalDAO.update(rental);
+                hasUpdates = true;
+            }
+        }
+
+        if (hasUpdates) {
+            System.out.println("✅ Rental statuses updated based on current date");
+        }
+    }
 }

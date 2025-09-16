@@ -1,23 +1,24 @@
 # The "Bugs" bunny
+1) [EMAIL DATABASE CHECK] can create same account, check email if exist say this account have already existed
 
-1) ~~new password cannot change for admin~~ ✅ **FIXED** - Admin password change now works with proper validation and loop-back functionality
-2) ~~don't specify format (60xxxx , xxxx, xxxx) just let user type phone number as usual 01157881296 or 0115788129 (accept both value of 3 num or 4 num)~~ ✅ **FIXED** - Phone number input simplified with examples, now accepts 10-11 digit numbers with flexible formatting
-3) ~~Registration failed: Password must be at least 6 characters long (if does not met requirement it no loop)~~ ✅ **FIXED** - Password confirmation now properly loops back to first password input when validation fails or passwords don't match
-4) payment online (crash) - done
-5) payment method cant exit back to menu (0 cancel payment) - done
-6) credit card payment (the amount should auto key in) - done
-7) credit card (crash) - done
-8) view rental (page indicator should be at bottom together with total rental)
-9) after view payment history, remain in profile menu
-10) update password also loop back if requirement not met
-11) by logic revenue should display after payment confirmed (system report)
-12) I can create exact same account details and login choose the first one (limit email)
-13) add rental history (from assignment question) customer can view past rental date and vehicle (11/7/2025 - 11/7/2025 MB001 X RM10 1 DAY)
-14) availability update did not change (logical error)
-15) need 2 times update vehicle all of the above to take effect changes 
-16) update price did not change (logical error)
-17) report did not update when delete rental (pending,revenue)
-18) adding new rental to customer should be same as fixed vehicle price since u already specify vehicle id, if every vehicle id can manually fill daily rate, the vehicle id wont matter
-19) when admin delete rental, customer account outstanding no change (logical error)
-20) active rental no increase after book
-21) save booked date so it doesn't conflict with other customer
+2) [UNEXPECTED FLOW PAYMENT BUG] if invalid otp/payment cancel , the payment is count as paid
+
+3) [SYSTEM REPORT BUG] active rental should increase after payment is success + pending reminder should be active when payment not paid, revenue should be counted after payment successful. MAKE SURE THE EFFECT APPLY TO WHEN UPDATE DELETE RENTAL USING ADMIN 
+
+4) [VIEW RENTAL] should not display payment status since its to view past record, you can say STATUS: ACTIVE (before due), and STATUS: END (after due)
+
+5) [ADMIN PROCESS PAYMENT BUG] customer use cash, but admin still found no pending payment
+
+6) [ADMIN UPDATE VEHICLE BUG] (price):no change; (available): no change; recommended remove (all of the above) sometime it change and no change, no exact issue;
+
+7) [RENTAL LOGICAL ERROR] save rental date so no other same vehicle same date can be made(THIS VEHICLE HAS BEEN RENTED IN 11/11/2025) MAKE SURE EFFECT APPLY TO  (ADD RENTAL ADMIN)
+
+8) [ADMIN ADD RENTAL BUG] If I add same vehicle, it overwrites for some reason. Customer  account dont have added rental from admin. 
+
+NOTE: THE IDEAL (VIEW ALL RENTAL) SHOULD LOOK LIKE DIFFERENT DATES FOR SAME VEHICLE
+
+1) (optional)[REINPUT ADMIN DELETE RENTAL] ask user again want to delete another?
+
+2) (optional)[PAYMENT SLIP AND PAYMENT HISTORY ARE SAME] remove payment slip in payment history, its exact same as payment
+
+3) (optional)[CREDIT CARD INVALID FORMAT NEED REINPUT] credit card format checking, if entered 15 instead of 16 digits say invalid and loop input, same for name holder, date, csv

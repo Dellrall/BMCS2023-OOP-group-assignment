@@ -68,6 +68,14 @@ public class DurationManager {
         }
     }
 
+    public List<Reminder> getPendingRemindersForCustomer(int customerId) {
+        synchronized (reminderLock) {
+            return reminders.stream()
+                    .filter(r -> "PENDING".equals(r.getStatus()) && r.getAssociatedId() == customerId)
+                    .collect(Collectors.toList());
+        }
+    }
+
     public void markReminderCompleted(int associatedId, String reminderType) {
         synchronized (reminderLock) {
             for (Reminder reminder : reminders) {
@@ -216,6 +224,16 @@ public class DurationManager {
         rentalPeriods.stream()
                 .filter(RentalPeriod::isActive)
                 .filter(RentalPeriod::isEndingSoon)
+                .forEach(period -> {
+                    LocalDateTime returnDate = period.getEndDate().atStartOfDay();
+                    createReturnReminder(period.getRentalId(), returnDate);
+                });
+    }
+
+    public void generateOneDayReturnReminders() {
+        rentalPeriods.stream()
+                .filter(RentalPeriod::isActive)
+                .filter(RentalPeriod::isEndingWithinOneDay)
                 .forEach(period -> {
                     LocalDateTime returnDate = period.getEndDate().atStartOfDay();
                     createReturnReminder(period.getRentalId(), returnDate);

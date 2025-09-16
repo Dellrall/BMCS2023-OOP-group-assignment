@@ -27,7 +27,8 @@ public class RentalDAO extends DataAccessObject<Rental> {
                rental.getStartDate() + "," +
                rental.getEndDate() + "," +
                rental.getTotalCost() + "," +
-               rental.getPaymentStatus();
+               rental.getPaymentStatus() + "," +
+               rental.getStatus();
     }
     
     @Override
@@ -42,8 +43,11 @@ public class RentalDAO extends DataAccessObject<Rental> {
                 LocalDate endDate = LocalDate.parse(parts[4]);
                 double totalCost = Double.parseDouble(parts[5]);
                 String paymentStatus = parts.length > 6 ? parts[6] : "Unpaid"; // Default to Unpaid for backward compatibility
+                String status = parts.length > 7 ? parts[7] : "Upcoming"; // Default to Upcoming for backward compatibility
+                
                 Rental rental = new Rental(rentalId, customerId, vehicleId, startDate, endDate, totalCost);
                 rental.setPaymentStatus(paymentStatus);
+                rental.setStatus(status);
                 return rental;
             }
         } catch (Exception e) {
@@ -77,6 +81,18 @@ public class RentalDAO extends DataAccessObject<Rental> {
                 .collect(Collectors.toList());
     }
     
+    public List<Rental> getActiveRentalsByCustomerId(int customerId) {
+        return loadAll().stream()
+                .filter(rental -> rental.getCustomerId() == customerId && "Active".equals(rental.getStatus()))
+                .collect(Collectors.toList());
+    }
+    
+    public List<Rental> getActiveRentals() {
+        return loadAll().stream()
+                .filter(rental -> "Active".equals(rental.getStatus()))
+                .collect(Collectors.toList());
+    }
+    
     @Override
     protected Rental generateNewId(Rental rental, List<Rental> existingRentals) {
         // Generate new rental ID based on existing rentals
@@ -85,10 +101,11 @@ public class RentalDAO extends DataAccessObject<Rental> {
                 .max()
                 .orElse(0);
         
-        // Create new rental with generated ID, preserving payment status
+        // Create new rental with generated ID, preserving payment status and rental status
         Rental newRental = new Rental(maxId + 1, rental.getCustomerId(), rental.getVehicleId(), 
                          rental.getStartDate(), rental.getEndDate(), rental.getTotalCost());
         newRental.setPaymentStatus(rental.getPaymentStatus());
+        newRental.setStatus(rental.getStatus());
         return newRental;
     }
 }

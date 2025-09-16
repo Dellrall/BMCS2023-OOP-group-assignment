@@ -155,6 +155,11 @@ public class RentalPeriod {
         return endDate.isAfter(now) && endDate.isBefore(now.plusDays(3)) && isActive();
     }
 
+    public boolean isEndingWithinOneDay() {
+        LocalDate now = LocalDate.now();
+        return endDate.isAfter(now) && !endDate.isAfter(now.plusDays(1)) && isActive();
+    }
+
     public double calculateTotalCost() {
         long days = getDurationInDays();
         double baseCost = days * dailyRate;

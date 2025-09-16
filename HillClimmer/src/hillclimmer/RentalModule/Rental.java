@@ -18,6 +18,7 @@ public class Rental {
     private LocalDate endDate;
     private double totalCost;
     private String paymentStatus; // "Paid", "Pending", "Unpaid"
+    private String status; // "Active", "Upcoming", "End", "Cancelled"
     
     public Rental(int rentalId, int customerId, int vehicleId, LocalDate startDate, LocalDate endDate, double totalCost) {
         this.rentalId = rentalId;
@@ -27,6 +28,7 @@ public class Rental {
         this.endDate = endDate;
         this.totalCost = totalCost;
         this.paymentStatus = "Unpaid"; // Default status
+        this.status = "Upcoming"; // Default status for new rentals
     }
     
     // Getters
@@ -58,6 +60,10 @@ public class Rental {
         return paymentStatus;
     }
     
+    public String getStatus() {
+        return status;
+    }
+    
     // Setters
     public void setRentalId(int rentalId) {
         this.rentalId = rentalId;
@@ -87,6 +93,10 @@ public class Rental {
         this.paymentStatus = paymentStatus;
     }
     
+    public void setStatus(String status) {
+        this.status = status;
+    }
+    
     @Override
     public String toString() {
         return "Rental{" +
@@ -97,6 +107,7 @@ public class Rental {
                 ", endDate=" + endDate +
                 ", totalCost=" + totalCost +
                 ", paymentStatus='" + paymentStatus + '\'' +
+                ", status='" + status + '\'' +
                 '}';
     }
 }

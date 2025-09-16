@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.io.Console;
 
 /**
@@ -854,6 +855,13 @@ public class HillClimmer {
                 System.out.println("✅ Login successful!");
                 System.out.println("🎉 Welcome back, " + customer.getName() + "!");
                 System.out.println("🏔️ Ready to explore Malaysia's hill climbing adventures?");
+                
+                // Update rental statuses based on current date
+                rentalManager.updateRentalStatuses();
+                
+                // Generate reminders for rentals ending within 1 day
+                durationManager.generateOneDayReturnReminders();
+                
                 showCustomerMenu();
             } else {
                 System.out.println("❌ Invalid customer ID/email or password. Please try again.");
@@ -935,18 +943,6 @@ public class HillClimmer {
             while (name == null) {
                 try {
                     name = readString("Full Name (as per IC): ");
-                    
-                    // Check if name already exists
-                    List<Customer> allCustomers = customerDAO.getAll();
-                    for (Customer existingCustomer : allCustomers) {
-                        if (existingCustomer.getName().equalsIgnoreCase(name)) {
-                            System.out.println("❌ This name is already registered.");
-                            System.out.println("💡 Please use a different name or login with your existing account.");
-                            name = null; // Reset name to continue the loop
-                            break;
-                        }
-                    }
-                    
                 } catch (UserExitException e) {
                     System.out.println("🔙 Returned to main menu.");
                     return;
@@ -957,18 +953,6 @@ public class HillClimmer {
             while (icNumber == null) {
                 try {
                     icNumber = readIC("IC Number (XXXXXX-XX-XXXX): ");
-                    
-                    // Check if IC number already exists
-                    List<Customer> allCustomers = customerDAO.getAll();
-                    for (Customer existingCustomer : allCustomers) {
-                        if (existingCustomer.getIcNumber().equals(icNumber)) {
-                            System.out.println("❌ This IC number is already registered.");
-                            System.out.println("💡 Please use a different IC number or login with your existing account.");
-                            icNumber = null; // Reset IC number to continue the loop
-                            break;
-                        }
-                    }
-                    
                 } catch (UserExitException e) {
                     System.out.println("🔙 Returned to main menu.");
                     return;
@@ -989,16 +973,6 @@ public class HillClimmer {
             while (email == null) {
                 try {
                     email = readEmail("Email Address: ");
-                    
-                    // Check if email already exists
-                    Customer existingCustomer = customerDAO.findByEmail(email);
-                    if (existingCustomer != null) {
-                        System.out.println("❌ This email address is already registered.");
-                        System.out.println("💡 Please use a different email address or login with your existing account.");
-                        email = null; // Reset email to continue the loop
-                        continue;
-                    }
-                    
                 } catch (UserExitException e) {
                     System.out.println("🔙 Returned to main menu.");
                     return;
@@ -1038,15 +1012,20 @@ public class HillClimmer {
             // Generate customer ID using DAO's consistent ID generation
             String customerId = customerDAO.generateNextCustomerId();
 
-            // Calculate age from IC
+            // Create customer object for validation
             Customer tempCustomer = new Customer(customerId, name, icNumber, phoneNo, email,
                 licenseType, licenseExpiry, 0, password);
-            int age = tempCustomer.getAgeFromIC();
 
-            if (age < 18) {
-                System.out.println("❌ You must be at least 18 years old to register.");
+            // Validate all customer details using comprehensive validation
+            try {
+                validateCustomerDetails(tempCustomer, false, null);
+            } catch (ValidationException e) {
+                System.out.println("❌ " + e.getMessage());
                 return;
             }
+
+            // Calculate age from IC (already validated in validateCustomerDetails)
+            int age = tempCustomer.getAgeFromIC();
 
             Customer newCustomer = new Customer(customerId, name, icNumber, phoneNo, email,
                 licenseType, licenseExpiry, age, password);
@@ -1067,6 +1046,122 @@ public class HillClimmer {
         }
     }
 
+    /**
+     * Comprehensive customer validation method that applies the same validations as registration.
+     * This ensures consistency between registration and profile updates.
+     *
+     * @param customer The customer object to validate
+     * @param isUpdate Whether this is an update operation (affects uniqueness checks)
+     * @param originalCustomer The original customer object (for update operations, null for registration)
+     * @throws ValidationException if validation fails
+     */
+    private static void validateCustomerDetails(Customer customer, boolean isUpdate, Customer originalCustomer) throws ValidationException {
+        // Load all customers for validation checks
+        List<Customer> allCustomers = customerDAO.getAll();
+
+        // 1. Name validation and uniqueness check
+        if (customer.getName() == null || customer.getName().trim().isEmpty()) {
+            throw new ValidationException("Name cannot be empty.");
+        }
+
+        // Check name uniqueness (skip if updating and name hasn't changed)
+        if (!isUpdate || (originalCustomer != null && !customer.getName().equalsIgnoreCase(originalCustomer.getName()))) {
+            for (Customer existingCustomer : allCustomers) {
+                if (existingCustomer.getName().equalsIgnoreCase(customer.getName())) {
+                    if (!isUpdate || (originalCustomer != null && !existingCustomer.getCustomerID().equals(originalCustomer.getCustomerID()))) {
+                        throw new ValidationException("This name is already registered.");
+                    }
+                }
+            }
+        }
+
+        // 2. IC Number validation and uniqueness check
+        if (customer.getIcNumber() == null || customer.getIcNumber().trim().isEmpty()) {
+            throw new ValidationException("IC Number cannot be empty.");
+        }
+
+        // Validate IC format (XXXXXX-XX-XXXX)
+        if (!customer.getIcNumber().matches("\\d{6}-\\d{2}-\\d{4}")) {
+            throw new ValidationException("IC Number must be in format XXXXXX-XX-XXXX.");
+        }
+
+        // Check IC uniqueness (skip if updating and IC hasn't changed)
+        if (!isUpdate || (originalCustomer != null && !customer.getIcNumber().equals(originalCustomer.getIcNumber()))) {
+            for (Customer existingCustomer : allCustomers) {
+                if (existingCustomer.getIcNumber().equals(customer.getIcNumber())) {
+                    if (!isUpdate || (originalCustomer != null && !existingCustomer.getCustomerID().equals(originalCustomer.getCustomerID()))) {
+                        throw new ValidationException("This IC number is already registered.");
+                    }
+                }
+            }
+        }
+
+        // 3. Phone number validation
+        if (customer.getPhoneNo() == null || customer.getPhoneNo().trim().isEmpty()) {
+            throw new ValidationException("Phone number cannot be empty.");
+        }
+
+        // Validate phone format (accepts Malaysian formats)
+        if (!customer.getPhoneNo().matches("^(01[0-9]-?\\d{7,8}|\\+601[0-9]-?\\d{7,8}|\\d{10,11})$")) {
+            throw new ValidationException("Phone number must be a valid Malaysian mobile number (e.g., 0123456789 or +60123456789).");
+        }
+
+        // 4. Email validation and uniqueness check
+        if (customer.getEmail() == null || customer.getEmail().trim().isEmpty()) {
+            throw new ValidationException("Email address cannot be empty.");
+        }
+
+        // Validate email format
+        if (!customer.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+            throw new ValidationException("Please enter a valid email address.");
+        }
+
+        // Check email uniqueness (skip if updating and email hasn't changed)
+        if (!isUpdate || (originalCustomer != null && !customer.getEmail().equalsIgnoreCase(originalCustomer.getEmail()))) {
+            Customer existingCustomer = customerDAO.findByEmail(customer.getEmail());
+            if (existingCustomer != null) {
+                if (!isUpdate || (originalCustomer != null && !existingCustomer.getCustomerID().equals(originalCustomer.getCustomerID()))) {
+                    throw new ValidationException("This email address is already registered.");
+                }
+            }
+        }
+
+        // 5. License type validation
+        if (customer.getLicenseType() == null || customer.getLicenseType().trim().isEmpty()) {
+            throw new ValidationException("License type cannot be empty.");
+        }
+
+        // Validate license type format
+        if (!customer.getLicenseType().matches("^(B|B2|D|DA|E|E1|E2)$")) {
+            throw new ValidationException("License type must be one of: B, B2, D, DA, E, E1, E2.");
+        }
+
+        // 6. License expiry date validation
+        if (customer.getLicenseExpiryDate() == null) {
+            throw new ValidationException("License expiry date cannot be empty.");
+        }
+
+        // Check if license is expired
+        if (customer.getLicenseExpiryDate().isBefore(LocalDate.now())) {
+            throw new ValidationException("License has expired. Please renew your license before registering.");
+        }
+
+        // 7. Age validation (calculated from IC)
+        int age = customer.getAgeFromIC();
+        if (age < 18) {
+            throw new ValidationException("You must be at least 18 years old to register.");
+        }
+    }
+
+    /**
+     * Custom exception for validation errors
+     */
+    private static class ValidationException extends Exception {
+        public ValidationException(String message) {
+            super(message);
+        }
+    }
+
     private static void showCustomerMenu() {
         while (currentCustomer != null) {
             // Clear screen for customer menu
@@ -1080,16 +1175,46 @@ public class HillClimmer {
             System.out.println("\n=== CUSTOMER DASHBOARD ===");
             System.out.println("👋 Hello, " + currentCustomer.getName() + "! Welcome to your dashboard.");
             System.out.println("💰 Outstanding Balance: RM" + String.format("%.2f", currentCustomer.getOutstandingBalance()));
+            
+            // Check for pending reminders for this customer
+            int customerId = Integer.parseInt(currentCustomer.getCustomerID().substring(1));
+            List<Reminder> customerReminders = durationManager.getPendingRemindersForCustomer(customerId);
+            if (!customerReminders.isEmpty()) {
+                System.out.println("\n🚨 REMINDERS:");
+                for (Reminder reminder : customerReminders) {
+                    if ("RETURN".equals(reminder.getReminderType())) {
+                        System.out.println("   ⚠️  You have a vehicle return due soon! Please return your vehicle before the due date.");
+                    } else {
+                        System.out.println("   📢 " + reminder.getReminderType() + " reminder: " + reminder.getMessage());
+                    }
+                }
+                System.out.println();
+            }
+            
+            // Check if customer has active rentals
+            List<Rental> customerRentals = rentalManager.getRentalsByCustomer(
+                Integer.parseInt(currentCustomer.getCustomerID().substring(1)));
+            List<Rental> activeRentals = customerRentals.stream()
+                .filter(rental -> "Active".equals(rental.getStatus()))
+                .collect(Collectors.toList());
+            boolean hasActiveRentals = !activeRentals.isEmpty();
+            
             System.out.println("\n1. 🚗 New Vehicle Rental");
             System.out.println("2. 📋 View My Rentals");
             System.out.println("3. 👤 My Profile");
             System.out.println("4. 🔒 Safety Check");
             System.out.println("5. 💳 Make Payment");
-            System.out.println("6. 🚪 Logout");
+            if (hasActiveRentals) {
+                System.out.println("6. 🔄 Return Vehicle");
+                System.out.println("7. 🚪 Logout");
+            } else {
+                System.out.println("6. 🚪 Logout");
+            }
             System.out.println("\n💡 Enter '0' at any input to return to this menu");
             
             try {
-                int choice = readInt("Please select an option (1-6): ", 1, 6);
+                int maxChoice = hasActiveRentals ? 7 : 6;
+                int choice = readInt("Please select an option (1-" + maxChoice + "): ", 1, maxChoice);
 
             switch (choice) {
                 case 1:
@@ -1108,10 +1233,23 @@ public class HillClimmer {
                     makePayment();
                     break;
                 case 6:
-                    System.out.println("👋 Thank you for using HillClimmer, " + currentCustomer.getName() + "!");
-                    System.out.println("🏔️ We hope to see you again for your next adventure!");
-                    currentCustomer = null;
-                    return;
+                    if (hasActiveRentals) {
+                        returnVehicle();
+                    } else {
+                        System.out.println("👋 Thank you for using HillClimmer, " + currentCustomer.getName() + "!");
+                        System.out.println("🏔️ We hope to see you again for your next adventure!");
+                        currentCustomer = null;
+                        return;
+                    }
+                    break;
+                case 7:
+                    if (hasActiveRentals) {
+                        System.out.println("👋 Thank you for using HillClimmer, " + currentCustomer.getName() + "!");
+                        System.out.println("🏔️ We hope to see you again for your next adventure!");
+                        currentCustomer = null;
+                        return;
+                    }
+                    break;
                 default:
                     System.out.println("❌ Invalid option. Please select 1-6.");
             }
@@ -1298,11 +1436,12 @@ public class HillClimmer {
             System.out.println("2. ➕ Add New Rental");
             System.out.println("3. 🔍 Search Rental by Reference Number");
             System.out.println("4. 🗑️  Remove Rental");
+            System.out.println("5. 🔄 Process Vehicle Return");
             System.out.println("0. 🔙 Back to Main Menu");
             System.out.println("\n💡 Enter '0' to return to main menu");
 
             try {
-                int choice = readInt("Select rental operation (0-4): ", 0, 4);
+                int choice = readInt("Select rental operation (0-5): ", 0, 5);
 
                 switch (choice) {
                     case 0:
@@ -1319,11 +1458,113 @@ public class HillClimmer {
                     case 4:
                         removeRental();
                         break;
+                    case 5:
+                        processVehicleReturn();
+                        break;
                 }
             } catch (UserExitException e) {
                 return; // Back to main menu
             }
         }
+    }
+
+    private static void processVehicleReturn() {
+        System.out.println("\n=== PROCESS VEHICLE RETURN ===");
+        
+        // Get all active rentals
+        List<Rental> activeRentals = rentalManager.getAllRentals().stream()
+            .filter(rental -> "Active".equals(rental.getStatus()))
+            .collect(Collectors.toList());
+        
+        if (activeRentals.isEmpty()) {
+            System.out.println("❌ No active rentals to process.");
+            pauseForUserConfirmation();
+            return;
+        }
+        
+        System.out.println("Active rentals requiring return:");
+        System.out.println("=".repeat(80));
+        for (int i = 0; i < activeRentals.size(); i++) {
+            Rental rental = activeRentals.get(i);
+            // Find customer name
+            Customer customer = customerDAO.load(String.valueOf(rental.getCustomerId()));
+            String customerName = customer != null ? customer.getName() : "Customer ID: " + rental.getCustomerId();
+            
+            // Find vehicle info
+            Vehicle vehicle = vehicleManager.getAllVehicles().stream()
+                .filter(v -> {
+                    try {
+                        return Integer.parseInt(v.getVehicleID().substring(2)) == rental.getVehicleId();
+                    } catch (Exception e) {
+                        return false;
+                    }
+                })
+                .findFirst()
+                .orElse(null);
+            String vehicleInfo = vehicle != null ? vehicle.getVehicleModel() + " (" + vehicle.getVehicleID() + ")" : "Vehicle ID: " + rental.getVehicleId();
+            
+            System.out.println((i + 1) + ". Rental ID: R" + rental.getRentalId());
+            System.out.println("   Customer: " + customerName);
+            System.out.println("   Vehicle: " + vehicleInfo);
+            System.out.println("   Period: " + rental.getStartDate() + " to " + rental.getEndDate());
+            System.out.println("   Status: " + rental.getStatus());
+            System.out.println("-".repeat(40));
+        }
+        
+        try {
+            int choice = readInt("Select rental to process return (1-" + activeRentals.size() + "): ", 1, activeRentals.size());
+            Rental selectedRental = activeRentals.get(choice - 1);
+            
+            // Find customer and vehicle info for display
+            Customer customer = customerDAO.load(String.valueOf(selectedRental.getCustomerId()));
+            Vehicle vehicle = vehicleManager.getAllVehicles().stream()
+                .filter(v -> {
+                    try {
+                        return Integer.parseInt(v.getVehicleID().substring(2)) == selectedRental.getVehicleId();
+                    } catch (Exception e) {
+                        return false;
+                    }
+                })
+                .findFirst()
+                .orElse(null);
+            
+            System.out.println("\nProcessing return for:");
+            System.out.println("Rental ID: R" + selectedRental.getRentalId());
+            if (customer != null) {
+                System.out.println("Customer: " + customer.getName() + " (ID: " + customer.getCustomerID() + ")");
+            }
+            if (vehicle != null) {
+                System.out.println("Vehicle: " + vehicle.getVehicleModel() + " (" + vehicle.getVehicleID() + ")");
+            }
+            System.out.println("Rental Period: " + selectedRental.getStartDate() + " to " + selectedRental.getEndDate());
+            
+            String confirm = readString("Confirm vehicle return processing? (Y/N): ");
+            if ("Y".equalsIgnoreCase(confirm)) {
+                // Update rental status to "End"
+                selectedRental.setStatus("End");
+                rentalManager.updateRental(selectedRental);
+                
+                // Mark vehicle as available again
+                if (vehicle != null) {
+                    vehicleManager.setVehicleAvailability(vehicle.getVehicleID(), true);
+                }
+                
+                System.out.println("✅ Vehicle return processed successfully!");
+                System.out.println("Rental status updated to 'End'");
+                System.out.println("Vehicle marked as available for new rentals");
+                
+                // Update system statistics (decrease active rentals count)
+                // This would typically update a statistics tracking system
+                
+            } else {
+                System.out.println("Vehicle return processing cancelled.");
+            }
+            
+        } catch (UserExitException e) {
+            System.out.println("🔙 Vehicle return processing cancelled.");
+        }
+        
+        pauseForUserConfirmation();
     }
 
     // ===== CUSTOMER MANAGEMENT SUBMENU =====
@@ -1670,10 +1911,17 @@ public class HillClimmer {
             rentalManager.addRentalWithId(rentalId, Integer.parseInt(currentCustomer.getCustomerID().substring(1)),
                 Integer.parseInt(selectedVehicle.getVehicleID().substring(2)), startDate, endDate, totalCost);
             
-            // Get the created rental and set initial payment status
+            // Get the created rental and set initial payment status and rental status
             Rental newRental = rentalManager.getRentalById(rentalId);
             if (newRental != null) {
                 newRental.setPaymentStatus("Unpaid");
+                // Set initial rental status based on start date
+                LocalDate today = LocalDate.now();
+                if (newRental.getStartDate().isAfter(today)) {
+                    newRental.setStatus("Upcoming");
+                } else {
+                    newRental.setStatus("Active");
+                }
                 rentalManager.updateRental(newRental);
             }
 
@@ -1786,6 +2034,8 @@ public class HillClimmer {
                 Rental rental = rentalManager.getRentalById(rentalId);
                 if (rental != null) {
                     rental.setPaymentStatus("Paid");
+                    // Set rental status to Active since payment is successful
+                    rental.setStatus("Active");
                     rentalManager.updateRental(rental);
                     
                     // Create rental period now that payment is successful
@@ -1824,7 +2074,28 @@ public class HillClimmer {
                 System.out.println("⚠️  Your rental is pre-booked but not confirmed until payment is made.");
                 pauseForUserConfirmation();
             } else {
-                System.out.println("❌ Payment was not completed. Please try again.");
+                // Handle payment failures for Credit Card and Online Banking
+                if (payment instanceof CreditCardPayment || payment instanceof OnlineBankingPayment) {
+                    // For Credit Card and Online Banking failures, add amount to outstanding balance
+                    // so user can pay later through "Make Payment" option
+                    currentCustomer.setOutstandingBalance(currentCustomer.getOutstandingBalance() + amount);
+                    customerDAO.update(currentCustomer);
+                    
+                    // Update rental payment status to Unpaid
+                    Rental rental = rentalManager.getRentalById(rentalId);
+                    if (rental != null) {
+                        rental.setPaymentStatus("Unpaid");
+                        rentalManager.updateRental(rental);
+                    }
+                    
+                    System.out.println("❌ Payment was not completed.");
+                    System.out.println("💰 Amount of RM" + String.format("%.2f", amount) + " has been added to your outstanding balance.");
+                    System.out.println("💡 You can complete payment later using the 'Make Payment' option in the main menu.");
+                    System.out.println("📄 Reference Number: " + payment.getReferenceNumber());
+                } else {
+                    // For other payment types (shouldn't happen in current implementation)
+                    System.out.println("❌ Payment was not completed. Please try again.");
+                }
                 pauseForUserConfirmation();
             }
 
@@ -1869,27 +2140,53 @@ public class HillClimmer {
                 System.out.println("Period: " + rental.getStartDate() + " to " + rental.getEndDate());
                 System.out.println("Total Cost: RM" + String.format("%.2f", rental.getTotalCost()));
                 
-                // Display payment status with appropriate emoji
+                // Display rental status with appropriate emoji
                 String statusEmoji = "";
-                String statusColor = "";
-                switch (rental.getPaymentStatus().toLowerCase()) {
-                    case "paid":
+                String statusText = "";
+                switch (rental.getStatus().toLowerCase()) {
+                    case "active":
+                        statusEmoji = "🔄";
+                        statusText = "ACTIVE (Ongoing rental)";
+                        break;
+                    case "upcoming":
+                        statusEmoji = "📅";
+                        statusText = "UPCOMING (Future rental)";
+                        break;
+                    case "end":
                         statusEmoji = "✅";
-                        statusColor = "PAID";
+                        statusText = "END (Completed)";
                         break;
-                    case "pending":
-                        statusEmoji = "⏳";
-                        statusColor = "PENDING";
-                        break;
-                    case "unpaid":
+                    case "cancelled":
                         statusEmoji = "❌";
-                        statusColor = "UNPAID";
+                        statusText = "CANCELLED";
                         break;
                     default:
                         statusEmoji = "❓";
-                        statusColor = rental.getPaymentStatus().toUpperCase();
+                        statusText = rental.getStatus().toUpperCase();
                 }
-                System.out.println("Payment Status: " + statusEmoji + " " + statusColor);
+                System.out.println("Rental Status: " + statusEmoji + " " + statusText);
+                
+                // Display payment status with appropriate emoji
+                String paymentEmoji = "";
+                String paymentText = "";
+                switch (rental.getPaymentStatus().toLowerCase()) {
+                    case "paid":
+                        paymentEmoji = "💰";
+                        paymentText = "PAID";
+                        break;
+                    case "pending":
+                        paymentEmoji = "⏳";
+                        paymentText = "PENDING";
+                        break;
+                    case "unpaid":
+                        paymentEmoji = "❌";
+                        paymentText = "UNPAID";
+                        break;
+                    default:
+                        paymentEmoji = "❓";
+                        paymentText = rental.getPaymentStatus().toUpperCase();
+                }
+                System.out.println("Payment Status: " + paymentEmoji + " " + paymentText);
                 System.out.println("---");
             }
 
@@ -1958,9 +2255,30 @@ public class HillClimmer {
                 case 1:
                     try {
                         String newPhone = readPhone("New phone number (e.g., 0123456789): ");
-                        currentCustomer.setPhoneNo(newPhone);
-                        customerDAO.update(currentCustomer);
-                        System.out.println("✅ Phone number updated successfully!");
+                        
+                        // Create a temporary customer object for validation
+                        Customer tempCustomer = new Customer(
+                            currentCustomer.getCustomerID(),
+                            currentCustomer.getName(),
+                            currentCustomer.getIcNumber(),
+                            newPhone,
+                            currentCustomer.getEmail(),
+                            currentCustomer.getLicenseType(),
+                            currentCustomer.getLicenseExpiryDate(),
+                            currentCustomer.getAge(),
+                            "TempPass123!" // Temporary password for validation
+                        );
+                        
+                        // Validate the phone number change
+                        try {
+                            validateCustomerDetails(tempCustomer, true, currentCustomer);
+                            currentCustomer.setPhoneNo(newPhone);
+                            customerDAO.update(currentCustomer);
+                            System.out.println("✅ Phone number updated successfully!");
+                        } catch (ValidationException e) {
+                            System.out.println("❌ " + e.getMessage());
+                        }
+                        
                         pauseForUserConfirmation();
                     } catch (UserExitException e) {
                         System.out.println("🔙 Phone number update cancelled.");
@@ -1977,18 +2295,29 @@ public class HillClimmer {
                             break;
                         }
                         
-                        // Check if email already exists for another customer
-                        Customer existingCustomer = customerDAO.findByEmail(newEmail);
-                        if (existingCustomer != null && !existingCustomer.getCustomerID().equals(currentCustomer.getCustomerID())) {
-                            System.out.println("❌ This email address is already registered to another account.");
-                            System.out.println("💡 Please use a different email address.");
-                            pauseForUserConfirmation();
-                            break;
+                        // Create a temporary customer object for validation
+                        Customer tempCustomer = new Customer(
+                            currentCustomer.getCustomerID(),
+                            currentCustomer.getName(),
+                            currentCustomer.getIcNumber(),
+                            currentCustomer.getPhoneNo(),
+                            newEmail,
+                            currentCustomer.getLicenseType(),
+                            currentCustomer.getLicenseExpiryDate(),
+                            currentCustomer.getAge(),
+                            "TempPass123!" // Temporary password for validation
+                        );
+                        
+                        // Validate the email change
+                        try {
+                            validateCustomerDetails(tempCustomer, true, currentCustomer);
+                            currentCustomer.setEmail(newEmail);
+                            customerDAO.update(currentCustomer);
+                            System.out.println("✅ Email updated successfully!");
+                        } catch (ValidationException e) {
+                            System.out.println("❌ " + e.getMessage());
                         }
                         
-                        currentCustomer.setEmail(newEmail);
-                        customerDAO.update(currentCustomer);
-                        System.out.println("✅ Email updated successfully!");
                         pauseForUserConfirmation();
                     } catch (UserExitException e) {
                         System.out.println("🔙 Email update cancelled.");
@@ -1999,6 +2328,9 @@ public class HillClimmer {
                         String currentPass = readPassword("Current password: ");
                         if (currentCustomer.authenticate(currentPass)) {
                             String newPass = readPasswordWithConfirmation("New password: ", 6);
+                            
+                            // Password validation is already handled by readPasswordWithConfirmation
+                            // which ensures minimum length and confirmation matching
                             currentCustomer.updatePassword(newPass);
                             customerDAO.update(currentCustomer);
                             System.out.println("✅ Password changed successfully!");
@@ -2097,6 +2429,90 @@ public class HillClimmer {
             System.out.println("You can retake the safety check anytime from the main menu.");
             pauseForUserConfirmation();
         }
+    }
+
+    private static void returnVehicle() {
+        System.out.println("\n=== VEHICLE RETURN ===");
+        
+        // Get customer's active rentals
+        List<Rental> customerRentals = rentalManager.getRentalsByCustomer(
+            Integer.parseInt(currentCustomer.getCustomerID().substring(1)));
+        List<Rental> activeRentals = customerRentals.stream()
+            .filter(rental -> "Active".equals(rental.getStatus()))
+            .collect(Collectors.toList());
+        
+        if (activeRentals.isEmpty()) {
+            System.out.println("❌ You don't have any active rentals to return.");
+            pauseForUserConfirmation();
+            return;
+        }
+        
+        System.out.println("Your active rentals:");
+        for (int i = 0; i < activeRentals.size(); i++) {
+            Rental rental = activeRentals.get(i);
+            // Find vehicle by ID from all vehicles
+            Vehicle vehicle = vehicleManager.getAllVehicles().stream()
+                .filter(v -> {
+                    try {
+                        return Integer.parseInt(v.getVehicleID().substring(2)) == rental.getVehicleId();
+                    } catch (Exception e) {
+                        return false;
+                    }
+                })
+                .findFirst()
+                .orElse(null);
+            String vehicleInfo = vehicle != null ? vehicle.getVehicleModel() + " (" + vehicle.getVehicleID() + ")" : "Vehicle ID: " + rental.getVehicleId();
+            System.out.println((i + 1) + ". " + vehicleInfo + " - Rental ID: R" + rental.getRentalId());
+        }
+        
+        try {
+            int choice = readInt("Select rental to return (1-" + activeRentals.size() + "): ", 1, activeRentals.size());
+            Rental selectedRental = activeRentals.get(choice - 1);
+            
+            System.out.println("\nReturning vehicle:");
+            // Find vehicle by ID from all vehicles
+            Vehicle vehicle = vehicleManager.getAllVehicles().stream()
+                .filter(v -> {
+                    try {
+                        return Integer.parseInt(v.getVehicleID().substring(2)) == selectedRental.getVehicleId();
+                    } catch (Exception e) {
+                        return false;
+                    }
+                })
+                .findFirst()
+                .orElse(null);
+            if (vehicle != null) {
+                System.out.println("Vehicle: " + vehicle.getVehicleModel() + " (" + vehicle.getVehicleID() + ")");
+            }
+            System.out.println("Rental ID: R" + selectedRental.getRentalId());
+            System.out.println("Rental Period: " + selectedRental.getStartDate() + " to " + selectedRental.getEndDate());
+            
+            String confirm = readString("Confirm vehicle return? (Y/N): ");
+            if ("Y".equalsIgnoreCase(confirm)) {
+                // Update rental status to "End"
+                selectedRental.setStatus("End");
+                rentalManager.updateRental(selectedRental);
+                
+                // Mark vehicle as available again
+                if (vehicle != null) {
+                    vehicleManager.setVehicleAvailability(vehicle.getVehicleID(), true);
+                }
+                
+                // Update system stats (decrease active rentals count)
+                // This would typically be handled by a statistics manager
+                
+                System.out.println("✅ Vehicle returned successfully!");
+                System.out.println("Thank you for using HillClimmer services.");
+                
+            } else {
+                System.out.println("Vehicle return cancelled.");
+            }
+            
+        } catch (UserExitException e) {
+            System.out.println("🔙 Vehicle return cancelled.");
+        }
+        
+        pauseForUserConfirmation();
     }
 
     private static void makePayment() {
@@ -2298,7 +2714,16 @@ public class HillClimmer {
                 System.out.println("⚠️  Your payment is pre-booked but not confirmed until payment is made.");
                 pauseForUserConfirmation();
             } else {
-                System.out.println("❌ Payment was not completed. Please try again.");
+                // Handle failed Credit Card and Online Banking payments by adding to outstanding balance
+                if (payment instanceof CreditCardPayment || payment instanceof OnlineBankingPayment) {
+                    currentCustomer.setOutstandingBalance(currentCustomer.getOutstandingBalance() + amount);
+                    customerDAO.update(currentCustomer);
+                    System.out.println("❌ Payment failed. The amount of RM" + String.format("%.2f", amount) + " has been added to your outstanding balance.");
+                    System.out.println("💰 Your new outstanding balance is: RM" + String.format("%.2f", currentCustomer.getOutstandingBalance()));
+                    System.out.println("💳 You can complete this payment later through the Make Payment menu.");
+                } else {
+                    System.out.println("❌ Payment was not completed. Please try again.");
+                }
                 pauseForUserConfirmation();
             }
 
@@ -2891,9 +3316,28 @@ public class HillClimmer {
             }
 
             // Remove customer
+            System.out.println("DEBUG: Attempting to delete customer with ID: '" + customerToRemove.getCustomerID() + "'");
+            System.out.println("DEBUG: ID length: " + customerToRemove.getCustomerID().length());
+            System.out.println("DEBUG: Working directory: " + System.getProperty("user.dir"));
+            
+            // Check if customer exists before deletion
+            Customer checkBefore = customerDAO.load(customerToRemove.getCustomerID());
+            System.out.println("DEBUG: Customer exists before deletion: " + (checkBefore != null));
+            if (checkBefore != null) {
+                System.out.println("DEBUG: Found customer: '" + checkBefore.getCustomerID() + "' - '" + checkBefore.getName() + "'");
+            }
+            
             customerDAO.delete(customerToRemove.getCustomerID());
-            System.out.println("✅ Customer removed successfully!");
-            System.out.println("Removed: " + customerToRemove.getName() + " (" + customerToRemove.getCustomerID() + ")");
+            
+            // Verify deletion
+            Customer verifyCustomer = customerDAO.load(customerToRemove.getCustomerID());
+            if (verifyCustomer == null) {
+                System.out.println("✅ Customer removed successfully!");
+                System.out.println("Removed: " + customerToRemove.getName() + " (" + customerToRemove.getCustomerID() + ")");
+            } else {
+                System.out.println("❌ ERROR: Customer still exists after deletion attempt!");
+                System.out.println("Customer found: '" + verifyCustomer.getCustomerID() + "' - '" + verifyCustomer.getName() + "'");
+            }
 
         } catch (Exception e) {
             System.out.println("❌ Error removing customer: " + e.getMessage());
