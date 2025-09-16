@@ -2735,6 +2735,20 @@ public class HillClimmer {
             } else if ("Prebooked - Awaiting Cash Payment".equals(payment.getPaymentStatus())) {
                 // For cash payments, record as pending
                 transactionManager.recordTransaction(payment);
+                
+                // Mark any unpaid rentals as pending (awaiting cash payment at counter)
+                List<Rental> customerRentals = rentalManager.getAllRentals().stream()
+                    .filter(r -> r.getCustomerId() == Integer.parseInt(currentCustomer.getCustomerID().substring(1)))
+                    .toList();
+                
+                for (Rental rental : customerRentals) {
+                    if ("Unpaid".equals(rental.getPaymentStatus())) {
+                        rental.setPaymentStatus("Pending");
+                        rentalManager.updateRental(rental);
+                        System.out.println("✅ Rental " + rental.getRentalId() + " marked as Pending (awaiting cash payment)");
+                    }
+                }
+                
                 System.out.println("📄 PAYMENT SLIP GENERATED");
                 System.out.println("=".repeat(50));
                 System.out.println("Please complete payment at the counter when you arrive.");
