@@ -866,7 +866,11 @@ public class HillClimmer {
                 System.out.println("🏔️ Ready to explore Malaysia's hill climbing adventures?");
                 
                 // Update rental statuses based on current date
-                rentalManager.updateRentalStatuses();
+                try {
+                    rentalManager.updateRentalStatuses();
+                } catch (Exception e) {
+                    System.err.println("⚠️  Warning: Error updating rental statuses on login: " + e.getMessage());
+                }
                 
                 // Generate reminders for rentals ending within 1 day
                 durationManager.generateOneDayReturnReminders();
@@ -2034,20 +2038,29 @@ public class HillClimmer {
                 // NOTE: Rental payments do NOT affect outstanding balance
                 // Outstanding balance is only for separate debt payments, not rental costs
                 
-                // Update rental payment status to Paid
-                Rental rental = rentalManager.getRentalById(rentalId);
-                if (rental != null) {
-                    rental.setPaymentStatus("Paid");
-                    // Update rental status based on dates now that payment is successful
-                    rentalManager.updateRentalStatuses();
-                    
-                    // Create rental period now that payment is successful
-                    // Use a default daily rate since vehicle details are not easily accessible here
-                    double dailyRate = 50.0; // Default rate, can be improved later
-                    durationManager.createBasicRentalPeriod(rentalId, rental.getStartDate(), rental.getEndDate(), dailyRate);
-                    
-                    // Mark return reminder as completed since payment is successful
-                    durationManager.markReminderCompleted(rentalId, "RETURN");
+                try {
+                    // Update rental payment status to Paid
+                    Rental rental = rentalManager.getRentalById(rentalId);
+                    if (rental != null) {
+                        rental.setPaymentStatus("Paid");
+                        rentalManager.updateRental(rental); // Save the payment status change to CSV!
+                        
+                        // Update rental status based on dates now that payment is successful
+                        rentalManager.updateRentalStatuses();
+                        
+                        // Create rental period now that payment is successful
+                        // Use a default daily rate since vehicle details are not easily accessible here
+                        double dailyRate = 50.0; // Default rate, can be improved later
+                        durationManager.createBasicRentalPeriod(rentalId, rental.getStartDate(), rental.getEndDate(), dailyRate);
+                        
+                        // Mark return reminder as completed since payment is successful
+                        durationManager.markReminderCompleted(rentalId, "RETURN");
+                    } else {
+                        System.err.println("⚠️  Warning: Rental ID " + rentalId + " not found after successful payment. Status update skipped.");
+                    }
+                } catch (Exception e) {
+                    System.err.println("⚠️  Warning: Error updating rental status after payment: " + e.getMessage());
+                    e.printStackTrace();
                 }
                 
                 System.out.println("✅ Payment of RM" + String.format("%.2f", amount) + " processed successfully!");
@@ -2104,7 +2117,7 @@ public class HillClimmer {
 
         } catch (Exception e) {
             System.out.println("❌ Payment failed: " + e.getMessage());
-            e.printStackTrace(); // Add this for debugging
+            e.printStackTrace(); 
             pauseForUserConfirmation();
         }
     }
@@ -2653,8 +2666,12 @@ public class HillClimmer {
                         }
                     }
                     
-                    // Update rental statuses after marking rentals as paid
-                    rentalManager.updateRentalStatuses();
+                    try {
+                        // Update rental statuses after marking rentals as paid
+                        rentalManager.updateRentalStatuses();
+                    } catch (Exception e) {
+                        System.err.println("⚠️  Warning: Error updating rental statuses for outstanding balance payment: " + e.getMessage());
+                    }
 
                     System.out.println("💰 Outstanding balance updated successfully!");
                     pauseForUserConfirmation();
@@ -2702,6 +2719,13 @@ public class HillClimmer {
                         rental.setPaymentStatus("Paid");
                         rentalManager.updateRental(rental);
                     }
+                }
+                
+                try {
+                    // Update rental statuses after marking rentals as paid
+                    rentalManager.updateRentalStatuses();
+                } catch (Exception e) {
+                    System.err.println("⚠️  Warning: Error updating rental statuses for outstanding balance payment: " + e.getMessage());
                 }
                 
                 customerDAO.update(currentCustomer);
@@ -3322,17 +3346,6 @@ public class HillClimmer {
             }
 
             // Remove customer
-            System.out.println("DEBUG: Attempting to delete customer with ID: '" + customerToRemove.getCustomerID() + "'");
-            System.out.println("DEBUG: ID length: " + customerToRemove.getCustomerID().length());
-            System.out.println("DEBUG: Working directory: " + System.getProperty("user.dir"));
-            
-            // Check if customer exists before deletion
-            Customer checkBefore = customerDAO.load(customerToRemove.getCustomerID());
-            System.out.println("DEBUG: Customer exists before deletion: " + (checkBefore != null));
-            if (checkBefore != null) {
-                System.out.println("DEBUG: Found customer: '" + checkBefore.getCustomerID() + "' - '" + checkBefore.getName() + "'");
-            }
-            
             customerDAO.delete(customerToRemove.getCustomerID());
             
             // Verify deletion
@@ -3516,8 +3529,12 @@ public class HillClimmer {
                 if (adminRental != null) {
                     adminRental.setPaymentStatus("Paid");
                     rentalManager.updateRental(adminRental);
-                    // Update rental status based on dates now that payment is successful
-                    rentalManager.updateRentalStatuses();
+                    try {
+                        // Update rental status based on dates now that payment is successful
+                        rentalManager.updateRentalStatuses();
+                    } catch (Exception e) {
+                        System.err.println("⚠️  Warning: Error updating rental status for admin rental: " + e.getMessage());
+                    }
                 }
 
                 // Create rental period for admin-created rentals (considered paid)
@@ -3751,8 +3768,12 @@ public class HillClimmer {
                 // Update rental status to "Paid"
                 selectedRental.setPaymentStatus("Paid");
                 rentalManager.updateRental(selectedRental);
-                // Update rental status based on dates now that payment is successful
-                rentalManager.updateRentalStatuses();
+                try {
+                    // Update rental status based on dates now that payment is successful
+                    rentalManager.updateRentalStatuses();
+                } catch (Exception e) {
+                    System.err.println("⚠️  Warning: Error updating rental status for cash payment: " + e.getMessage());
+                }
 
                 // Create rental period now that payment is successful
                 double dailyRate = 50.0; // Default rate, can be improved later
@@ -3764,9 +3785,7 @@ public class HillClimmer {
 
                 // Update customer's outstanding balance
                 Customer customer = customerDAO.load(customerId);
-                System.out.println("DEBUG: Looking for customer ID: " + customerId);
                 if (customer != null) {
-                    System.out.println("DEBUG: Found customer: " + customer.getName());
                     double currentBalance = customer.getOutstandingBalance();
                     double newBalance = Math.max(0, currentBalance - selectedRental.getTotalCost());
                     customer.setOutstandingBalance(newBalance);
@@ -3775,7 +3794,6 @@ public class HillClimmer {
                     // Refresh currentCustomer if they're logged in (to update displayed balance)
                     if (currentCustomer != null && currentCustomer.getCustomerID().equals(customerId)) {
                         currentCustomer = customerDAO.load(customerId);
-                        System.out.println("DEBUG: Refreshed currentCustomer balance to: RM" + String.format("%.2f", currentCustomer.getOutstandingBalance()));
                     }
 
                     System.out.println("✅ Cash payment processed successfully!");
