@@ -9,9 +9,10 @@ import java.time.LocalDate;
  * Test to verify rental status update functionality based on current date
  *
  * Status definitions:
- * - Upcoming: startDate > today (pre-booking)
- * - Active: startDate <= today AND endDate >= today (ongoing)
- * - End: endDate < today (completed)
+ * - Pending: Created but not paid yet (paymentStatus != "Paid")
+ * - Upcoming: Paid and startDate > today (pre-booking)
+ * - Active: Paid and startDate <= today AND endDate >= today (ongoing)
+ * - End: Paid and endDate < today (completed)
  */
 public class RentalStatusUpdateTest {
 
@@ -40,18 +41,21 @@ public class RentalStatusUpdateTest {
             Rental upcomingRental = new Rental(0, 999, 1,
                 today.plusDays(5), today.plusDays(7), 150.0);
             upcomingRental.setStatus("Active"); // Set wrong status initially
+            upcomingRental.setPaymentStatus("Paid"); // Set as paid for testing
             rentalDAO.save(upcomingRental);
 
             // Test Case 2: Active rental (started in past, ends in future)
             Rental activeRental = new Rental(0, 999, 2,
                 today.minusDays(2), today.plusDays(2), 200.0);
             activeRental.setStatus("Upcoming"); // Set wrong status initially
+            activeRental.setPaymentStatus("Paid"); // Set as paid for testing
             rentalDAO.save(activeRental);
 
             // Test Case 3: Ended rental (ended in past)
             Rental endedRental = new Rental(0, 999, 3,
                 today.minusDays(5), today.minusDays(1), 120.0);
             endedRental.setStatus("Active"); // Set wrong status initially
+            endedRental.setPaymentStatus("Paid"); // Set as paid for testing
             rentalDAO.save(endedRental);
 
             System.out.println("\n📝 Created test rentals with incorrect initial statuses");

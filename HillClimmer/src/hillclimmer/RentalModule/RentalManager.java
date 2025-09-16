@@ -163,9 +163,10 @@ public class RentalManager {
 
     /**
      * Updates rental statuses based on current date:
-     * - Upcoming: startDate > today (pre-booking)
-     * - Active: startDate <= today and endDate >= today (ongoing)
-     * - End: endDate < today (completed)
+     * - Pending: Created but not paid yet (paymentStatus != "Paid")
+     * - Upcoming: Paid and startDate > today (pre-booking)
+     * - Active: Paid and startDate <= today and endDate >= today (ongoing)
+     * - End: Paid and endDate < today (completed)
      */
     public void updateRentalStatuses() {
         List<Rental> allRentals = rentalDAO.getAll();
@@ -176,12 +177,18 @@ public class RentalManager {
             String currentStatus = rental.getStatus();
             String newStatus = currentStatus;
 
-            if (rental.getStartDate().isAfter(today)) {
-                newStatus = "Upcoming";
-            } else if (rental.getEndDate().isBefore(today)) {
-                newStatus = "End";
+            // If rental is not paid, it should be Pending
+            if (!"Paid".equals(rental.getPaymentStatus())) {
+                newStatus = "Pending";
             } else {
-                newStatus = "Active";
+                // For paid rentals, determine status based on dates
+                if (rental.getStartDate().isAfter(today)) {
+                    newStatus = "Upcoming";
+                } else if (rental.getEndDate().isBefore(today)) {
+                    newStatus = "End";
+                } else {
+                    newStatus = "Active";
+                }
             }
 
             if (!currentStatus.equals(newStatus)) {

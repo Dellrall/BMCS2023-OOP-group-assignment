@@ -28,7 +28,7 @@ public class Rental {
         this.endDate = endDate;
         this.totalCost = totalCost;
         this.paymentStatus = "Unpaid"; // Default status
-        this.status = "Upcoming"; // Default status for new rentals
+        this.status = "Pending"; // Default status for new rentals - waiting for payment
     }
     
     // Getters

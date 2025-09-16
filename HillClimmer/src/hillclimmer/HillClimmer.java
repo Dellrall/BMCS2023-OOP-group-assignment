@@ -640,6 +640,15 @@ public class HillClimmer {
                 System.out.println("   ⚠️ Sample customer creation skipped (may already exist): " + e.getMessage());
             }
 
+            // Update rental statuses based on current date at startup
+            try {
+                rentalManager = new RentalManager(); // Initialize rental manager for status updates
+                rentalManager.updateRentalStatuses();
+                System.out.println("   ✅ Rental statuses updated based on current date");
+            } catch (Exception e) {
+                System.out.println("   ⚠️ Rental status update skipped: " + e.getMessage());
+            }
+
             System.out.println("✅ System initialization completed successfully");
 
         } catch (RuntimeException e) {
@@ -1915,13 +1924,8 @@ public class HillClimmer {
             Rental newRental = rentalManager.getRentalById(rentalId);
             if (newRental != null) {
                 newRental.setPaymentStatus("Unpaid");
-                // Set initial rental status based on start date
-                LocalDate today = LocalDate.now();
-                if (newRental.getStartDate().isAfter(today)) {
-                    newRental.setStatus("Upcoming");
-                } else {
-                    newRental.setStatus("Active");
-                }
+                // Set initial rental status to Pending - waiting for payment
+                newRental.setStatus("Pending");
                 rentalManager.updateRental(newRental);
             }
 
@@ -2034,9 +2038,8 @@ public class HillClimmer {
                 Rental rental = rentalManager.getRentalById(rentalId);
                 if (rental != null) {
                     rental.setPaymentStatus("Paid");
-                    // Set rental status to Active since payment is successful
-                    rental.setStatus("Active");
-                    rentalManager.updateRental(rental);
+                    // Update rental status based on dates now that payment is successful
+                    rentalManager.updateRentalStatuses();
                     
                     // Create rental period now that payment is successful
                     // Use a default daily rate since vehicle details are not easily accessible here
@@ -3510,6 +3513,8 @@ public class HillClimmer {
                 if (adminRental != null) {
                     adminRental.setPaymentStatus("Paid");
                     rentalManager.updateRental(adminRental);
+                    // Update rental status based on dates now that payment is successful
+                    rentalManager.updateRentalStatuses();
                 }
 
                 // Create rental period for admin-created rentals (considered paid)
@@ -3743,6 +3748,8 @@ public class HillClimmer {
                 // Update rental status to "Paid"
                 selectedRental.setPaymentStatus("Paid");
                 rentalManager.updateRental(selectedRental);
+                // Update rental status based on dates now that payment is successful
+                rentalManager.updateRentalStatuses();
 
                 // Create rental period now that payment is successful
                 double dailyRate = 50.0; // Default rate, can be improved later
