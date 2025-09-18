@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" version="28.2.3">
   <diagram name="Page-1" id="KUWia0mi56MD-sfbcHVG">
-    <mxGraphModel dx="6627" dy="190" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="13757" dy="4060" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -180,7 +180,7 @@
           <mxGeometry y="26" width="380" height="144" as="geometry" />
         </mxCell>
         <mxCell id="6XG5QplGx-Yt1XKf_cvf-49" value="DurationManager" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=20;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="-3330" y="5400" width="630" height="580" as="geometry" />
+          <mxGeometry x="-610" y="4720" width="630" height="580" as="geometry" />
         </mxCell>
         <mxCell id="6XG5QplGx-Yt1XKf_cvf-50" value="- nextPeriodId : int&lt;br&gt;- nextReminderId : int&lt;br&gt;- periodLock : Object&lt;br&gt;- reminderLock : Object&lt;br&gt;- reminders : List&amp;lt;Reminder&amp;gt;&lt;br&gt;- rentalPeriods : List&amp;lt;RentalPeriod&amp;gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="6XG5QplGx-Yt1XKf_cvf-49" vertex="1">
           <mxGeometry y="20" width="630" height="100" as="geometry" />
@@ -191,8 +191,15 @@
         <mxCell id="6XG5QplGx-Yt1XKf_cvf-52" value="+DurationManager()&lt;br&gt;+addReminder (Reminder reminder) addRentalPeriod(RentalPeriod period)&lt;br&gt;+cancelRentalPeriod(int periodld)&lt;br&gt;+completeRentalPeriod (int periodld)&lt;br&gt;+createBasicRentalPeriod (int rentalld, LocalDate startDate, LocalDate endDate, double dailyRate): RentalPeriod&lt;div&gt;+createInsuredRentalPeriod (int rentalld, LocalDate startDate, LocalDate endDate, double dailyRate):&amp;nbsp;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;RentalPeriod&lt;br&gt;+createMaintenanceReminder (int vehicleld, LocalDateTime&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;maintenance Date, String maintenance Type) : Reminder&lt;/span&gt;&lt;/div&gt;&lt;div&gt;+ createPaymentReminder (int customerld, LocalDateTime paymentDate, double&amp;nbsp;amount) : Reminder&lt;br&gt;+ createReturnReminder (int rentalld, LocalDate Time&amp;nbsp;returnDate) : Reminder&lt;br&gt;+ extendRentalPeriod (int periodld, int additionalDays)&lt;br&gt;+generateOneDayReturn Reminders()&lt;br&gt;+ generateReturn RemindersForActivePeriods() getActiveRentalPeriods(): List&amp;lt;RentalPeriod&amp;gt;&lt;br&gt;+getAllReminders(): List&amp;lt;Reminder&amp;gt;&lt;br&gt;+ getAllRentalPeriods(): List&amp;lt;RentalPeriod&amp;gt;&lt;br&gt;+ getOverdueReminders(): List&amp;lt;Reminder&amp;gt;&lt;br&gt;+ getOverdueRentalPeriods(): List&amp;lt;RentalPeriod&amp;gt;&lt;br&gt;+ getPendingReminders(): List&amp;lt;Reminder&amp;gt;&lt;br&gt;+ getPendingReminders For Customer(int customerld): List&amp;lt;Reminder&amp;gt;&lt;br&gt;+ getRemindersByType(String type): List&amp;lt;Reminder&amp;gt;&lt;br&gt;+ getRemindersDueSoon(): List&amp;lt;Reminder&amp;gt;&lt;br&gt;+ getRentalPeriodByld(int periodld): RentalPeriod&lt;br&gt;+ getRentalPeriodsByRentalld(int rentalld): List&amp;lt;RentalPeriod&amp;gt;&lt;br&gt;+ getRentalPeriods EndingSoon(): List&amp;lt;RentalPeriod&amp;gt;&lt;br&gt;+ getTotalActiveReminders() : int&lt;br&gt;+ getTotalActiveRentalPeriods() : int&lt;br&gt;+ getTotalRevenueFromActivePeriods() : double&lt;br&gt;+ markReminder AsCompleted (int reminderld)&lt;br&gt;+ markReminderAsSent(int reminderld)&lt;br&gt;+ markReminderCompleted (int associatedld, String reminder Type)&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="6XG5QplGx-Yt1XKf_cvf-49" vertex="1">
           <mxGeometry y="128" width="630" height="452" as="geometry" />
         </mxCell>
+        <mxCell id="ceyopC86vSADz4O9Ktu8-118" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" edge="1" parent="1" source="6XG5QplGx-Yt1XKf_cvf-53" target="6XG5QplGx-Yt1XKf_cvf-28">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-820" y="4350" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
         <mxCell id="6XG5QplGx-Yt1XKf_cvf-53" value="Reminder" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="-3800" y="6060" width="570" height="580" as="geometry" />
+          <mxGeometry x="-1460" y="4980" width="570" height="580" as="geometry" />
         </mxCell>
         <mxCell id="6XG5QplGx-Yt1XKf_cvf-54" value="- associatedld: int&lt;br&gt;- createdDate: LocalDateTime&lt;br&gt;- dueDate: LocalDateTime&lt;br&gt;- message: String&lt;br&gt;- priority: String&lt;br&gt;- reminderld: int&lt;br&gt;- reminder Type : String&lt;br&gt;- status: String" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="6XG5QplGx-Yt1XKf_cvf-53" vertex="1">
           <mxGeometry y="26" width="570" height="124" as="geometry" />
@@ -204,7 +211,7 @@
           <mxGeometry y="158" width="570" height="422" as="geometry" />
         </mxCell>
         <mxCell id="6XG5QplGx-Yt1XKf_cvf-58" value="RentalPeriod" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="-2960" y="6180" width="450" height="750" as="geometry" />
+          <mxGeometry x="200" y="4940" width="450" height="750" as="geometry" />
         </mxCell>
         <mxCell id="6XG5QplGx-Yt1XKf_cvf-59" value="- createdDate: LocalDateTime dailyRate: double&lt;br&gt;- endDate: LocalDate&lt;br&gt;- includesInsurance : boolean&lt;br&gt;- notes: String&lt;br&gt;- periodld: int&lt;br&gt;- rentalld: int&lt;br&gt;- startDate: LocalDate&lt;br&gt;- status: String&lt;br&gt;- totalCost: double" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="6XG5QplGx-Yt1XKf_cvf-58" vertex="1">
           <mxGeometry y="26" width="450" height="144" as="geometry" />
@@ -609,6 +616,43 @@
         </mxCell>
         <mxCell id="ceyopC86vSADz4O9Ktu8-111" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.517;entryY=0.017;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=12;startSize=8;endSize=8;" edge="1" parent="1" source="ceyopC86vSADz4O9Ktu8-17" target="ceyopC86vSADz4O9Ktu8-27">
           <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ceyopC86vSADz4O9Ktu8-114" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.552;entryY=1.006;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=12;startSize=8;endSize=8;" edge="1" parent="1" source="ceyopC86vSADz4O9Ktu8-30" target="ceyopC86vSADz4O9Ktu8-13">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="190" y="4780" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ceyopC86vSADz4O9Ktu8-115" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1.004;entryY=0.171;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=12;startSize=8;endSize=8;" edge="1" parent="1" source="6XG5QplGx-Yt1XKf_cvf-52" target="6XG5QplGx-Yt1XKf_cvf-56">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ceyopC86vSADz4O9Ktu8-116" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" edge="1" parent="1" source="6XG5QplGx-Yt1XKf_cvf-52" target="6XG5QplGx-Yt1XKf_cvf-61">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ceyopC86vSADz4O9Ktu8-117" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.286;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=12;startSize=8;endSize=8;" edge="1" parent="1" source="ceyopC86vSADz4O9Ktu8-36" target="6XG5QplGx-Yt1XKf_cvf-49">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="810" y="3330" />
+              <mxPoint x="520" y="3660" />
+              <mxPoint x="-400" y="3910" />
+              <mxPoint x="-650" y="4430" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ceyopC86vSADz4O9Ktu8-120" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" edge="1" parent="1" source="ceyopC86vSADz4O9Ktu8-13" target="6XG5QplGx-Yt1XKf_cvf-10">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-3210" y="5270" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ceyopC86vSADz4O9Ktu8-121" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.478;entryY=1.055;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=12;startSize=8;endSize=8;" edge="1" parent="1" source="6XG5QplGx-Yt1XKf_cvf-61" target="6XG5QplGx-Yt1XKf_cvf-18">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-2380" y="6800" />
+            </Array>
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>
