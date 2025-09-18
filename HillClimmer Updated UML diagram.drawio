@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" version="28.2.3">
   <diagram name="Page-1" id="KUWia0mi56MD-sfbcHVG">
-    <mxGraphModel dx="4340" dy="3260" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="6320" dy="4880" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -28,17 +28,29 @@
         <mxCell id="1-GLfwU_gdSAN0xT_Nue-4" value="+ Customer(String customerID, String name, String icNumber, String phoneNo, String email, String licenseType, LocalDate licenseExpiryDate, int age, String password)&lt;br&gt;+ getters&lt;br&gt;+ setters&lt;br&gt;+ authenticate(String inputPassword) : boolean&lt;br&gt;+ authenticatePassword(String inputPassword) : boolean&lt;br&gt;+ clearPlainPassword()&lt;br&gt;- generateSalt() : String&lt;br&gt;- hashPassword(String password, String salt) : String&lt;br&gt;+ isActive() : boolean&lt;br&gt;+ isLicenseValid() : boolean&lt;br&gt;+ isSafetyCheckPassed() : boolean&lt;br&gt;+ isValidIC(String icNumber) : boolean&lt;div&gt;+ isValidLicenseType(String licenseType) : boolean&lt;br&gt;+ isValidMalaysianPhone(String phoneInput) : boolean&lt;br&gt;+ isValidMalaysianPhoneInput(String phoneInput) : String&lt;br&gt;+ isValidPassword(String password) : boolean&lt;br&gt;+ normalizeMalaysianPhone(String phoneInput) : String&lt;br&gt;+ setActive(boolean active)&lt;br&gt;+ toString() : String Object&lt;br&gt;+ updatePassword(String newPassword)&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="1-GLfwU_gdSAN0xT_Nue-1">
           <mxGeometry y="368" width="400" height="332" as="geometry" />
         </mxCell>
-        <mxCell id="1-GLfwU_gdSAN0xT_Nue-5" value="Classname" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="-720" y="505" width="160" height="86" as="geometry" />
+        <mxCell id="1-GLfwU_gdSAN0xT_Nue-5" value="SafetyCheck" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-720" y="330" width="380" height="320" as="geometry" />
         </mxCell>
-        <mxCell id="1-GLfwU_gdSAN0xT_Nue-6" value="+ field: type" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="1-GLfwU_gdSAN0xT_Nue-5">
-          <mxGeometry y="26" width="160" height="26" as="geometry" />
+        <mxCell id="1-GLfwU_gdSAN0xT_Nue-6" value="- PENALTY_QUESTIONS : String[][]&lt;br&gt;- SANITY_QUESTIONS : String[][]&lt;br&gt;- TRAFFIC_QUESTIONS : String[][]&lt;br&gt;- USAGE_QUESTIONS : String[][]&lt;br&gt;- checkID : String&lt;br&gt;- completedDate : Date&lt;br&gt;- customerID : String&lt;br&gt;- passed : boolean&lt;br&gt;- score : int&lt;br&gt;- totalQuestions : int&lt;br&gt;- wrongAnswers : List&amp;lt;String&amp;gt;&lt;div&gt;&lt;br/&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="1-GLfwU_gdSAN0xT_Nue-5">
+          <mxGeometry y="26" width="380" height="174" as="geometry" />
         </mxCell>
         <mxCell id="1-GLfwU_gdSAN0xT_Nue-7" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="1-GLfwU_gdSAN0xT_Nue-5">
-          <mxGeometry y="52" width="160" height="8" as="geometry" />
+          <mxGeometry y="200" width="380" height="8" as="geometry" />
         </mxCell>
-        <mxCell id="1-GLfwU_gdSAN0xT_Nue-8" value="+ method(type): type" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="1-GLfwU_gdSAN0xT_Nue-5">
-          <mxGeometry y="60" width="160" height="26" as="geometry" />
+        <mxCell id="1-GLfwU_gdSAN0xT_Nue-8" value="+ SafetyCheck(String customerID)&lt;br&gt;+ conductSafetyCheck() : boolean&lt;br&gt;- displayResults()&lt;br&gt;+ getters()&lt;br&gt;+ setters()&lt;br&gt;+ isPassed() : boolean&lt;br&gt;+ validateSafetyCheckStatus(boolean safetyCheckPassed) : boolean&lt;br&gt;&lt;br&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="1-GLfwU_gdSAN0xT_Nue-5">
+          <mxGeometry y="208" width="380" height="112" as="geometry" />
+        </mxCell>
+        <mxCell id="1-GLfwU_gdSAN0xT_Nue-9" value="Questions" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-680" y="820" width="350" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="1-GLfwU_gdSAN0xT_Nue-10" value="+ correctAnswer : String&lt;br&gt;+ options : String[]&lt;br&gt;+ questionText : String&lt;br&gt;+ sectionName : String&lt;br&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="1-GLfwU_gdSAN0xT_Nue-9">
+          <mxGeometry y="26" width="350" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="1-GLfwU_gdSAN0xT_Nue-11" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="1-GLfwU_gdSAN0xT_Nue-9">
+          <mxGeometry y="90" width="350" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="1-GLfwU_gdSAN0xT_Nue-12" value="+ Question(String questionText, String[] options, String correctAnswer, String sectionName)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="1-GLfwU_gdSAN0xT_Nue-9">
+          <mxGeometry y="98" width="350" height="42" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
