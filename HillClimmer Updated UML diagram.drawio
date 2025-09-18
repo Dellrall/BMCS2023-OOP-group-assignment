@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" version="28.2.3">
   <diagram name="Page-1" id="KUWia0mi56MD-sfbcHVG">
-    <mxGraphModel dx="4050" dy="3680" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="3832" dy="2507" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -87,6 +87,12 @@
         </mxCell>
         <mxCell id="6XG5QplGx-Yt1XKf_cvf-16" value="+ Manager(String managerID, String name,&amp;nbsp; int authorizationLevel)&lt;br&gt;+authenticatePassword(String InputPassword) : boolean&lt;br&gt;- generateSalt() : String&lt;br&gt;+ getters&lt;br&gt;+ setters&lt;br&gt;+ hasPermission(String action) : boolean&lt;br&gt;- hashPassword(String password, String salt): String&lt;br&gt;+ isValidPassword(String password) : boolean&lt;br&gt;+ toString() : String Object&lt;br&gt;+ updatePassword(String newPassword)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="6XG5QplGx-Yt1XKf_cvf-13">
           <mxGeometry y="148" width="300" height="182" as="geometry" />
+        </mxCell>
+        <mxCell id="6XG5QplGx-Yt1XKf_cvf-17" value="ManagerDAO" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-2100" y="860" width="340" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="6XG5QplGx-Yt1XKf_cvf-18" value="+ ManagerDAO()&lt;br&gt;+ authenticate(String managerID, String password): Manager&lt;br&gt;# csvToObject(String csvLine) : Manager DataAccessObject&amp;lt;T&amp;gt;&lt;br&gt;+ findById(String managerID) : Manager&lt;br&gt;+ getAllManagers() : List&amp;lt;Manager&amp;gt;&lt;br&gt;# getId(Manager manager) : String DataAccessObject&amp;lt;T&amp;gt;&lt;br&gt;# objectToCSV(Manager manager) : String DataAccessObject&amp;lt;T&amp;gt;&lt;br&gt;- parseCSVLine(String line) : String[]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="6XG5QplGx-Yt1XKf_cvf-17">
+          <mxGeometry y="26" width="340" height="154" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
