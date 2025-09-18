@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" version="28.2.3">
   <diagram name="Page-1" id="KUWia0mi56MD-sfbcHVG">
-    <mxGraphModel dx="4313" dy="4135" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="3036" dy="2734" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -165,6 +165,18 @@
         </mxCell>
         <mxCell id="6XG5QplGx-Yt1XKf_cvf-61" value="&lt;div class=&quot;js-append-result-card p-4 w-full&quot;&gt;&lt;div class=&quot;result-card mt-2 js-result-card-0&quot;&gt;&lt;div class=&quot;py-3 w-full js-single-img-preview border border-borderColor rounded-xl animate-fadeInTop&quot;&gt;&lt;div data-index=&quot;0&quot; class=&quot;js-result-text-area-0 max-h-24 overflow-y-auto p-4 pt-0 break-words js-show-after-result-0&quot;&gt;+ RentalPeriod()&lt;br&gt;+ RentalPeriod(int periodld, int rentalld, LocalDate startDate, LocalDate &lt;br/&gt;endDate, double dailyRate, boolean includesInsurance) calculate &lt;br/&gt;TotalCost(): double&lt;br&gt;+ cancelPeriod()&lt;br&gt;+ completePeriod()&lt;br&gt;+ createBasicRental(int rentalld, LocalDate startDate, LocalDate endDate, double dailyRate): RentalPeriod&lt;br&gt;+ createInsuredRental(int rentalld, LocalDate startDate, LocalDate endDate, double dailyRate): RentalPeriod&lt;br&gt;+ extendPeriod (LocalDate newEndDate)&lt;br&gt;+ extendPeriod(int additionalDays)&lt;br&gt;+ getCreatedDate(): LocalDateTime&lt;br&gt;+ getDailyRate(): double&lt;br&gt;+ getDurationInDays(): long&lt;br&gt;+ getDurationInHours() : long&lt;br&gt;+ getEndDate(): LocalDate getNotes(): String&lt;br&gt;+ getPeriodld(): int&lt;br&gt;+ getRemainingCost(): double&lt;br&gt;+ getRentalld() : int&lt;br&gt;+ getStartDate(): LocalDate&lt;br&gt;+ getStatus(): String&lt;br&gt;+ getTotalCost(): double&lt;br&gt;+ isActive(): boolean&lt;br&gt;+ isEndingSoon(): boolean&lt;br&gt;+ isEndingWithinOneDay(): boolean&lt;br&gt;+ isIncludesInsurance() : boolean&lt;br&gt;+ isOverdue(): boolean&lt;br&gt;+ isStartingSoon(): boolean&lt;br&gt;+ setDailyRate (double dailyRate)&lt;br&gt;+ setEndDate (LocalDate endDate)&lt;br&gt;+ setIncludesInsurance (boolean includesInsurance)&lt;br&gt;+ setNotes(String notes)&lt;br&gt;+ setPeriodld(int periodld)&lt;br&gt;+ setRentalld(int rentalld)&lt;br&gt;+ setStartDate(LocalDate startDate)&lt;br&gt;+ setStatus(String status)&lt;br&gt;+ toString(): String ↑ Object&lt;/div&gt;&lt;br/&gt;            &lt;/div&gt;&lt;br/&gt;        &lt;/div&gt;&lt;/div&gt;&lt;br/&gt;                                                                &lt;div class=&quot;w-full border-t border-[#D9D9D9]&quot;&gt;&lt;br/&gt;    &lt;div class=&quot;rounded-lg bg-[#F1F1F1] text-center feedback_section p-4 m-4&quot;&gt;&lt;br/&gt;        &lt;h3 class=&quot;text-[#161618] text-lg font-semibold close_on_form&quot;&gt;&lt;/h3&gt;&lt;/div&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="6XG5QplGx-Yt1XKf_cvf-58">
           <mxGeometry y="178" width="450" height="572" as="geometry" />
+        </mxCell>
+        <mxCell id="6XG5QplGx-Yt1XKf_cvf-62" value="Classname" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="630" y="50" width="160" height="86" as="geometry" />
+        </mxCell>
+        <mxCell id="6XG5QplGx-Yt1XKf_cvf-63" value="+ field: type" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="6XG5QplGx-Yt1XKf_cvf-62">
+          <mxGeometry y="26" width="160" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="6XG5QplGx-Yt1XKf_cvf-64" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="6XG5QplGx-Yt1XKf_cvf-62">
+          <mxGeometry y="52" width="160" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="6XG5QplGx-Yt1XKf_cvf-65" value="+ method(type): type" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="6XG5QplGx-Yt1XKf_cvf-62">
+          <mxGeometry y="60" width="160" height="26" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
