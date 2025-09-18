@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" version="28.2.3">
   <diagram name="Page-1" id="KUWia0mi56MD-sfbcHVG">
-    <mxGraphModel dx="3191" dy="2904" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2886" dy="2569" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -225,6 +225,33 @@
         </mxCell>
         <mxCell id="ceyopC86vSADz4O9Ktu8-17" value="&lt;div&gt;+ OnlineBankingPayment(String paymentID, double totalAmount, String timestamp, String customerID) &lt;br&gt;- generateOTP(): String&lt;/div&gt;&lt;div&gt;- generatePaymentSlip() : String&lt;/div&gt;&lt;div&gt;- getBankName(int choice) : String&lt;/div&gt;&lt;div&gt;- getMaskedInput(): String&lt;/div&gt;&lt;div&gt;- getUserInput() : String&lt;/div&gt;&lt;div&gt;+ normalizeUsername(String usernameInput) : String&lt;/div&gt;&lt;div&gt;+ processPayment() ↑ Payment&lt;/div&gt;&lt;div&gt;- verifyCredentials() : boolean&lt;/div&gt;&lt;div&gt;- verifyOTP(): boolean&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="ceyopC86vSADz4O9Ktu8-14">
           <mxGeometry y="148" width="520" height="172" as="geometry" />
+        </mxCell>
+        <mxCell id="ceyopC86vSADz4O9Ktu8-18" value="Payment" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="940" width="470" height="420" as="geometry" />
+        </mxCell>
+        <mxCell id="ceyopC86vSADz4O9Ktu8-19" value="# customerID: String&lt;br&gt;# paymentID: String&lt;br&gt;# paymentMethod: String&lt;br&gt;# paymentSlip: String&lt;br&gt;# paymentStatus: String&lt;br&gt;# referenceNumber : String&lt;br&gt;# timestamp: String&lt;br&gt;# totalAmount: double" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="ceyopC86vSADz4O9Ktu8-18">
+          <mxGeometry y="26" width="470" height="134" as="geometry" />
+        </mxCell>
+        <mxCell id="ceyopC86vSADz4O9Ktu8-20" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="ceyopC86vSADz4O9Ktu8-18">
+          <mxGeometry y="160" width="470" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="ceyopC86vSADz4O9Ktu8-21" value="+ Payment(String paymentID, double totalAmount, String paymentMethod, String paymentStatus, String timestamp, String customerID)&lt;br&gt;+ createPayment(String paymentType, String paymentID, double totalAmount, String timestamp, String customerID): Payment&amp;nbsp;&lt;div&gt;- generateReferenceNumber(): String&lt;br&gt;+ getCustomerID() : String&lt;br&gt;+ getPaymentDetails() : String&lt;br&gt;+ getPaymentID(): String&lt;br&gt;+ getPaymentMethod(): String&lt;br&gt;+ getPaymentSlip() : String&lt;br&gt;+ getPaymentStatus() : String&lt;br&gt;+ getReferenceNumber() : String&lt;br&gt;+ getTimestamp(): String&lt;br&gt;+ getTotalAmount() : double&lt;br&gt;+ processPayment()&lt;br&gt;+ refundPayment()&lt;br&gt;+ updateStatus(String newStatus)&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="ceyopC86vSADz4O9Ktu8-18">
+          <mxGeometry y="168" width="470" height="252" as="geometry" />
+        </mxCell>
+        <mxCell id="ceyopC86vSADz4O9Ktu8-26" value="«interface»&lt;br&gt;PaymentProcessor&lt;br&gt;+ cancelPayment()&lt;br&gt;+ getPaymentMethodName() : String&lt;br&gt;+ getPaymentStatus() : String&lt;br&gt;+ isInteractive() : boolean&lt;br&gt;+ processPayment(double amount) : Payment Result&lt;div&gt;+ validateAmount(double amount) : boolean&lt;br&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="1430" width="310" height="139" as="geometry" />
+        </mxCell>
+        <mxCell id="ceyopC86vSADz4O9Ktu8-27" value="PaymentResult" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1560" y="1820" width="550" height="86" as="geometry" />
+        </mxCell>
+        <mxCell id="ceyopC86vSADz4O9Ktu8-28" value="+ field: type" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="ceyopC86vSADz4O9Ktu8-27">
+          <mxGeometry y="26" width="550" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="ceyopC86vSADz4O9Ktu8-29" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="ceyopC86vSADz4O9Ktu8-27">
+          <mxGeometry y="52" width="550" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="ceyopC86vSADz4O9Ktu8-30" value="+ method(type): type" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="ceyopC86vSADz4O9Ktu8-27">
+          <mxGeometry y="60" width="550" height="26" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
