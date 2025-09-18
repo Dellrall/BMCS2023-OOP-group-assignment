@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" version="28.2.3">
   <diagram name="Page-1" id="KUWia0mi56MD-sfbcHVG">
-    <mxGraphModel dx="3054" dy="1653" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="3114" dy="1719" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -89,7 +89,7 @@
           <mxGeometry y="148" width="300" height="182" as="geometry" />
         </mxCell>
         <mxCell id="6XG5QplGx-Yt1XKf_cvf-17" value="ManagerDAO" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="-2100" y="860" width="340" height="180" as="geometry" />
+          <mxGeometry x="-2255" y="680" width="340" height="180" as="geometry" />
         </mxCell>
         <mxCell id="6XG5QplGx-Yt1XKf_cvf-18" value="+ ManagerDAO()&lt;br&gt;+ authenticate(String managerID, String password): Manager&lt;br&gt;# csvToObject(String csvLine) : Manager DataAccessObject&amp;lt;T&amp;gt;&lt;br&gt;+ findById(String managerID) : Manager&lt;br&gt;+ getAllManagers() : List&amp;lt;Manager&amp;gt;&lt;br&gt;# getId(Manager manager) : String DataAccessObject&amp;lt;T&amp;gt;&lt;br&gt;# objectToCSV(Manager manager) : String DataAccessObject&amp;lt;T&amp;gt;&lt;br&gt;- parseCSVLine(String line) : String[]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="6XG5QplGx-Yt1XKf_cvf-17">
           <mxGeometry y="26" width="340" height="154" as="geometry" />
@@ -99,6 +99,24 @@
         </mxCell>
         <mxCell id="6XG5QplGx-Yt1XKf_cvf-24" value="+ PaymentDAO()&lt;br&gt;# csvToObject(String csvLine) : Payment DataAccessObject&amp;lt;T&amp;gt;&lt;br&gt;# generateNewId(Payment payment, List&amp;lt;Payment&amp;gt; existingPayments) : Payment&lt;br&gt;DataAccessObject&amp;lt;T&amp;gt;&lt;br&gt;+ getByReferenceNumber(String referenceNumber) : Payment&lt;br&gt;# getId(Payment payment) String DataAccessObject&amp;lt;T&amp;gt;&lt;br&gt;+ getTotalEarnings() : double&lt;br&gt;# objectToCSV(Payment payment) : String DataAccessObject&amp;lt;T&amp;gt;&lt;br&gt;- searchByReferenceInRawData(String referenceNumber) : Payment" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="6XG5QplGx-Yt1XKf_cvf-21">
           <mxGeometry y="26" width="460" height="144" as="geometry" />
+        </mxCell>
+        <mxCell id="6XG5QplGx-Yt1XKf_cvf-25" value="ReminderDAO" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-2270" y="170" width="370" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="6XG5QplGx-Yt1XKf_cvf-28" value="+ ReminderDAO()&lt;br&gt;# csvToObject(String csvLine) : Reminder&amp;nbsp;&amp;nbsp;DataAccessObject&amp;lt;T&amp;gt;&lt;br&gt;# generateNewId(Reminder reminder, List&amp;lt;Reminder&amp;lt; existingReminders) :&amp;nbsp; Reminder&amp;nbsp;&amp;nbsp;DataAccessObject&amp;lt;T&amp;gt;&lt;br&gt;# getID(Reminder reminder) : String&amp;nbsp;&amp;nbsp;DataAccessObject&amp;lt;T&amp;gt;&lt;br&gt;+ getPendingReminders() : List &amp;lt;Reminder&amp;gt;&lt;br&gt;+ getRemindersByPriority(String priority): List&amp;lt;Reminder&amp;gt;&lt;br&gt;+ getRemindersByType(String type) : List&amp;lt;Reminder&amp;gt;&lt;br&gt;# objectToCSV(Reminder reminder) : String&amp;nbsp;&amp;nbsp;DataAccessObject&amp;lt;T&amp;gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="6XG5QplGx-Yt1XKf_cvf-25">
+          <mxGeometry y="26" width="370" height="144" as="geometry" />
+        </mxCell>
+        <mxCell id="6XG5QplGx-Yt1XKf_cvf-33" value="RentalDAO" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-2240" y="-231" width="360" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="6XG5QplGx-Yt1XKf_cvf-36" value="+ RentalDAO()&lt;br&gt;# csvToObject(String csvLine) : Rental&amp;nbsp;&amp;nbsp;DataAccessObject&amp;lt;T&amp;gt;&lt;br&gt;# generateNewId(Rental rental, List&amp;lt;Rental&amp;gt; existingRentals) : Rental&amp;nbsp;&amp;nbsp;DataAccessObject&amp;lt;T&amp;gt;&lt;br&gt;+ getActiveRentals(): List&amp;lt;Rental&amp;gt;&lt;br&gt;+ getActiveRentalsByCustomerId(int customerId) : List &amp;lt;Rental&amp;gt;&lt;br&gt;+ getAll(): List&amp;lt;Rental&amp;gt;&lt;br&gt;+ getByCustomerId(int customerId) : List&amp;lt;Rental&amp;gt;&lt;br&gt;+ getById(int rentalId) : Rental&lt;br&gt;+ getByVehicleId(int vehicleId) : List&amp;lt;Rental&amp;gt;&lt;br&gt;# getId(Rental rental) : String&amp;nbsp;&amp;nbsp;DataAccessObject&amp;lt;T&amp;gt;&lt;br&gt;# objectToCSV(Rental rental) : String&amp;nbsp;&amp;nbsp;DataAccessObject&amp;lt;T&amp;gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="6XG5QplGx-Yt1XKf_cvf-33">
+          <mxGeometry y="26" width="360" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="6XG5QplGx-Yt1XKf_cvf-37" value="RentalPeriodDAO" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-2230" y="968" width="420" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="6XG5QplGx-Yt1XKf_cvf-40" value="+ RentalPeriodDAO()&lt;br&gt;# csvToObject(String csvLine) : RentalPeriod&amp;nbsp;&amp;nbsp;DataAccessObject&amp;lt;T&amp;gt;&lt;br&gt;# generateNewId(RentalPeriod period, List&amp;lt;RentalPeriod&amp;gt; existingPeriods) : RentalPeriod&lt;br&gt;+ getActivePeriods() : List &amp;lt;RentalPeriod&amp;gt;&lt;br&gt;# getId(RentalPeriod period) : String&amp;nbsp;&amp;nbsp;DataAccessObject&amp;lt;T&amp;gt;&lt;br&gt;+ getOverduePeriods() : List &amp;lt;RentalPeriod&amp;gt;&lt;br&gt;+ getTotalRevenueFromActivePeriods() : double&lt;br&gt;# objectToCSV(RentalPeriod period) : String&amp;nbsp;&amp;nbsp;DataAccessObject&amp;lt;T&amp;gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="6XG5QplGx-Yt1XKf_cvf-37">
+          <mxGeometry y="26" width="420" height="144" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
